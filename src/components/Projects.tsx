@@ -50,10 +50,11 @@ const projectsData: Project[] = [
 
 const Projects = () => {
   return (
-    <section id="projects" className="py-20 bg-muted/30">
+    <section id="projects" className="py-20 bg-gradient-to-br from-white to-blue-50">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Projects</h2>
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl gradient-text mb-2">Projects</h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary to-blue-600 rounded mb-4"></div>
           <p className="mt-4 text-lg text-muted-foreground max-w-[700px]">
             A selection of my recent development work
           </p>
@@ -61,35 +62,39 @@ const Projects = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {projectsData.map((project, index) => (
-            <Card key={index} className="overflow-hidden border border-border/40 transition-all hover:shadow-md">
+            <Card 
+              key={index} 
+              className="card-hover overflow-hidden border-none shadow-lg"
+              style={{ animationDelay: `${index * 0.15}s` }}
+            >
               <div className="aspect-video w-full overflow-hidden">
                 <img 
                   src={project.image} 
                   alt={project.title}
-                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-110"
                 />
               </div>
               <CardHeader>
-                <CardTitle>{project.title}</CardTitle>
-                <CardDescription>{project.description}</CardDescription>
+                <CardTitle className="text-xl md:text-2xl">{project.title}</CardTitle>
+                <CardDescription className="text-base">{project.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {project.techStack.map((tech) => (
-                    <Badge key={tech} variant="secondary">{tech}</Badge>
+                    <Badge key={tech} variant="secondary" className="animate-pulse-slow">{tech}</Badge>
                   ))}
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" asChild className="group">
                   <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                    <Github size={16} />
+                    <Github size={16} className="group-hover:rotate-12 transition-transform" />
                     Code
                   </a>
                 </Button>
-                <Button size="sm" asChild>
+                <Button size="sm" asChild className="bg-gradient-to-r from-primary to-blue-600 hover:opacity-90 transition-opacity">
                   <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                    <ExternalLink size={16} />
+                    <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
                     Live Demo
                   </a>
                 </Button>
