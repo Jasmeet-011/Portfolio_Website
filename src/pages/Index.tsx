@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
+  const [scrollProgress, setScrollProgress] = useState(0);
   
   useEffect(() => {
     // Simulate page loading
@@ -16,7 +17,19 @@ const Index = () => {
       setLoading(false);
     }, 1000);
     
-    return () => clearTimeout(timer);
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+      const progress = (currentScroll / totalScroll) * 100;
+      setScrollProgress(progress);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
@@ -30,7 +43,7 @@ const Index = () => {
         <div className="flex flex-col items-center">
           <div className="h-16 w-16 relative">
             <div className="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-t-primary border-transparent rounded-full animate-spin"></div>
+            <div className="absolute inset-0 border-4 border-t-accent border-transparent rounded-full animate-spin"></div>
           </div>
           <p className="mt-4 text-lg animate-pulse gradient-text font-medium">Loading Portfolio</p>
         </div>
@@ -39,9 +52,9 @@ const Index = () => {
       {/* Scroll progress indicator */}
       <div className="fixed top-0 left-0 w-full h-1 z-50">
         <div 
-          className="h-full bg-gradient-to-r from-primary via-blue-500 to-purple-500" 
+          className="h-full bg-gradient-to-r from-primary via-accent to-blue-600" 
           style={{ 
-            width: `${typeof window !== 'undefined' ? (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100 : 0}%`,
+            width: `${scrollProgress}%`,
             transition: 'width 0.1s' 
           }}
         ></div>
@@ -59,8 +72,8 @@ const Index = () => {
       {/* Go to top button */}
       <button 
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-6 right-6 p-3 rounded-full bg-primary text-white shadow-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-primary/20 hover:scale-110 z-40 ${
-          typeof window !== 'undefined' && window.scrollY > 300 ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+        className={`fixed bottom-6 right-6 p-3 rounded-full bg-accent text-background shadow-lg shadow-accent/20 transition-all duration-300 hover:bg-accent/90 hover:shadow-accent/40 hover:scale-110 z-40 ${
+          scrollProgress > 20 ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
         }`}
         aria-label="Go to top"
       >

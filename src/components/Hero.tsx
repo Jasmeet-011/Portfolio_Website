@@ -23,20 +23,20 @@ const Hero = () => {
     <section id="about" className="min-h-screen flex flex-col justify-center pt-16 pb-10 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full filter blur-3xl animate-float"></div>
-      <div className="absolute -bottom-12 -left-12 w-72 h-72 bg-blue-500/5 rounded-full filter blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute -bottom-12 -left-12 w-72 h-72 bg-accent/5 rounded-full filter blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
       
       {/* Parallax elements */}
-      <div className="absolute top-20 left-10 w-4 h-4 bg-purple-400/30 rounded-full animate-pulse-slow"></div>
-      <div className="absolute top-40 right-20 w-3 h-3 bg-blue-400/20 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-20 left-10 w-4 h-4 bg-accent/30 rounded-full animate-pulse-slow"></div>
+      <div className="absolute top-40 right-20 w-3 h-3 bg-primary/20 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
       <div className="absolute bottom-20 left-1/4 w-6 h-6 bg-primary/10 rounded-full animate-float" style={{ animationDelay: '3s' }}></div>
       
       <div className="container px-4 md:px-6 relative z-10">
         <div className={`flex flex-col gap-8 ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}>
           <div>
-            <h1 className={`text-4xl md:text-6xl font-bold tracking-tighter mb-4 ${isLoaded ? 'animate-slide-in-left' : 'opacity-0'}`}>
+            <h1 className={`text-4xl md:text-6xl font-bold font-heading tracking-tighter mb-4 ${isLoaded ? 'animate-slide-in-left' : 'opacity-0'}`}>
               Hi, I'm <span className="gradient-text">Developer Name</span>
             </h1>
-            <h2 className={`text-2xl md:text-3xl text-muted-foreground ${isLoaded ? 'animate-slide-in-left animate-delay-100' : 'opacity-0'}`}>
+            <h2 className={`text-2xl md:text-3xl text-muted-foreground font-heading ${isLoaded ? 'animate-slide-in-left animate-delay-100' : 'opacity-0'}`}>
               Full Stack Developer
             </h2>
           </div>
@@ -47,11 +47,11 @@ const Hero = () => {
           </p>
           
           <div className={`flex flex-col sm:flex-row gap-4 ${isLoaded ? 'animate-slide-in-left animate-delay-300' : 'opacity-0'}`}>
-            <Button onClick={scrollToContact} size="lg" className="btn-glow group relative overflow-hidden">
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/50 to-blue-600/50 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+            <Button onClick={scrollToContact} size="lg" className="btn-glow shadow-lg shadow-primary/20 group relative overflow-hidden">
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary/50 to-accent/50 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               <span className="relative z-10">Get In Touch</span>
             </Button>
-            <Button variant="outline" size="lg" asChild className="group transition-all duration-300 hover:border-primary">
+            <Button variant="outline" size="lg" asChild className="group transition-all duration-300 hover:border-accent hover:text-accent">
               <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                 <span>View Resume</span>
                 <span className="transform group-hover:translate-x-1 transition-transform">→</span>
@@ -61,19 +61,19 @@ const Hero = () => {
 
           <div className={`flex space-x-4 ${isLoaded ? 'animate-slide-in-left animate-delay-400' : 'opacity-0'}`}>
             <a href="https://github.com" target="_blank" rel="noopener noreferrer" 
-              className="text-muted-foreground hover:text-primary transition-colors animate-bounce-slow hover:scale-110"
+              className="text-muted-foreground hover:text-accent transition-colors animate-bounce-slow hover:scale-110"
               style={{ animationDelay: '0s' }}>
               <Github size={24} className="hover:animate-spin-once" />
               <span className="sr-only">GitHub</span>
             </a>
             <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" 
-              className="text-muted-foreground hover:text-primary transition-colors animate-bounce-slow hover:scale-110" 
+              className="text-muted-foreground hover:text-accent transition-colors animate-bounce-slow hover:scale-110" 
               style={{ animationDelay: '0.2s' }}>
               <Linkedin size={24} className="hover:animate-spin-once" />
               <span className="sr-only">LinkedIn</span>
             </a>
             <a href="mailto:example@example.com" 
-              className="text-muted-foreground hover:text-primary transition-colors animate-bounce-slow hover:scale-110" 
+              className="text-muted-foreground hover:text-accent transition-colors animate-bounce-slow hover:scale-110" 
               style={{ animationDelay: '0.4s' }}>
               <Mail size={24} className="hover:animate-spin-once" />
               <span className="sr-only">Email</span>
@@ -84,10 +84,10 @@ const Hero = () => {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce-slow hidden md:block">
-        <div className="w-8 h-12 border-2 border-muted-foreground/30 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-muted-foreground/50 rounded-full mt-2 animate-bounce-slow"></div>
+        <div className="w-8 h-12 border-2 border-accent/30 rounded-full flex justify-center">
+          <div className="w-1 h-3 bg-accent rounded-full mt-2 animate-bounce-slow"></div>
         </div>
-        <p className="text-xs text-muted-foreground/70 mt-2 text-center">Scroll down</p>
+        <p className="text-xs text-muted-foreground mt-2 text-center">Scroll down</p>
       </div>
     </section>
   );

@@ -43,22 +43,20 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Show loading animation
-    const loadingToast = toast({
+    // Show loading toast
+    const loadingToastId = toast({
       title: "Sending your message",
       description: "Please wait while we process your request...",
-    });
+    }).id;
     
     // Simulate API call
     setTimeout(() => {
-      // Remove loading toast
-      toast.dismiss(loadingToast.id);
-      
       // Show success toast
       toast({
         title: "Message sent successfully",
         description: "Thanks for reaching out. I'll get back to you soon!",
       });
+      
       setFormData({ name: "", email: "", message: "" });
       setIsSubmitting(false);
     }, 1500);
@@ -77,61 +75,61 @@ const Contact = () => {
           ref={ref}
           className={`flex flex-col items-center text-center mb-12 transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white mb-2">Contact Me</h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-white/80 to-white/40 rounded mb-4"></div>
-          <p className="mt-4 text-lg text-white/80 max-w-[700px]">
+          <h2 className="text-3xl font-heading font-bold tracking-tighter sm:text-4xl md:text-5xl text-white mb-2">Contact Me</h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-accent to-accent/40 rounded mb-4"></div>
+          <p className="mt-4 text-lg text-white/80 max-w-[700px] font-light">
             Have a question or want to work together? Feel free to reach out.
           </p>
         </div>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-40">
-            <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full"></div>
+            <div className="animate-spin h-8 w-8 border-4 border-accent border-t-transparent rounded-full"></div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card 
-              className={`col-span-1 card-hover bg-white/10 border-white/20 text-white transition-all duration-500 ${
+              className={`col-span-1 card-hover glassmorphism text-white transition-all duration-500 ${
                 inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
             >
               <CardHeader>
-                <CardTitle className="text-white">Contact Information</CardTitle>
+                <CardTitle className="text-white font-heading">Contact Information</CardTitle>
                 <CardDescription className="text-white/70">Get in touch using the following details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-3 group">
-                  <div className="p-3 rounded-full bg-white/10 text-white group-hover:bg-white group-hover:text-primary transition-all">
+                  <div className="p-3 rounded-full bg-white/10 text-accent group-hover:bg-accent group-hover:text-white transition-all">
                     <Mail className="animate-pulse-slow" size={20} />
                   </div>
-                  <a href="mailto:example@example.com" className="text-white/80 hover:text-white transition-colors group-hover:translate-x-1 transition-transform">
+                  <a href="mailto:example@example.com" className="text-white/80 hover:text-white transition-colors hover:translate-x-1 transition-transform">
                     example@example.com
                   </a>
                 </div>
                 <div className="flex items-center gap-3 group">
-                  <div className="p-3 rounded-full bg-white/10 text-white group-hover:bg-white group-hover:text-primary transition-all">
+                  <div className="p-3 rounded-full bg-white/10 text-accent group-hover:bg-accent group-hover:text-white transition-all">
                     <Phone className="animate-pulse-slow" size={20} />
                   </div>
-                  <span className="text-white/80 group-hover:text-white transition-colors group-hover:translate-x-1 transition-transform">(123) 456-7890</span>
+                  <span className="text-white/80 group-hover:text-white transition-colors hover:translate-x-1 transition-transform">(123) 456-7890</span>
                 </div>
                 <div className="flex items-center gap-3 group">
-                  <div className="p-3 rounded-full bg-white/10 text-white group-hover:bg-white group-hover:text-primary transition-all">
+                  <div className="p-3 rounded-full bg-white/10 text-accent group-hover:bg-accent group-hover:text-white transition-all">
                     <MapPin className="animate-pulse-slow" size={20} />
                   </div>
-                  <span className="text-white/80 group-hover:text-white transition-colors group-hover:translate-x-1 transition-transform">San Francisco, CA</span>
+                  <span className="text-white/80 group-hover:text-white transition-colors hover:translate-x-1 transition-transform">San Francisco, CA</span>
                 </div>
               </CardContent>
             </Card>
             
             <Card 
-              className={`col-span-1 lg:col-span-2 card-hover bg-white/10 border-white/20 text-white transition-all duration-500 ${
+              className={`col-span-1 lg:col-span-2 card-hover glassmorphism text-white transition-all duration-500 ${
                 inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
               style={{ transitionDelay: '0.1s' }}
             >
               <form onSubmit={handleSubmit}>
                 <CardHeader>
-                  <CardTitle className="text-white">Send a Message</CardTitle>
+                  <CardTitle className="text-white font-heading">Send a Message</CardTitle>
                   <CardDescription className="text-white/70">Fill out the form below and I'll respond as soon as possible</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -185,13 +183,13 @@ const Contact = () => {
                 <CardFooter>
                   <Button 
                     type="submit" 
-                    className="w-full bg-white text-primary hover:bg-white/90 transition-all group relative overflow-hidden"
+                    className="w-full bg-accent text-background hover:bg-accent/90 transition-all group relative overflow-hidden"
                     disabled={isSubmitting}
                   >
                     <span className="absolute inset-0 w-0 bg-gradient-to-r from-primary/20 to-blue-400/20 transition-all duration-300 group-hover:w-full"></span>
                     {isSubmitting ? (
                       <div className="flex items-center gap-2">
-                        <span className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></span>
+                        <span className="animate-spin h-4 w-4 border-2 border-background border-t-transparent rounded-full"></span>
                         <span>Sending...</span>
                       </div>
                     ) : (
