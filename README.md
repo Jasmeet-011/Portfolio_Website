@@ -1,7 +1,7 @@
-#🌐 Personal Portfolio Website
+# 🌐 Personal Portfolio Website
 Welcome to my developer portfolio website! This site showcases my projects, technical skills, and work experience as a software engineer. It's built to reflect my journey, passions, and the technologies I love working with.
 
-##✨ Features
+## ✨ Features
 ⚡️ Interactive, animated user interface
 
 🧠 AI-related and full-stack projects
@@ -47,7 +47,7 @@ To run locally:
 bash
 Copy
 Edit
-# Clone the repo
+## Clone the repo
 git clone https://github.com/yourusername/portfolio.git
 cd portfolio
 
