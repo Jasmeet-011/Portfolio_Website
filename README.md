@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
+#🌐 Personal Portfolio Website
+Welcome to my developer portfolio website! This site showcases my projects, technical skills, and work experience as a software engineer. It's built to reflect my journey, passions, and the technologies I love working with.
 
-## Project info
+##✨ Features
+⚡️ Interactive, animated user interface
 
-**URL**: https://lovable.dev/projects/f14bada0-18fc-43fb-9176-ae7b85a32b78
+🧠 AI-related and full-stack projects
 
-## How can I edit this code?
+📱 Responsive design for desktop, tablet, and mobile
 
-There are several ways of editing your application.
+📄 Downloadable resume
 
-**Use Lovable**
+💼 Section for experience and skills
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f14bada0-18fc-43fb-9176-ae7b85a32b78) and start prompting.
+🌐 Deployed and accessible online
 
-Changes made via Lovable will be committed automatically to this repo.
+🚀 Live Demo
+👉 Visit My Portfolio
 
-**Use your preferred IDE**
+🛠️ Built With
+React / Next.js – Frontend framework
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Tailwind CSS – Styling
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Framer Motion – Animations
 
-Follow these steps:
+TypeScript – Type safety
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+ShadCN / Lucide – UI components & icons
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Vercel / Netlify – Deployment
 
-# Step 3: Install the necessary dependencies.
-npm i
+📂 Project Structure
+csharp
+Copy
+Edit
+portfolio/
+├── components/        # Reusable UI components
+├── pages/             # Main pages (Home, About, Projects, etc.)
+├── public/            # Static assets (images, icons)
+├── styles/            # Global styles
+├── utils/             # Helper functions
+└── tsconfig.json      # TypeScript configuration
+🧑‍💻 Getting Started
+To run locally:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+bash
+Copy
+Edit
+# Clone the repo
+git clone https://github.com/yourusername/portfolio.git
+cd portfolio
+
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
-```
+Open http://localhost:3000 to view it in your browser.
 
-**Edit a file directly in GitHub**
+📸 Screenshots
+Include a few screenshots or GIFs of your site here.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+📧 Contact
+If you're interested in working together, feel free to connect:
 
-**Use GitHub Codespaces**
+LinkedIn: your-link
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Email: your.email@example.com
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f14bada0-18fc-43fb-9176-ae7b85a32b78) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+📄 License
+This project is open-source and available under the MIT License.
