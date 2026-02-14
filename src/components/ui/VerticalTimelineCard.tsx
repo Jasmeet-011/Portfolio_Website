@@ -29,7 +29,7 @@ export const VerticalTimelineCard: React.FC<Props> = ({
       <div className="absolute left-4 top-7 bottom-0 w-0.5 bg-primary/30 z-0" />
 
       {/* Glowing animated dot */}
-      <div className="absolute left-[7px] top-1 w-5 h-5 bg-primary rounded-full border-2 border-background shadow-[0_0_10px_3px_rgba(99,102,241,0.4)] animate-pulse z-10"></div>
+      <div className="absolute left-[7px] top-1 w-5 h-5 bg-primary rounded-full border-2 border-background shadow-[0_0_10px_3px_rgba(99,102,241,0.4)] z-10"></div>
 
       {/* Content card */}
       <div className="bg-card border border-primary/30 rounded-lg p-6 mb-10 shadow-md shadow-black/20 hover:shadow-xl transition-shadow">

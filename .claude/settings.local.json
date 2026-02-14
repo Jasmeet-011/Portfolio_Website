@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.linkedin.com)",
+      "Bash(/tmp/final_report.txt << 'EOF'\nTHIRD-PARTY PACKAGES ACTUALLY USED IN SOURCE CODE:\n====================================================\n\n1. @radix-ui/react-hover-card\n2. @radix-ui/react-slot\n3. @radix-ui/react-toast\n4. @radix-ui/react-tooltip\n5. @tanstack/react-query\n6. class-variance-authority\n7. clsx\n8. framer-motion\n9. lucide-react\n10. next-themes\n11. react\n12. react-dom\n13. react-intersection-observer\n14. react-router-dom\n15. sonner\n16. tailwind-merge\n\nPACKAGES IN PACKAGE.JSON BUT NOT USED:\n======================================\n\\(Based on comparison with actual imports found\\)\nEOF)",
+      "Bash(npm run build:*)",
+      "Bash(gh api:*)"
+    ]
+  }
+}

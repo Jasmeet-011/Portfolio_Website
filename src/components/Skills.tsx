@@ -77,7 +77,7 @@ const Skills = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { ref, inView } = useInView({
     threshold: 0.1,
-    triggerOnce: false,
+    triggerOnce: true,
   });
 
   useEffect(() => {
@@ -132,7 +132,7 @@ const Skills = () => {
                         className={`absolute inset-0 bg-gradient-to-r ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
                       ></div>
                       <CardTitle className="text-xl flex items-center gap-2 relative z-10 font-heading">
-                        <span className="text-2xl animate-float-slow">
+                        <span className="text-2xl">
                           {category.icon}
                         </span>
                         <span

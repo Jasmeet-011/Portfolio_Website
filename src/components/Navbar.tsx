@@ -62,19 +62,33 @@ const Navbar = () => {
           : 'bg-transparent py-4'
       }`}
     >
-      <div className="container mx-auto px-6">
+      <div className="w-full mx-auto px-4">
         <div className="flex items-center justify-between">
-          <div className={`text-2xl font-bold transition-all duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-            <a 
-              href="#" 
-              className="gradient-text relative"
+          <div className={`transition-all duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+            <a
+              href="#"
+              className="flex items-center gap-2"
               onClick={(e) => {
                 e.preventDefault();
                 scrollToSection('about');
               }}
             >
-              <span className="relative z-10">Portfolio</span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+              <svg viewBox="0 0 64 64" className="w-9 h-9" aria-hidden="true">
+                <defs>
+                  <linearGradient id="nav-logo-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#8b5cf6"/>
+                    <stop offset="100%" stopColor="#7c3aed"/>
+                  </linearGradient>
+                  <linearGradient id="nav-logo-shine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="white" stopOpacity="0.2"/>
+                    <stop offset="50%" stopColor="white" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                <rect width="64" height="64" rx="16" fill="url(#nav-logo-bg)"/>
+                <rect width="64" height="64" rx="16" fill="url(#nav-logo-shine)"/>
+                <text x="32" y="44" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="800" fontSize="30" fill="white" textAnchor="middle" letterSpacing="-1">JS</text>
+              </svg>
+              <span className="sr-only">Home</span>
             </a>
           </div>
 
@@ -115,9 +129,9 @@ const Navbar = () => {
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMenuOpen ? (
-                <X size={24} className="animate-spin-once" />
+                <X size={24} className="transition-transform duration-300" />
               ) : (
-                <Menu size={24} className="animate-pulse-slow" />
+                <Menu size={24} className="transition-transform duration-300" />
               )}
             </button>
           </div>

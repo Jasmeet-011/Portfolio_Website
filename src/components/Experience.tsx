@@ -13,36 +13,44 @@ type ExperienceItem = {
 
 const experiences: ExperienceItem[] = [
   {
-    role: "Frontend Developer Intern",
-    company: "TechNova Labs",
-    duration: "Jan 2024 - Apr 2024",
+    role: "Graduate Teaching Assistant",
+    company: "NYU Courant Institute of Mathematical Sciences",
+    duration: "Sep 2025 - Present",
     description:
-      "Redesigned key UI components and boosted performance on a React SaaS platform with improved accessibility and responsiveness.",
-    techStack: ["React", "TypeScript", "Tailwind CSS", "Next.js"],
+      "Supporting coursework delivery and student learning as a Graduate TA for the Computer Science department at NYU Courant.",
+    techStack: ["Teaching", "Computer Science", "NYU"],
+  },
+  {
+    role: "Software Engineer",
+    company: "Qualitest",
+    duration: "Jun 2025 - Aug 2025",
+    description:
+      "Contributed to GenAI-powered QA workflows by refactoring a legacy test case validation pipeline into a MongoDB + FastAPI prompt store, improving modularity and enabling dynamic updates across agents. Diagnosed and documented defects in the CoCo automated test case generator, accelerating fixes and strengthening overall QA coverage and release reliability.",
+    techStack: ["Python", "FastAPI", "MongoDB", "GenAI"],
+  },
+  {
+    role: "Software Development Intern",
+    company: "Unified Mentor",
+    duration: "Jul 2024 - Sep 2024",
+    description:
+      "Worked on software development projects, building and shipping features in a collaborative team environment.",
+    techStack: ["JavaScript", "React", "Node.js"],
   },
   {
     role: "Web Development Intern",
-    company: "DevHive",
-    duration: "May 2023 - July 2023",
+    company: "The Sparks Foundation",
+    duration: "Jun 2023 - Aug 2023",
     description:
-      "Developed and deployed fully responsive landing pages, optimized performance, and implemented RESTful APIs.",
+      "Developed and deployed web applications as part of the Graduate Rotational Internship Program.",
     techStack: ["HTML", "CSS", "JavaScript", "Bootstrap"],
   },
   {
-    role: "Web Development Intern",
-    company: "CodeCrafts",
-    duration: "Dec 2022 - Feb 2023",
+    role: "Data Analytics Intern",
+    company: "AICTE",
+    duration: "May 2023 - Jul 2023",
     description:
-      "Worked on admin dashboards, integrated API endpoints, and implemented responsive components for internal tooling.",
-    techStack: ["React", "Sass", "Redux", "Figma"],
-  },
-  {
-    role: "Software Engineering Intern",
-    company: "InnoSoft",
-    duration: "Jul 2022 - Sept 2022",
-    description:
-      "Assisted in building an internal task management tool and improved performance of key user flows.",
-    techStack: ["Node.js", "Express", "MongoDB", "EJS"],
+      "Worked on data analytics and AI/ML projects, applying machine learning techniques to real-world datasets.",
+    techStack: ["Python", "Pandas", "Machine Learning", "Data Analytics"],
   },
 ];
 
@@ -68,7 +76,7 @@ const Experience = () => {
             inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold gradient-text bg-gradient-to-br from-primary via-accent to-foreground bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold gradient-text">
             Experience
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-accent to-primary/60 rounded mt-3 mb-2"></div>
