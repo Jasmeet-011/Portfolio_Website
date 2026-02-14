@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+# Jasmeet Singh | Portfolio
 
-## Project info
+Personal portfolio website showcasing my projects, experience, and skills as a Full Stack Developer.
 
-**URL**: https://lovable.dev/projects/f14bada0-18fc-43fb-9176-ae7b85a32b78
+## Live Site
 
-## How can I edit this code?
+[View Portfolio](https://jasmeet-011.github.io/Portfolio_Website/) *(update with your actual deployment URL)*
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend:** React 18, TypeScript, Tailwind CSS
+- **Animations:** Framer Motion, CSS keyframes
+- **UI Components:** shadcn/ui, Lucide Icons
+- **Build Tool:** Vite
+- **Contact Form:** Formspree
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f14bada0-18fc-43fb-9176-ae7b85a32b78) and start prompting.
+## Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- Responsive design (mobile, tablet, desktop)
+- Smooth scroll navigation with active section tracking
+- Scroll-triggered reveal animations
+- Working contact form with email fallback
+- Custom JS logo and favicon
+- Scroll progress indicator and back-to-top button
 
-**Use your preferred IDE**
+## Sections
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Hero** — Introduction with profile image, social links, and resume
+- **Projects** — Chain Lens, WalkWise, RepoScope, CodeMate, CloudMart
+- **Experience** — Timeline of roles (NYU GTA, Qualitest, Unified Mentor, Sparks Foundation, AICTE)
+- **Skills** — Frontend, Backend, Database, DevOps
+- **Contact** — Form + contact info
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Getting Started
 
-Follow these steps:
+```bash
+# Clone the repo
+git clone https://github.com/Jasmeet-011/Portfolio_Website.git
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Install dependencies
+cd Portfolio_Website
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start dev server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+src/
+  components/     # Navbar, Hero, Projects, Experience, Skills, Contact, Footer
+    ui/           # Reusable UI components (Button, Card, Badge, etc.)
+  pages/          # Index, NotFound
+  hooks/          # Custom hooks
+  lib/            # Utility functions
+public/
+  favicon.svg     # JS logo
+  profile.jpg     # Profile photo
+```
 
-**Use GitHub Codespaces**
+## Contact
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f14bada0-18fc-43fb-9176-ae7b85a32b78) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **Email:** jasmeetsingh5003@gmail.com
+- **LinkedIn:** [jasmeet-singh-wadhwa](https://www.linkedin.com/in/jasmeet-singh-wadhwa/)
+- **GitHub:** [Jasmeet-011](https://github.com/Jasmeet-011)
