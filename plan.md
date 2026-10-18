@@ -52,7 +52,7 @@ What we do instead, grounded in who Jasmeet is (AI engineer focused on AI and ag
 |---|---|
 | Landing | VS Code's **Welcome tab**, rewritten as Jasmeet's: name, current role, one sentence, and "Start" actions (Open projects, Ask the assistant, Download resume). The README is a separate file, not the landing. |
 | File tree | A believable engineer's repo with real folders, not one file per section. See section 5. |
-| Projects | A `projects/` folder, one file per project, extension matching the project's main language (`llm_gateway.py`, `chainlens.ts`). Each file has a **Preview / Source** toggle like VS Code's Markdown preview. Source view shows the same project as actual code via Shiki. |
+| Projects | A `projects/` folder, one file per project, extension matching the project's main language (`llm_gateway.py`, `chainlens.py`, `silentsos.ts`). Each file has a **Preview / Source** toggle like VS Code's Markdown preview. Source view shows the same project as actual code via Shiki. |
 | Experience | The **Source Control** view renders the career as a git graph. Each role is a commit, degrees and certifications are tags. `git log` in the terminal prints the same thing. |
 | Skills | The **Extensions** view. Each technology is an "installed extension" with a one-line description and "Used in" chips that link to the projects and roles using it. Derived automatically from content, no made-up proficiency numbers. |
 | Contact | `contact.http`, styled like a REST Client request: `POST /messages` with fields as headers and body. "Send request" submits to Formspree, and the response pane shows `201 Created` or the real error. |
@@ -100,10 +100,13 @@ JASMEET-WADHWA
 ├── README.md                → short intro, stack summary, links      /readme
 ├── about.py                 → bio, now, education, certs, publication /about
 ├── projects/
-│   ├── llm_gateway.py       → one file per project                    /projects/llm-gateway
-│   ├── agentguard.py
-│   ├── chainlens.ts
-│   └── ...                  (generated from src/content/projects.ts)
+│   ├── agentguard.py        → one file per project                    /projects/agentguard
+│   ├── chainlens.py
+│   ├── silentsos.ts
+│   ├── llm_gateway.py
+│   ├── synapsemeet.py
+│   ├── reposcope.js
+│   └── codemate.js          (generated from src/content/projects.ts, see section 10)
 ├── contact.http             → contact form as an HTTP request         /contact
 └── resume.pdf               → PDF preview + download                  /resume
 ```
@@ -135,14 +138,14 @@ type Project = {
   language: "Python" | "TypeScript" | "JavaScript" | "Go" | "Solidity" | string;
   status: "shipped" | "building";
   featured: boolean;       // shows on Welcome tab
-  period: string;          // "Sep 2026 to Present"
+  period: string;          // "Mon YYYY to Mon YYYY" or "Mon YYYY to Present"; TODO(jasmeet) when unknown
   oneLiner: string;
   problem: string;
   built: string[];         // what Jasmeet actually did
   results?: string[];      // only real, verifiable outcomes
   stack: string[];         // feeds the Extensions view
   links: { github?: string; live?: string; demo?: string; paper?: string };
-  context?: string;        // "Aptos x NYU Builder Camp", "Hackathon, led backend"
+  context?: string;        // "Built for the Gemini Live API hackathon, Live Agent track."
 };
 
 // experience.ts
@@ -163,7 +166,7 @@ type Role = {
 // skills.ts: categories and one-line descriptions only.
 // "Used in" is computed from projects[].stack and roles[].stack.
 
-// profile.ts: name, headline, shortBio, longBio, location, availability?, email, photo
+// profile.ts: name, headline, shortBio, longBio, location, availability?, email (no photo, no phone)
 // education.ts: degrees, certifications, publications
 // links.ts: github, linkedin, email, resume, formspreeId, others
 ```
@@ -280,10 +283,10 @@ Each phase ends with `npm run build && npm run lint` passing, a commit, and a sh
 
 ### Phase 1: Clean slate and scaffold
 
-1. Delete everything except: `.git/`, `docs/`, `.claude/`, `public/profile.jpg`. Remove both lockfiles and all Lovable dependencies.
+1. Delete everything except: `.git/`, `docs/`, `.claude/`, `CLAUDE.md`, `plan.md`. Remove both lockfiles and all Lovable dependencies. No profile photo is kept.
 2. Scaffold Vite + React + TS (strict) + Tailwind, ESLint, Prettier, path alias `@/`.
 3. Install: `zustand`, `react-router-dom`, `cmdk`, `lucide-react`, `shiki` (lazy imported only).
-4. Create `src/content/*.ts` with types from section 6, filled from the legacy archive plus confirmed facts. Unknowns become `TODO(jasmeet)`.
+4. Create `src/content/*.ts` with types from section 6, filled from the resolved facts in section 10. Unknowns become `TODO(jasmeet)`.
 5. Add `vercel.json` with SPA rewrites, `.env.example` with `ANTHROPIC_API_KEY=`.
 
 Done when: `npm run dev` shows a blank themed page, content types compile, no unused dependencies.
@@ -328,28 +331,94 @@ Per-route `<title>` and meta description, Open Graph image, generated `sitemap.x
 
 Decided: the site commits fully to the VS Code direction. No Three.js, WebGL, or 3D scenes in any phase. If an idea needs 3D to work, it's out of scope.
 
-## 10. Known facts to confirm (from Jasmeet, not yet in the old site)
+## 10. Resolved facts (source of truth)
 
-Confirm each before it goes live, and decide which to feature.
+Resolved by Jasmeet on 2026-10-18 after the Phase 0 review. **The resume wins over every other source.** "The resume" means what the `redesign-v1` tag recorded from it. Only what is listed here goes on the site, in `src/content/`, or in the assistant's context. A `TODO(jasmeet)` stays a `TODO(jasmeet)` until Jasmeet supplies the value.
 
-- MS in Computer Science, NYU Tandon, May 2026, GPA 3.9. Teaching Assistant for Object-Oriented Programming at NYU.
-- BE in Computer Science, SRM Institute, GPA 9.8.
-- Software Engineering Intern, Qualitest, Jun to Aug 2025: LLM prompt pipelines and distributed microservices on COCO, Qualitest's AI test generation platform.
-- AWS Certified Cloud Practitioner, AWS Certified Solutions Architect Associate.
-- IEEE publication on hybrid gradient boosting for dynamic pricing (need title and link).
-- Projects to consider: LLMGateway (FastAPI service in front of Claude and Gemini, github.com/Jasmeet-011/LLMGateway), AgentGuard (multi-agent RAG with MCP tools and automated evaluation), ChainLens (cross-chain portfolio analytics, Aptos x NYU Builder Camp), SilentSOS (multi-agent emergency app, hackathon, led backend), SynapseMeet (real-time meeting intelligence), plus older ones already on the site (WalkWise, RepoScope, CodeMate, CloudMart).
-- Emails on file: j.wadhwa.dev@gmail.com, jw9180@nyu.edu. Old site uses a different one. Pick one public address.
-- GitHub: github.com/Jasmeet-011. LinkedIn: from the old site.
+### Identity and contact
+
+| Field | Value |
+|---|---|
+| Name | Jasmeet Singh Wadhwa |
+| Positioning | AI engineer focused on AI and agentic backend systems (framing, not a job title) |
+| Headline | TODO(jasmeet). "Full Stack Developer" is dropped. |
+| Bio | TODO(jasmeet) |
+| Email | `j.wadhwa.dev@gmail.com`, the only public address |
+| Location | New York, NY |
+| Phone | none on the site |
+| Photo | none on the site |
+| GitHub | `https://github.com/Jasmeet-011` |
+| LinkedIn | `https://www.linkedin.com/in/jasmeet-singh-wadhwa/` |
+| Site source | `https://github.com/Jasmeet-011/Portfolio_Website` |
+| Resume | `public/resume.pdf`, TODO(jasmeet) to add. Until it exists, resume actions follow the "works or is not shown" rule in 7.1. |
+| Live URL | decided in Phase 7 |
+
+### Experience
+
+Newest first. Titles and dates from the resume.
+
+| Title | Company | Kind | Dates | Stack |
+|---|---|---|---|---|
+| Research Engineer | NYU, Prof. Dennis Shasha | research | 2026-08 to Present | SQLite (the only tool the resume names) |
+| Teaching Assistant, Object-Oriented Programming | NYU Tandon | teaching | 2025-09 to 2026-05 | none |
+| Software Engineer Intern | Qualitest | internship | 2025-06 to 2025-08 | Python, FastAPI, MongoDB |
+
+- **Research Engineer** summary: "I test whether a config-first operations engine can take on a logistics vertical without changes to its core."
+- **Teaching Assistant** summary: "I held weekly office hours and reviewed student code for object-oriented design." (From the May 2026 resume.)
+- **Qualitest** summary: "I worked on the prompts behind an LLM test-case generator and moved its templates into a service that updates without redeploys." Highlights, the resume wording recorded in `redesign-v1` commit `2ff9f3d`:
+  - "Traced about half of the off-scenario steps from COCO's LLM test-case generator to conflicting prompt quotas, and rewrote the prompt."
+  - "Built a FastAPI + MongoDB prompt config service for template updates with zero redeploys, and added schema validation to CI that cut manual verification 30%."
+
+### Education, certification, publication
+
+Exactly as on the resume.
+
+- MS Computer Science, NYU Tandon School of Engineering, 2024-08 to 2026-05, GPA 3.9.
+- BE Computer Science, SRM Institute of Science and Technology, 2020-09 to 2024-06, GPA 9.8/10.
+- AWS Certified Solutions Architect, Associate (Amazon Web Services): `https://www.credly.com/badges/0f2262c3-59d5-483b-8860-7b3e987382e3/public_url`. This is the only certification.
+- "A Hybrid Gradient Boosting Algorithm for Dynamic Pricing using a Custom Dataset", 2024 5th International Conference on Image Processing and Capsule Networks (ICIPCN), IEEE: `https://ieeexplore.ieee.org/abstract/document/10660680`.
+
+### Projects
+
+Describe each project only from what its repo shows. File extensions follow each repo's main language on GitHub (checked 2026-10-18). Every `period` is TODO(jasmeet): no source gives project dates.
+
+| Project | File | Language | Status | Links | Notes |
+|---|---|---|---|---|---|
+| AgentGuard | `agentguard.py` | Python | shipped | github `Jasmeet-011/AgentGuard` | A single pipeline (policy guard, decompose, retrieve, fuse, rerank, generate, verify) over 10 SEC Form ADV brochures. Results only with their caveat (8 held-out questions). |
+| ChainLens | `chainlens.py` | Python | shipped | github `Jasmeet-011/On-Chain-Portfolio`, live `https://on-chain-portfolio.vercel.app` | Portfolio across Aptos and Solana wallets, FastAPI backend. `context`: TODO(jasmeet). |
+| SilentSOS | `silentsos.ts` | TypeScript | shipped | github `Jasmeet-011/Silentsos` | `context`: "Built for the Gemini Live API hackathon, Live Agent track." No timing claims until measured. |
+| LLM Gateway | `llm_gateway.py` | Python | building | github `Jasmeet-011/LLMGateway` | Built so far: unified schema, provider error types, adapter interface, mock provider (45 passing tests). Everything else is planned. No performance numbers. |
+| SynapseMeet | `synapsemeet.py` | Python | building | github `Jasmeet-011/SynapseMeet` | Backend services and AI pipeline exist as a working skeleton. Nothing measured. |
+| RepoScope | `reposcope.js` | JavaScript | shipped | github `Jasmeet-011/RepoScope`, live `https://repo-scope.vercel.app` | "Pulls a repository's stars, forks, open issues and languages from the GitHub API, and asks Gemini for code suggestions." |
+| CodeMate | `codemate.js` | JavaScript | shipped | github `Jasmeet-011/Codemate`, live `https://codemate-taupe.vercel.app` | Pick a language and ask Gemini. An Express API with a per-IP rate limit saves each question and answer to MongoDB for a history view. |
+
+- Dropped: WalkWise, CloudMart.
+- `Jasmeet-011/codemate-chat` also exists: a later TypeScript chat UI with an Express backend and no database. Not linked. TODO(jasmeet): keep it unlinked, or link it as well?
+- Featured: TODO(jasmeet), see section 11.
+
+### Skills
+
+Derived only from `projects[].stack` and `roles[].stack`. A technology no project or role uses does not appear. Nothing comes from the old Skills section or from a separate skills list.
+
+### Images and contact
+
+- No stock images anywhere. The only images allowed are screenshots of Jasmeet's own projects.
+- `contact.http` posts to Formspree form `mzdarpdv`. TODO(jasmeet): verify the form still receives submissions.
 
 ## 11. Content Jasmeet still needs to write
 
-- A one-line headline and a two-sentence bio in his own voice.
-- For each featured project: the problem, what he built, one real result (latency, accuracy, users, cost, prize).
-- An updated resume PDF in `public/resume.pdf`.
+- The headline and a two-sentence bio in his own voice.
+- `public/resume.pdf`.
 - Which three projects are featured on the Welcome tab.
+- Project periods for all seven projects.
+- ChainLens `context`, if there is one.
+- A real result for each featured project where none exists yet (ChainLens, SilentSOS, LLM Gateway, SynapseMeet have none measured).
+- Whether to link `codemate-chat`.
+- Confirm Formspree form `mzdarpdv` works.
 
 ## 12. Open decisions
 
-- Final default theme name and accent color (Floodlight amber is a proposal).
 - Whether the assistant routes through LLMGateway (great demo, more moving parts).
 - Custom domain.
+
+Decided: the default theme stays "Floodlight", with the colors in section 4.
