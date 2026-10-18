@@ -127,7 +127,7 @@ const Contact = () => {
                   <div className="p-3 rounded-full bg-white/10 text-accent group-hover:bg-accent group-hover:text-white transition-all duration-300">
                     <Phone size={20} />
                   </div>
-                  <span className="text-white/80 group-hover:text-white hover:translate-x-1 transition-all duration-300">(929) 461-8279</span>
+                  <span className="text-white/80 group-hover:text-white hover:translate-x-1 transition-all duration-300">[phone removed]</span>
                 </div>
                 <div className="flex items-center gap-3 group">
                   <div className="p-3 rounded-full bg-white/10 text-accent group-hover:bg-accent group-hover:text-white transition-all duration-300">

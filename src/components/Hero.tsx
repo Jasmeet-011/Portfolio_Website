@@ -44,7 +44,7 @@ const Hero = () => {
                 <span className="relative z-10">Get In Touch</span>
               </Button>
               <Button variant="outline" size="lg" asChild className="group transition-all duration-300 hover:border-accent hover:text-accent-foreground">
-                <a href="https://drive.google.com/file/d/1eIJLhv8g05yvbTedBdMeCTYNSYyS3IHr/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                <a href="[link removed]" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                   <span>View Resume</span>
                   <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                 </a>
