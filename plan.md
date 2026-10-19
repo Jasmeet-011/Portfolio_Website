@@ -4,6 +4,13 @@ Owner: Jasmeet Singh Wadhwa
 Executor: Claude Code (read `CLAUDE.md` first)
 Repo: github.com/Jasmeet-011/Portfolio_Website, branch `revamp/vscode`
 
+## Status (2026-10-19)
+
+- **Done:** Phases 0 to 3 (preserve, scaffold, workspace shell, content files).
+- **Current:** Phase 4, interactions. Not started.
+- **Open `TODO(jasmeet)` items:** headline, short bio, long bio; `public/resume.pdf`; periods for all seven projects; AWS certification month; ChainLens `context`; measured results for ChainLens, SilentSOS, LLM Gateway, SynapseMeet; `problem` and `built` for RepoScope, `problem` for CodeMate; whether to link `codemate-chat`; verify Formspree form `mzdarpdv`; review the Phase 3 copy pass and skill descriptions.
+- **Pushing:** local commits only until Jasmeet says otherwise (see Decisions log).
+
 ---
 
 ## 1. Goal
@@ -452,3 +459,15 @@ Derived only from `projects[].stack`, `projects[].language` and `roles[].stack`.
 - Custom domain.
 
 Decided: the default theme is "Workspace Blue" (section 4). Floodlight stays as an optional theme.
+
+## 13. Decisions log
+
+Where an entry here conflicts with an earlier section of this file or with `CLAUDE.md`, this log wins. Decisions already written into earlier sections (Workspace Blue as the first-visit default applied before first paint, the teal assistant and green shipped dot, featured and "Currently building" placement, the collapsed `projects/archive/` folder) are not repeated here.
+
+| Date | Decision |
+|---|---|
+| 2026-10-18 | **One-color name, no highlight token.** The name renders in a single color with no pink or accent split. The `--highlight` token is dropped from every theme and must not come back. |
+| 2026-10-18 | **Form fields use `--input`.** Every theme defines an `--input` token for text fields and textareas (Workspace Blue `#313131`), separate from `--surface`, and `scripts/check-themes.mjs` checks text on it for AA. |
+| 2026-10-18 | **"Built" covers only Jasmeet's own commits.** Every `built` bullet is checked against `git shortlog` / `git log --author` on that project's repo, and work by others is not claimed. For SilentSOS, "I built" covers only Jasmeet's commits, and Tejas's pull request #1 gets a one-line credit linked to the PR. This adds an optional `credits` field to `Project` in section 6. |
+| 2026-10-18 | **LLM Gateway keeps "I built"** in its `built` bullets, limited to what exists in the repo (section 10). |
+| 2026-10-19 | **Commit locally, never push** to any remote (branches or tags) until Jasmeet says so. This overrides any push step elsewhere in this file or in `CLAUDE.md`. |
