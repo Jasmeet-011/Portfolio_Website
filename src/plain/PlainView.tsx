@@ -127,6 +127,19 @@ export function PlainView() {
                   </h3>
                   <p>{p.oneLiner}</p>
                   {context && <p className="text-muted">{context}</p>}
+                  {p.credits && (
+                    <p className="text-muted">
+                      Credit: {p.credits.text}
+                      {p.credits.href && (
+                        <>
+                          {" "}
+                          <a href={p.credits.href} className={link}>
+                            Pull request
+                          </a>
+                        </>
+                      )}
+                    </p>
+                  )}
                   {p.links.live && (
                     <p>
                       Live:{" "}

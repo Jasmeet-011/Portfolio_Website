@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { skills } from "../../src/content/skills";
 import { expect, test } from "./fixtures";
 
 test.use({ viewport: { width: 1440, height: 900 } });
@@ -145,7 +146,7 @@ test.describe("git graph and source control", () => {
 test.describe("extensions", () => {
   test("every skill shows its description and where it was used", async ({ page }) => {
     await page.goto("/skills");
-    await expect(editor(page)).toContainText("28 installed");
+    await expect(editor(page)).toContainText(`${skills.length} installed`);
     const fastapi = page.locator("#fastapi");
     await expect(fastapi).toContainText("A Python web framework for building typed HTTP APIs.");
     await expect(fastapi.getByRole("link", { name: "ChainLens" })).toHaveAttribute(
@@ -373,5 +374,22 @@ test.describe("welcome on a phone", () => {
     expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(320);
     await editor(page).getByRole("link", { name: "Read the plain view" }).click();
     await expect(page).toHaveURL("/plain");
+  });
+});
+
+test.describe("credits", () => {
+  test("SilentSOS credits Tejas's fixes and never claims them", async ({ page }) => {
+    await page.goto("/projects/silentsos");
+    await expect(editor(page)).toContainText("Credit: Tejas later contributed fixes");
+    await expect(editor(page).getByRole("link", { name: /Pull request/ })).toHaveAttribute(
+      "href",
+      "https://github.com/Jasmeet-011/Silentsos/pull/1",
+    );
+    const built = editor(page).locator("h2:has-text('What I built') + ul");
+    for (const fix of ["leak", "audio recording", "API key", "camera facing"]) {
+      await expect(built).not.toContainText(fix);
+    }
+    await page.goto("/plain");
+    await expect(page.getByRole("main")).toContainText("Credit: Tejas later contributed fixes");
   });
 });

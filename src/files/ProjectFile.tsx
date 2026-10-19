@@ -22,6 +22,7 @@ function data(p: Project): { [key: string]: Value } {
     problem: known(p.problem),
     built: known(p.built),
     results: known(p.results),
+    credits: p.credits?.text,
   };
 }
 
@@ -89,6 +90,12 @@ function Preview({ project: p, doc }: { project: Project; doc: Doc }) {
         {p.links.demo && <External href={p.links.demo}>Demo</External>}
         {p.links.paper && <External href={p.links.paper}>Paper</External>}
       </div>
+      {p.credits && (
+        <p className="mt-3 text-muted">
+          <span className="text-text">Credit:</span> {p.credits.text}{" "}
+          {p.credits.href && <External href={p.credits.href}>Pull request</External>}
+        </p>
+      )}
 
       {problem && (
         <>

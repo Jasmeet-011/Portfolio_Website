@@ -144,6 +144,10 @@ const catalog: Record<string, { category: SkillCategory; description: string }> 
     description: "A layer 1 blockchain built around the Move language.",
   },
 
+  "Google Cloud Speech-to-Text": {
+    category: "APIs and services",
+    description: "Google's cloud API that turns recorded speech into text.",
+  },
   Twilio: {
     category: "APIs and services",
     description: "A cloud API for sending SMS, voice calls and other messages.",

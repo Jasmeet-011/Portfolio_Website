@@ -39,6 +39,8 @@ interface ProjectBase {
   stack: string[];
   links: ProjectLinks;
   context?: string | Todo;
+  /** Work by other people, credited in one line. Never listed under built. */
+  credits?: { text: string; href?: string };
 }
 
 /**
@@ -126,16 +128,32 @@ export const projects: Project[] = [
       "Emergency app for people who can't speak or type. A Gemini Live agent asks yes/no questions, then alerts contacts.",
     problem:
       "People with ALS, autism, hearing impairments, or any condition that stops them speaking or typing can't make a normal emergency call. SilentSOS needs one tap: the agent works out what's wrong through the camera and yes/no questions, then alerts emergency contacts.",
+    // Verified against the repo's history: these are in Jasmeet's commits (00047c5 to
+    // e061bd3). The fixes in pull request #1 are Tejas's and are credited below.
     built: [
+      "I built the app end to end in React Native with Expo, including the Gemini Live agent loop that watches through the camera and asks yes/no questions.",
       "I built a four-level fallback chain (Gemini Live, Gemini one-shot, Claude Vision, static questions), so help is dispatched even if every AI service fails.",
-      "I made onAnswer() return a promise resolved by a tap or a nod, so the agent loop stays linear while the UI drives the input.",
-      "I read head nods from the phone's accelerometer, so answering needs no camera-based model and works on any phone.",
-      "I use Claude to turn the dialogue into the structured summary that goes out by SMS, with GPS location.",
+      "I built a voice agent with Google Cloud speech-to-text and expo-speech text-to-speech.",
+      "I made every question answerable with a tap or a nod: onAnswer() returns a promise that either resolves, and nods are read from the phone's accelerometer.",
+      "I use Claude to turn the dialogue into a structured SMS with the full questions and answers, scene details and GPS location, sent through Twilio.",
+      "I built the Supabase contact flow: emergency contacts are stored and managed there, and every alert is logged.",
     ],
     results: todo("TODO(jasmeet): measured tap-to-SMS time. No timing claims until measured"),
-    stack: ["Gemini Live", "Claude", "React Native", "Expo", "Twilio", "Supabase"],
+    stack: [
+      "Gemini Live",
+      "Claude",
+      "React Native",
+      "Expo",
+      "Google Cloud Speech-to-Text",
+      "Twilio",
+      "Supabase",
+    ],
     links: { github: "https://github.com/Jasmeet-011/Silentsos" },
     context: "Built for the Gemini Live API hackathon, Live Agent track.",
+    credits: {
+      text: "Tejas later contributed fixes for timeout and resolver leaks, camera and accelerometer bugs and an audio recording conflict, and removed a client-side API key.",
+      href: "https://github.com/Jasmeet-011/Silentsos/pull/1",
+    },
   },
   {
     slug: "llm-gateway",
