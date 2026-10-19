@@ -141,3 +141,37 @@ test.describe("git graph and source control", () => {
     await expect(page).toHaveURL("/skills#sqlite");
   });
 });
+
+test.describe("extensions", () => {
+  test("every skill shows its description and where it was used", async ({ page }) => {
+    await page.goto("/skills");
+    await expect(editor(page)).toContainText("28 installed");
+    const fastapi = page.locator("#fastapi");
+    await expect(fastapi).toContainText("A Python web framework for building typed HTTP APIs.");
+    await expect(fastapi.getByRole("link", { name: "ChainLens" })).toHaveAttribute(
+      "href",
+      "/projects/chainlens",
+    );
+    await expect(
+      fastapi.getByRole("link", { name: "Software Engineer Intern, Qualitest" }),
+    ).toHaveAttribute("href", "/experience#qualitest-intern");
+  });
+
+  test("project languages count as skills", async ({ page }) => {
+    await page.goto("/skills");
+    await expect(
+      page.locator("#typescript").getByRole("link", { name: "SilentSOS" }),
+    ).toBeVisible();
+    await expect(
+      page.locator("#javascript").getByRole("link", { name: "RepoScope" }),
+    ).toBeVisible();
+  });
+
+  test("the sidebar lists installed extensions and opens one", async ({ page }) => {
+    await page.goto("/skills");
+    const view = page.getByRole("navigation", { name: "Extensions" });
+    await view.getByRole("link", { name: /^Celery/ }).click();
+    await expect(page).toHaveURL("/skills#celery");
+    await expect(page.locator("#celery")).toBeInViewport();
+  });
+});
