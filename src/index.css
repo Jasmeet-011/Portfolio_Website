@@ -4,6 +4,7 @@
 @import "./themes/daylight.css";
 @import "./themes/high-contrast.css";
 @import "./themes/solarized-dark.css";
+@import "./themes/print.css";
 
 /*
  * Tailwind's default palette is removed so components can only use theme tokens.
@@ -61,6 +62,11 @@ html {
 body {
   @apply bg-editor font-sans text-sm text-text antialiased;
   overflow: hidden;
+}
+
+/* The Plain view scrolls and prints like a normal page. */
+html[data-page="plain"] body {
+  overflow: auto;
 }
 
 :focus-visible {

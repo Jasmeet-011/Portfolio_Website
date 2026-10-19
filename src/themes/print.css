@@ -1,0 +1,29 @@
+/* Print: the Plain view always prints black on white, whatever theme is on screen. */
+@media print {
+  :root[data-page="plain"] {
+    color-scheme: light;
+    --editor: #ffffff;
+    --chrome: #ffffff;
+    --activitybar: #ffffff;
+    --titlebar: #ffffff;
+    --surface: #ffffff;
+    --hover: #ffffff;
+    --selection: #ffffff;
+    --border: #999999;
+    --text: #000000;
+    --muted: #333333;
+    --accent: #000000;
+    --on-accent: #ffffff;
+    --link: #000000;
+    --focus: #000000;
+    --statusbar: #000000;
+    --on-statusbar: #ffffff;
+    --comment: #333333;
+    --highlight: #000000;
+    --tag: #333333;
+    --assistant: #000000;
+    --on-assistant: #ffffff;
+    --assistant-text: #000000;
+    --assistant-panel: #ffffff;
+  }
+}

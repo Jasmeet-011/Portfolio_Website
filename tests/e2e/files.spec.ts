@@ -244,3 +244,64 @@ test.describe("contact.http", () => {
     await expect(source).toContainText('"name": "Ada"');
   });
 });
+
+test.describe("plain view", () => {
+  test("has every role, project, degree, certification, publication and skill group", async ({
+    page,
+  }) => {
+    await page.goto("/plain");
+    const main = page.getByRole("main");
+    for (const text of [
+      "Research Engineer, NYU, Prof. Dennis Shasha",
+      "Teaching Assistant, Object-Oriented Programming, NYU Tandon",
+      "Software Engineer Intern, Qualitest",
+      "AgentGuard",
+      "ChainLens",
+      "SilentSOS",
+      "LLM Gateway (in progress, feat/llm-gateway)",
+      "SynapseMeet (in progress, feat/synapsemeet)",
+      "RepoScope (archived)",
+      "CodeMate (archived)",
+      "MS Computer Science",
+      "BE Computer Science",
+      "AWS Certified Solutions Architect, Associate",
+      "A Hybrid Gradient Boosting Algorithm for Dynamic Pricing using a Custom Dataset",
+      "AI and retrieval",
+    ]) {
+      await expect(main).toContainText(text);
+    }
+    await expect(page.locator("body")).not.toContainText("TODO");
+  });
+
+  test("the status bar opens it and it links back to the workspace", async ({ page }) => {
+    await page.goto("/about");
+    await page.getByRole("link", { name: "Plain view" }).click();
+    await expect(page).toHaveURL("/plain");
+    await page.getByRole("link", { name: "Back to the workspace" }).click();
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("tab", { name: "Welcome" })).toBeVisible();
+  });
+
+  test("prints black on white whatever the theme", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("theme", "workspace-blue"));
+    await page.goto("/plain");
+    await page.emulateMedia({ media: "print" });
+    const colors = await page.evaluate(() => {
+      const style = (selector: string) => {
+        const el = document.querySelector(selector);
+        return el ? getComputedStyle(el) : null;
+      };
+      return {
+        background: style("body > div div")?.backgroundColor,
+        text: style("h1")?.color,
+        link: style("main a")?.color,
+      };
+    });
+    expect(colors).toEqual({
+      background: "rgb(255, 255, 255)",
+      text: "rgb(0, 0, 0)",
+      link: "rgb(0, 0, 0)",
+    });
+    await expect(page.getByRole("link", { name: "Back to the workspace" })).toBeHidden();
+  });
+});

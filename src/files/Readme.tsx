@@ -26,6 +26,7 @@ const FILES = [
   { name: "contact.http", to: "/contact", text: "a message form, sent as an HTTP request." },
   { name: "Git Graph", to: "/experience", text: "my career as a commit history." },
   { name: "Extensions", to: "/skills", text: "every technology, and where I used it." },
+  { name: "Plain view", to: "/plain", text: "everything on one printable page." },
 ];
 
 const stack = skillCategories

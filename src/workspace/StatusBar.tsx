@@ -1,5 +1,6 @@
 import { CircleX, GitBranch, TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { cx } from "@/lib/cx";
 import { useTheme } from "@/store/theme";
 import { useWorkspace } from "@/store/workspace";
@@ -115,6 +116,9 @@ export function StatusBar({ doc }: { doc: Doc | undefined }) {
         <Item className="hidden sm:flex">{WORKSPACE_NAME}</Item>
       </div>
       <div className="flex h-full items-center">
+        <Link to="/plain" className={button}>
+          Plain view
+        </Link>
         {doc?.language && <Item className="hidden sm:flex">{doc.language}</Item>}
         <Item className="hidden md:flex">UTF-8</Item>
         <Item className="hidden md:flex">LF</Item>

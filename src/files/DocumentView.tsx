@@ -6,6 +6,7 @@ import { GitGraph } from "./GitGraph";
 import { Placeholder } from "./Placeholder";
 import { ProjectFile } from "./ProjectFile";
 import { Readme } from "./Readme";
+import { Resume } from "./Resume";
 
 /** Picks the renderer for a document. */
 export function DocumentView({ doc }: { doc: Doc }) {
@@ -22,6 +23,8 @@ export function DocumentView({ doc }: { doc: Doc }) {
       return <Extensions />;
     case "contact":
       return <Contact doc={doc} />;
+    case "resume":
+      return <Resume />;
     default:
       return <Placeholder doc={doc} />;
   }
