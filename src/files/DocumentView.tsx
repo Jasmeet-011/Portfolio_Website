@@ -1,5 +1,6 @@
 import type { Doc } from "@/workspace/documents";
 import { About } from "./About";
+import { Contact } from "./Contact";
 import { Extensions } from "./Extensions";
 import { GitGraph } from "./GitGraph";
 import { Placeholder } from "./Placeholder";
@@ -19,6 +20,8 @@ export function DocumentView({ doc }: { doc: Doc }) {
       return <GitGraph />;
     case "skills":
       return <Extensions />;
+    case "contact":
+      return <Contact doc={doc} />;
     default:
       return <Placeholder doc={doc} />;
   }

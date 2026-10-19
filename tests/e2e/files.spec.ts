@@ -175,3 +175,72 @@ test.describe("extensions", () => {
     await expect(page.locator("#celery")).toBeInViewport();
   });
 });
+
+test.describe("contact.http", () => {
+  const fill = async (page: Page) => {
+    await page.getByLabel('"name":').fill("Ada Lovelace");
+    await page.getByLabel('"email":').fill("ada@example.com");
+    await page.getByLabel('"message":').fill("Hello from a test.");
+  };
+
+  test("a successful request shows the real status and clears the form", async ({ page }) => {
+    let body: unknown;
+    await page.route("https://formspree.io/f/mzdarpdv", async (route) => {
+      body = route.request().postDataJSON();
+      await route.fulfill({ status: 200, contentType: "application/json", body: '{"ok":true}' });
+    });
+    await page.goto("/contact");
+    await fill(page);
+    await page.getByRole("button", { name: "Send request" }).click();
+    const response = page.getByRole("region", { name: "Response" });
+    await expect(response).toContainText("HTTP/1.1 200 OK");
+    await expect(response).toContainText('"ok": true');
+    await expect(page.getByLabel('"name":')).toHaveValue("");
+    expect(body).toEqual({
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      message: "Hello from a test.",
+      _gotcha: "",
+    });
+  });
+
+  test("an error response is shown as it came back", async ({ page }) => {
+    await page.route("https://formspree.io/f/mzdarpdv", (route) =>
+      route.fulfill({
+        status: 422,
+        contentType: "application/json",
+        body: '{"errors":[{"field":"email","message":"should be an email"}]}',
+      }),
+    );
+    await page.goto("/contact");
+    await fill(page);
+    await page.getByRole("button", { name: "Send request" }).click();
+    const response = page.getByRole("region", { name: "Response" });
+    await expect(response).toContainText("HTTP/1.1 422 Unprocessable Entity");
+    await expect(response).toContainText("should be an email");
+    await expect(page.getByLabel('"name":')).toHaveValue("Ada Lovelace");
+  });
+
+  test("required fields stop an empty request", async ({ page }) => {
+    let sent = false;
+    await page.route("https://formspree.io/f/mzdarpdv", async (route) => {
+      sent = true;
+      await route.fulfill({ status: 200, body: "{}" });
+    });
+    await page.goto("/contact");
+    await page.getByRole("button", { name: "Send request" }).click();
+    await expect(page.getByRole("region", { name: "Response" })).toContainText(
+      "Send the request to see the response here.",
+    );
+    expect(sent).toBe(false);
+  });
+
+  test("the source view is the request with what was typed", async ({ page }) => {
+    await page.goto("/contact");
+    await page.getByLabel('"name":').fill("Ada");
+    await page.getByRole("button", { name: "Source", exact: true }).click();
+    const source = page.getByLabel("Source", { exact: true });
+    await expect(source).toContainText("POST https://formspree.io/f/mzdarpdv");
+    await expect(source).toContainText('"name": "Ada"');
+  });
+});
