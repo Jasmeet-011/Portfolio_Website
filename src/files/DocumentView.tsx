@@ -1,5 +1,6 @@
 import type { Doc } from "@/workspace/documents";
 import { About } from "./About";
+import { GitGraph } from "./GitGraph";
 import { Placeholder } from "./Placeholder";
 import { ProjectFile } from "./ProjectFile";
 import { Readme } from "./Readme";
@@ -13,6 +14,8 @@ export function DocumentView({ doc }: { doc: Doc }) {
       return <About doc={doc} />;
     case "project":
       return <ProjectFile doc={doc} />;
+    case "experience":
+      return <GitGraph />;
     default:
       return <Placeholder doc={doc} />;
   }

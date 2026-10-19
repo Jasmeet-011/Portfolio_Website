@@ -16,6 +16,9 @@ function strings(value: unknown, path: string, out: [string, string][] = []): [s
   return out;
 }
 
+// En dash and em dash, by code point so this file contains neither.
+const DASHES = new RegExp(`[${String.fromCharCode(0x2013)}${String.fromCharCode(0x2014)}]`);
+
 test.describe("content rules", () => {
   test("project one-liners are under 20 words and carry no numbers", () => {
     for (const p of projects) {
@@ -45,6 +48,28 @@ test.describe("content rules", () => {
 
   test("no en or em dashes anywhere in content", () => {
     const all = strings({ education, experience, links, profile, projects, skills }, "content");
-    for (const [path, text] of all) expect(text, path).not.toMatch(/[–—]/);
+    for (const [path, text] of all) expect(text, path).not.toMatch(DASHES);
+  });
+});
+
+test.describe("git graph data", () => {
+  test("commit hashes are the first 7 characters of sha1(slug)", async () => {
+    const { createHash } = await import("node:crypto");
+    const { sha1 } = await import("../../src/lib/sha1");
+    const { graphRows } = await import("../../src/lib/career");
+    for (const text of ["", "abc", "qualitest-intern", "a".repeat(200), "ünïcode"]) {
+      expect(sha1(text)).toBe(createHash("sha1").update(text, "utf8").digest("hex"));
+    }
+    for (const row of graphRows) {
+      expect(row.hash).toBe(createHash("sha1").update(row.slug).digest("hex").slice(0, 7));
+    }
+  });
+
+  test("rows are newest first, roles are commits and degrees are tags", async () => {
+    const { graphRows } = await import("../../src/lib/career");
+    const dates = graphRows.map((r) => r.date);
+    expect(dates).toEqual([...dates].sort().reverse());
+    expect(graphRows.filter((r) => r.type === "commit")).toHaveLength(experience.roles.length);
+    expect(graphRows.filter((r) => r.type === "tag")).toHaveLength(education.degrees.length);
   });
 });

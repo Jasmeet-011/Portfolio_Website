@@ -108,3 +108,36 @@ test.describe("project files", () => {
     );
   });
 });
+
+test.describe("git graph and source control", () => {
+  test("every role is a commit with its message, dates and summary", async ({ page }) => {
+    await page.goto("/experience");
+    for (const message of [
+      "Research Engineer @ NYU, Prof. Dennis Shasha",
+      "Teaching Assistant, Object-Oriented Programming @ NYU Tandon",
+      "Software Engineer Intern @ Qualitest",
+    ]) {
+      await expect(editor(page)).toContainText(message);
+    }
+    await expect(editor(page)).toContainText("Aug 2026 to Present, research");
+    await expect(editor(page)).toContainText("tag: ms-cs-nyu");
+    await expect(editor(page)).toContainText("AWS Certified Solutions Architect, Associate");
+  });
+
+  test("opening the Git Graph shows the source control view, and commits link to rows", async ({
+    page,
+  }) => {
+    await page.goto("/experience");
+    const scm = page.getByRole("navigation", { name: "Source control" });
+    await expect(scm).toBeVisible();
+    await scm.getByRole("link", { name: /Software Engineer Intern @ Qualitest/ }).click();
+    await expect(page).toHaveURL("/experience#qualitest-intern");
+    await expect(page.locator("#qualitest-intern")).toBeInViewport();
+  });
+
+  test("a stack chip on a role opens the skill in Extensions", async ({ page }) => {
+    await page.goto("/experience");
+    await editor(page).getByRole("link", { name: "SQLite", exact: true }).click();
+    await expect(page).toHaveURL("/skills#sqlite");
+  });
+});
