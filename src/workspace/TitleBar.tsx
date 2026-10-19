@@ -46,7 +46,7 @@ function WindowDots() {
 
 export function TitleBar() {
   return (
-    <header className="grid h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border bg-chrome px-3">
+    <header className="grid h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border bg-titlebar px-3">
       <div className="flex min-w-0 items-center gap-3">
         <WindowDots />
         <MenuBar />

@@ -150,7 +150,25 @@ test.describe("desktop", () => {
       expect(hex(colors.footer)).toBe(colors.statusbar);
     }
     await page.reload();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "solarized-dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", themes.at(-1)?.id ?? "");
+  });
+
+  test("defaults to Workspace Blue when the OS prefers dark", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "workspace-blue");
+  });
+
+  test("a saved theme wins over the OS preference, before any app code runs", async ({ page }) => {
+    // Serve an empty app bundle: whatever theme is set now came from the inline
+    // script in <head>, which runs before first paint.
+    await page.route("**/src/main.tsx", (route) =>
+      route.fulfill({ contentType: "text/javascript", body: "" }),
+    );
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "workspace-blue");
+    await page.evaluate(() => localStorage.setItem("theme", "floodlight"));
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "floodlight");
   });
 
   test("defaults to Daylight when the OS prefers light", async ({ browser }) => {

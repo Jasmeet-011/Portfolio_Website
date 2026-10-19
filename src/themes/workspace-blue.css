@@ -1,0 +1,32 @@
+/*
+ * Workspace Blue, the default dark theme: VS Code Dark+ greys with blue as the one bold color.
+ * Blue marks interactive things only. --accent (#007acc) and --assistant (#6840c8) are fills
+ * and borders, never text: links and accent text use --link, purple text uses --assistant-text.
+ */
+:root,
+[data-theme="workspace-blue"] {
+  color-scheme: dark;
+  --editor: #1e1e1e;
+  --chrome: #252526;
+  --activitybar: #333333;
+  --titlebar: #1a1a2e;
+  --surface: #232323;
+  --hover: #2a2d2e;
+  --selection: #37373d;
+  --border: #3c3c3c;
+  --text: #f5f5f5;
+  --muted: #a8a8a8;
+  --accent: #007acc;
+  --on-accent: #ffffff;
+  --link: #4fc3f7;
+  --focus: #4fc3f7;
+  --statusbar: #007acc;
+  --on-statusbar: #ffffff;
+  --comment: #4ec9b0;
+  --highlight: #f868d8;
+  --tag: #c586c0;
+  --assistant: #6840c8;
+  --on-assistant: #ffffff;
+  --assistant-text: #b088f8;
+  --assistant-panel: #302840;
+}

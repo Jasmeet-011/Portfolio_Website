@@ -60,7 +60,7 @@ export function Panel({ isDesktop }: { isDesktop: boolean }) {
       className={cx(
         "flex flex-col border-t border-border",
         isDesktop
-          ? "h-56 shrink-0 bg-editor"
+          ? "h-56 shrink-0 bg-chrome"
           : "fixed inset-x-0 bottom-6 z-30 h-[50dvh] rounded-t-lg bg-chrome",
       )}
     >

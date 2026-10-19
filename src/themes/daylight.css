@@ -8,10 +8,20 @@
   --border: #d0d6de;
   --text: #1c2330;
   --muted: #5b6576;
-  --accent: #b7791f;
-  --on-accent: #0b0e13;
+  --accent: #005fb8;
+  --on-accent: #ffffff;
   --link: #0f6e8c;
   --focus: #0f6e8c;
-  --statusbar: #b7791f;
-  --on-statusbar: #0b0e13;
+  --statusbar: #005fb8;
+  --on-statusbar: #ffffff;
+  --activitybar: #eceff3;
+  --titlebar: #eceff3;
+  --selection: #dde2e9;
+  --comment: #16705e;
+  --highlight: #b4219f;
+  --tag: #8f3f8a;
+  --assistant: #6840c8;
+  --on-assistant: #ffffff;
+  --assistant-text: #6840c8;
+  --assistant-panel: #efeafb;
 }

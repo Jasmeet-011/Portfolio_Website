@@ -63,11 +63,32 @@ What we do instead, grounded in who Jasmeet is (AI engineer focused on AI and ag
 
 ## 4. Design tokens (first proposal, refine in Phase 2)
 
-Spend the boldness in one place: the amber status bar and accent. Everything else stays quiet and close to how a real editor feels.
+Spend the boldness in one place: blue, and blue marks interactive things only. Everything else stays quiet and close to how a real editor feels. Pink and purple are rare accents.
+
+**Default theme, "Workspace Blue" (dark).** VS Code Dark+ greys. Decided 2026-10-18; values in `src/themes/workspace-blue.css`.
+
+| Token | Hex | Use |
+|---|---|---|
+| `--editor` | `#1E1E1E` | main area, active tab |
+| `--chrome` | `#252526` | sidebar, terminal, inactive tabs |
+| `--activitybar` | `#333333` | activity bar |
+| `--titlebar` | `#1A1A2E` | title bar |
+| `--surface` | `#232323` | cards, chips |
+| `--hover` / `--selection` | `#2A2D2E` / `#37373D` | list hover, selected row |
+| `--border` | `#3C3C3C` | dividers |
+| `--text` / `--muted` | `#F5F5F5` / `#A8A8A8` | text |
+| `--accent` | `#007ACC` | fills only: status bar, primary button, selected-row accent. White text on it. Never text on dark. |
+| `--link`, `--focus` | `#4FC3F7` | links, accent text, highlighted keywords, focus rings |
+| `--comment` | `#4EC9B0` | comment-style lines, small status dots |
+| `--highlight` | `#F868D8` | the surname accent (pill borders and the underline are also allowed) |
+| `--tag` | `#C586C0` | secondary dot or tag |
+| `--assistant` / `--assistant-text` / `--assistant-panel` | `#6840C8` / `#B088F8` / `#302840` | assistant panel only. `#6840C8` is a fill, never text. |
+
+The build's theme check (`scripts/check-themes.mjs`) enforces AA on every text pair and fails if a fill-only token (`accent`, `assistant`, `statusbar`) is used as a text color.
 
 **Type.** IBM Plex Sans for UI chrome and prose, IBM Plex Mono for editor content, code, terminal, and the name on the Welcome tab. One superfamily, engineering feel, clearly different from a wide display face. Self-host via Google Fonts with a system fallback stack. Base size 14px UI, 15px prose, line length under 80 characters.
 
-**Default theme, "Floodlight" (dark).**
+**Optional theme, "Floodlight" (dark, amber).** Was the default until 2026-10-18.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -80,13 +101,13 @@ Spend the boldness in one place: the amber status bar and accent. Everything els
 | `--accent` | `#F0B429` | status bar, active tab rule, primary buttons |
 | `--link` | `#4FB6C9` | links, keywords in source view |
 
-**"Daylight" (light).** `--editor #F7F8FA`, `--chrome #ECEFF3`, `--text #1C2330`, `--muted #5B6576`, `--accent #B7791F`, `--link #0F6E8C`.
+**"Daylight" (light).** `--editor #F7F8FA`, `--chrome #ECEFF3`, `--text #1C2330`, `--muted #5B6576`, `--accent #005FB8` (blue family since 2026-10-18; white text on it), `--link #0F6E8C`.
 
 **"High Contrast".** Pure black, white text, yellow focus outlines, mirroring VS Code's accessibility theme.
 
 **"Solarized Dark".** Public palette, included as a familiar alternative.
 
-All colors are CSS variables on `:root[data-theme=...]`. Components never hardcode colors. Theme choice persists in `localStorage` and defaults to the OS preference (dark → Floodlight, light → Daylight).
+All colors are CSS variables on `:root[data-theme=...]`. Components never hardcode colors. Theme choice persists in `localStorage` and defaults to the OS preference (dark → Workspace Blue, light → Daylight). Browsers report "no preference" as light, so it gets Daylight.
 
 **Motion.** One orchestrated moment only: on a first visit the workspace "opens" (explorer fills in, Welcome tab slides into place) in under 1.2s. Skipped on return visits and with `prefers-reduced-motion`. Everything else animates only in response to the visitor (menus, tabs, panels).
 
@@ -207,7 +228,7 @@ Ctrl/Cmd+P go to file, Ctrl/Cmd+Shift+P command palette, Ctrl/Cmd+B toggle sideb
 
 ### 7.5 Status bar
 
-Left: branch `main`, problems count, workspace name. Right: Plain view link, assistant status (idle / thinking / rate limited), language mode of the active file, `UTF-8`, `LF`, theme name (click opens theme picker), clock. Amber in Floodlight, themed elsewhere.
+Left: branch `main`, problems count, workspace name. Right: Plain view link, assistant status (idle / thinking / rate limited), language mode of the active file, `UTF-8`, `LF`, theme name (click opens theme picker), clock. Blue in Workspace Blue, themed elsewhere.
 
 ### 7.6 Terminal
 
@@ -430,4 +451,4 @@ Derived only from `projects[].stack`, `projects[].language` and `roles[].stack`.
 - Whether the assistant routes through LLMGateway (great demo, more moving parts).
 - Custom domain.
 
-Decided: the default theme stays "Floodlight", with the colors in section 4.
+Decided: the default theme is "Workspace Blue" (section 4). Floodlight stays as an optional theme.

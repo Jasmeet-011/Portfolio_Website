@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="floodlight">
+<html lang="en" data-theme="workspace-blue">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,13 +8,15 @@
     <script>
       // Apply the saved or OS theme before first paint. Ids match src/themes/themes.ts.
       (function () {
-        var ids = ["floodlight", "daylight", "high-contrast", "solarized-dark"];
+        var ids = ["workspace-blue", "daylight", "floodlight", "high-contrast", "solarized-dark"];
         var theme = null;
         try {
           theme = localStorage.getItem("theme");
         } catch (e) {}
         if (ids.indexOf(theme) < 0) {
-          theme = matchMedia("(prefers-color-scheme: light)").matches ? "daylight" : "floodlight";
+          theme = matchMedia("(prefers-color-scheme: light)").matches
+            ? "daylight"
+            : "workspace-blue";
         }
         document.documentElement.dataset.theme = theme;
       })();

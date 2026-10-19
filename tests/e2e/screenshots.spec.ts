@@ -35,37 +35,37 @@ for (const theme of themes) {
   }
 }
 
-test("floodlight desktop, panel and settings open", async ({ page }) => {
+test("default theme desktop, panel and settings open", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openSampleTabs(page, true);
   await page.getByRole("button", { name: "Settings" }).click();
   await page.getByRole("button", { name: /^Problems/ }).click();
   await page.getByRole("tab", { name: "Terminal" }).click();
-  await page.screenshot({ path: `${OUT}/floodlight-desktop-panel.png` });
+  await page.screenshot({ path: `${OUT}/default-desktop-panel.png` });
 });
 
-test("floodlight desktop, 1280px", async ({ page }) => {
+test("default theme desktop, 1280px", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await openSampleTabs(page, true);
-  await page.screenshot({ path: `${OUT}/floodlight-1280.png` });
+  await page.screenshot({ path: `${OUT}/default-1280.png` });
 });
 
-test("floodlight tablet, 1024px", async ({ page }) => {
+test("default theme tablet, 1024px", async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 768 });
   await openSampleTabs(page, true);
-  await page.screenshot({ path: `${OUT}/floodlight-tablet.png` });
+  await page.screenshot({ path: `${OUT}/default-tablet.png` });
 });
 
-test("floodlight mobile, explorer drawer open", async ({ page }) => {
+test("default theme mobile, explorer drawer open", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await openSampleTabs(page, false);
   await page.getByRole("button", { name: "Open explorer" }).click();
-  await page.screenshot({ path: `${OUT}/floodlight-mobile-drawer.png` });
+  await page.screenshot({ path: `${OUT}/default-mobile-drawer.png` });
 });
 
-test("floodlight mobile, theme picker open", async ({ page }) => {
+test("default theme mobile, theme picker open", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await openSampleTabs(page, false);
   await page.getByRole("button", { name: /^Color theme/ }).click();
-  await page.screenshot({ path: `${OUT}/floodlight-mobile-themes.png` });
+  await page.screenshot({ path: `${OUT}/default-mobile-themes.png` });
 });

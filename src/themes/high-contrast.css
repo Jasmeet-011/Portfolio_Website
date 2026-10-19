@@ -14,4 +14,14 @@
   --focus: #ffd600;
   --statusbar: #000000;
   --on-statusbar: #ffffff;
+  --activitybar: #000000;
+  --titlebar: #000000;
+  --selection: #333333;
+  --comment: #d6d6d6;
+  --highlight: #ffd600;
+  --tag: #21a6ff;
+  --assistant: #ffd600;
+  --on-assistant: #000000;
+  --assistant-text: #ffffff;
+  --assistant-panel: #000000;
 }

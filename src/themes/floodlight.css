@@ -1,5 +1,4 @@
-/* Floodlight, the default dark theme. Base values from plan.md section 4. */
-:root,
+/* Floodlight, an optional amber dark theme. Base values from plan.md section 4. */
 [data-theme="floodlight"] {
   color-scheme: dark;
   --chrome: #0d1015;
@@ -8,11 +7,21 @@
   --hover: #161b22;
   --border: #262e3a;
   --text: #d5dbe3;
-  --muted: #7c8696;
+  --muted: #7e8898;
   --accent: #f0b429;
   --on-accent: #0d1015;
   --link: #4fb6c9;
   --focus: #f0b429;
   --statusbar: #f0b429;
   --on-statusbar: #0d1015;
+  --activitybar: #0d1015;
+  --titlebar: #0d1015;
+  --selection: #1a2029;
+  --comment: #7c8696;
+  --highlight: #f0b429;
+  --tag: #4fb6c9;
+  --assistant: #f0b429;
+  --on-assistant: #0d1015;
+  --assistant-text: #f0b429;
+  --assistant-panel: #1a2029;
 }

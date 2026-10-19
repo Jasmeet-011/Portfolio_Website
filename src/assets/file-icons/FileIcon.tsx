@@ -30,7 +30,7 @@ export function FileIcon({ icon, className }: { icon: DocIcon; className?: strin
     case "ts":
       return <Badge label="ts" className={cx("text-link", className)} />;
     case "js":
-      return <Badge label="js" className={cx("text-accent", className)} />;
+      return <Badge label="js" className={cx("text-muted", className)} />;
     case "md":
       return <Badge label="md" className={cx("text-muted", className)} />;
     case "http":
@@ -38,7 +38,7 @@ export function FileIcon({ icon, className }: { icon: DocIcon; className?: strin
       return (
         <svg
           viewBox="0 0 16 16"
-          className={cx("size-4 shrink-0 text-accent", className)}
+          className={cx("size-4 shrink-0 text-link", className)}
           fill="none"
           stroke="currentColor"
           strokeWidth="1.6"

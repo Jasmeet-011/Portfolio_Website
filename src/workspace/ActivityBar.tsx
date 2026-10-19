@@ -40,7 +40,7 @@ export function ActivityBar() {
     <div
       aria-label="Views"
       role="group"
-      className="flex w-12 shrink-0 flex-col justify-between border-r border-border bg-chrome"
+      className="flex w-12 shrink-0 flex-col justify-between border-r border-border bg-activitybar"
     >
       <div className="flex flex-col">
         {VIEWS.map((v) => (

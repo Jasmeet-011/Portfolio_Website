@@ -98,7 +98,7 @@ export function Tabs({ activeId }: { activeId: string | undefined }) {
               aria-label={`Close ${doc.title}`}
               onClick={() => closeTab(doc.id)}
               className={cx(
-                "mr-1.5 grid size-5 place-items-center rounded hover:bg-surface pointer-coarse:opacity-100",
+                "mr-1.5 grid size-5 place-items-center rounded hover:bg-selection pointer-coarse:opacity-100",
                 selected ? "opacity-100" : "opacity-0 group-hover:opacity-100",
               )}
             >

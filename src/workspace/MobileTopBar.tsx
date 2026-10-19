@@ -9,7 +9,7 @@ export function MobileTopBar() {
   const drawerOpen = useWorkspace((s) => s.drawerOpen);
   const setDrawerOpen = useWorkspace((s) => s.setDrawerOpen);
   return (
-    <header className="flex h-11 shrink-0 items-center justify-between border-b border-border bg-chrome">
+    <header className="flex h-11 shrink-0 items-center justify-between border-b border-border bg-titlebar">
       <button
         type="button"
         id={EXPLORER_TOGGLE_ID}

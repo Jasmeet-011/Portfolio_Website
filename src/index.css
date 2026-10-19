@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./themes/workspace-blue.css";
 @import "./themes/floodlight.css";
 @import "./themes/daylight.css";
 @import "./themes/high-contrast.css";
@@ -12,8 +13,11 @@
   --color-*: initial;
   --color-chrome: var(--chrome);
   --color-editor: var(--editor);
+  --color-activitybar: var(--activitybar);
+  --color-titlebar: var(--titlebar);
   --color-surface: var(--surface);
   --color-hover: var(--hover);
+  --color-selection: var(--selection);
   --color-border: var(--border);
   --color-text: var(--text);
   --color-muted: var(--muted);
@@ -23,6 +27,13 @@
   --color-focus: var(--focus);
   --color-statusbar: var(--statusbar);
   --color-on-statusbar: var(--on-statusbar);
+  --color-comment: var(--comment);
+  --color-highlight: var(--highlight);
+  --color-tag: var(--tag);
+  --color-assistant: var(--assistant);
+  --color-on-assistant: var(--on-assistant);
+  --color-assistant-text: var(--assistant-text);
+  --color-assistant-panel: var(--assistant-panel);
 
   --font-sans:
     "IBM Plex Sans Variable", "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -44,7 +55,7 @@ body {
 }
 
 ::selection {
-  background: var(--surface);
+  background: var(--selection);
 }
 
 * {

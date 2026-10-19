@@ -1,13 +1,16 @@
-// Fails when a theme misses a token, a text pair drops below WCAG AA, or a component
-// hardcodes a color. Run by `npm run build`.
+// Fails when a theme misses a token, a text pair drops below WCAG AA, a fill-only token is
+// used as text, or a component hardcodes a color. Run by `npm run build`.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const TOKENS = [
-  "chrome",
   "editor",
+  "chrome",
+  "activitybar",
+  "titlebar",
   "surface",
   "hover",
+  "selection",
   "border",
   "text",
   "muted",
@@ -17,26 +20,46 @@ const TOKENS = [
   "focus",
   "statusbar",
   "on-statusbar",
+  "comment",
+  "highlight",
+  "tag",
+  "assistant",
+  "on-assistant",
+  "assistant-text",
+  "assistant-panel",
 ];
+
+// Every surface that text can sit on.
+const SURFACES = ["editor", "chrome", "activitybar", "titlebar", "surface", "hover", "selection"];
 
 // [foreground, background, minimum ratio]. 4.5 for text, 3 for focus rings and fills.
 const PAIRS = [
-  ["text", "editor", 4.5],
-  ["text", "chrome", 4.5],
-  ["text", "surface", 4.5],
-  ["text", "hover", 4.5],
-  ["muted", "editor", 4.5],
-  ["muted", "chrome", 4.5],
-  ["muted", "hover", 4.5],
-  ["link", "editor", 4.5],
-  ["link", "chrome", 4.5],
-  ["on-statusbar", "statusbar", 4.5],
+  ...SURFACES.flatMap((bg) => [
+    ["text", bg, 4.5],
+    ["muted", bg, 4.5],
+  ]),
+  // Accent text: links, comment-style lines, the wordmark accent, tags.
+  ...["link", "comment", "highlight", "tag", "assistant-text"].flatMap((fg) => [
+    [fg, "editor", 4.5],
+    [fg, "chrome", 4.5],
+  ]),
+  // Text on fills.
   ["on-accent", "accent", 4.5],
+  ["on-statusbar", "statusbar", 4.5],
+  ["on-assistant", "assistant", 4.5],
+  // The assistant panel.
+  ["text", "assistant-panel", 4.5],
+  ["assistant-text", "assistant-panel", 4.5],
+  // Non-text: focus rings and blue fills must stand out from the surfaces they sit on.
   ["focus", "editor", 3],
   ["focus", "chrome", 3],
+  ["focus", "titlebar", 3],
   ["accent", "editor", 3],
   ["accent", "chrome", 3],
 ];
+
+// Fill-only tokens: below AA as text on the dark surfaces, so never used as a text color.
+const FILL_ONLY = /\b(?:text|placeholder|caret)-(?:accent|assistant|statusbar)\b/;
 
 const luminance = (hex) => {
   const [r, g, b] = [1, 3, 5]
@@ -59,10 +82,14 @@ const dir = "src/themes";
 for (const file of readdirSync(dir).filter((f) => f.endsWith(".css"))) {
   const css = readFileSync(join(dir, file), "utf8");
   const vars = Object.fromEntries(
-    [...css.matchAll(/--([\w-]+):\s*(#[0-9a-f]{6})/gi)].map((m) => [m[1], m[2].toLowerCase()]),
+    [...css.matchAll(/^\s*--([\w-]+):\s*(#[0-9a-f]{6});/gim)].map((m) => [
+      m[1],
+      m[2].toLowerCase(),
+    ]),
   );
   console.log(file);
   for (const t of TOKENS) if (!vars[t]) fail(`${file}: missing --${t}`);
+  for (const t of Object.keys(vars)) if (!TOKENS.includes(t)) fail(`${file}: unknown token --${t}`);
   for (const [fg, bg, min] of PAIRS) {
     if (!vars[fg] || !vars[bg]) continue;
     const r = ratio(vars[fg], vars[bg]);
@@ -80,12 +107,14 @@ for (const file of walk("src").filter(
     .split("\n")
     .forEach((line, i) => {
       if (COLOR.test(line)) fail(`${file}:${i + 1} hardcodes a color: ${line.trim()}`);
+      if (FILL_ONLY.test(line))
+        fail(`${file}:${i + 1} uses a fill-only token as text: ${line.trim()}`);
     });
 }
 
 console.log(
   failures
     ? `\n${failures} theme check(s) failed`
-    : "\nThemes OK: tokens complete, AA contrast, no hardcoded colors",
+    : "\nThemes OK: tokens complete, AA contrast, fill-only tokens never text, no hardcoded colors",
 );
 process.exit(failures ? 1 : 0);

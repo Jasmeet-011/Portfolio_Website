@@ -7,11 +7,21 @@
   --hover: #01262f;
   --border: #0b4b5b;
   --text: #93a1a1;
-  --muted: #839496;
+  --muted: #8b9c9e;
   --accent: #b58900;
   --on-accent: #002b36;
   --link: #2aa198;
   --focus: #b58900;
   --statusbar: #b58900;
   --on-statusbar: #002b36;
+  --activitybar: #00212b;
+  --titlebar: #00212b;
+  --selection: #073642;
+  --comment: #859900;
+  --highlight: #b58900;
+  --tag: #2aa198;
+  --assistant: #2aa198;
+  --on-assistant: #002b36;
+  --assistant-text: #93a1a1;
+  --assistant-panel: #073642;
 }

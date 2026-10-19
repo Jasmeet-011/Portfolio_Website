@@ -40,7 +40,7 @@ export function ThemeOptions({
             setTheme(t.id);
             onConfirm?.();
           }}
-          className="flex h-8 cursor-pointer items-center gap-2.5 rounded px-2 hover:bg-hover has-checked:bg-surface has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-focus"
+          className="flex h-8 cursor-pointer items-center gap-2.5 rounded px-2 hover:bg-hover has-checked:bg-selection has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-focus"
         >
           <input
             type="radio"

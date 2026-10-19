@@ -84,7 +84,10 @@ function Nodes({
             <Link
               to={node.doc.route}
               aria-current={node.doc.id === activeId ? "page" : undefined}
-              className={cx(rowClass(options), "aria-[current=page]:bg-surface")}
+              className={cx(
+                rowClass(options),
+                "relative aria-[current=page]:bg-selection aria-[current=page]:before:absolute aria-[current=page]:before:inset-y-0 aria-[current=page]:before:left-0 aria-[current=page]:before:w-0.5 aria-[current=page]:before:bg-accent",
+              )}
               style={indent(options)}
             >
               {/* Lines file icons up with folder names. */}
