@@ -27,9 +27,6 @@ const featured = visible.filter((p) => p.status === "shipped");
 const building = visible.filter((p) => p.status === "building");
 const docFor = (slug: string) => documents.find((d) => d.projectSlug === slug);
 
-const space = profile.name.lastIndexOf(" ");
-const givenNames = profile.name.slice(0, space);
-const surname = profile.name.slice(space + 1);
 const resume = known(links.resume);
 
 function Heading({ children, id }: { children: ReactNode; id: string }) {
@@ -95,7 +92,7 @@ export function Welcome() {
         {/* Always one line: plan.md section 3 rules out a name split over two lines with the
             second line in an accent color. Fluid size keeps it on one line down to 320px. */}
         <h1 className="font-mono text-[clamp(1.25rem,6.6vw,2.5rem)] leading-tight font-semibold whitespace-nowrap">
-          {givenNames} <span className="text-highlight">{surname}</span>
+          {profile.name}
         </h1>
         <p className="mt-3 font-mono text-[14px] text-comment">
           {"// "}

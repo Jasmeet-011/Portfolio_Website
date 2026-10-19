@@ -6,18 +6,15 @@
     <link rel="icon" href="data:," />
     <title>Jasmeet Singh Wadhwa</title>
     <script>
-      // Apply the saved or OS theme before first paint. Ids match src/themes/themes.ts.
+      // Apply the saved theme, or Workspace Blue on a first visit, before first paint.
+      // Ids match src/themes/themes.ts.
       (function () {
         var ids = ["workspace-blue", "daylight", "floodlight", "high-contrast", "solarized-dark"];
         var theme = null;
         try {
           theme = localStorage.getItem("theme");
         } catch (e) {}
-        if (ids.indexOf(theme) < 0) {
-          theme = matchMedia("(prefers-color-scheme: light)").matches
-            ? "daylight"
-            : "workspace-blue";
-        }
+        if (ids.indexOf(theme) < 0) theme = "workspace-blue";
         document.documentElement.dataset.theme = theme;
       })();
     </script>

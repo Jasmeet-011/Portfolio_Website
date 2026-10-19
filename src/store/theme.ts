@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { isThemeId, systemTheme, THEME_STORAGE_KEY, type ThemeId } from "@/themes/themes";
+import { DEFAULT_THEME, isThemeId, THEME_STORAGE_KEY, type ThemeId } from "@/themes/themes";
 
 function storedTheme(): ThemeId | null {
   try {
@@ -20,7 +20,7 @@ interface ThemeState {
 }
 
 export const useTheme = create<ThemeState>((set) => ({
-  theme: storedTheme() ?? systemTheme(),
+  theme: storedTheme() ?? DEFAULT_THEME,
   setTheme: (theme) => {
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme);
@@ -31,11 +31,3 @@ export const useTheme = create<ThemeState>((set) => ({
     set({ theme });
   },
 }));
-
-// Until the visitor picks a theme, follow the OS preference live.
-window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => {
-  if (storedTheme()) return;
-  const theme = systemTheme();
-  apply(theme);
-  useTheme.setState({ theme });
-});

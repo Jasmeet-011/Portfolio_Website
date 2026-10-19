@@ -17,10 +17,5 @@ export const isThemeId = (value: unknown): value is ThemeId =>
 export const themeLabel = (id: ThemeId): string =>
   themes.find((theme) => theme.id === id)?.label ?? id;
 
-/**
- * The OS preference: light goes to Daylight, dark to Workspace Blue. Browsers report
- * "no preference" as light (the no-preference value was dropped from the spec), so it
- * cannot be told apart from an explicit light setting.
- */
-export const systemTheme = (): ThemeId =>
-  window.matchMedia("(prefers-color-scheme: light)").matches ? "daylight" : "workspace-blue";
+/** Every first visit gets Workspace Blue, whatever the OS prefers. A saved choice wins. */
+export const DEFAULT_THEME: ThemeId = "workspace-blue";

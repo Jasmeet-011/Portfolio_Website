@@ -171,11 +171,11 @@ test.describe("desktop", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "floodlight");
   });
 
-  test("defaults to Daylight when the OS prefers light", async ({ browser }) => {
+  test("a first visit is Workspace Blue even when the OS prefers light", async ({ browser }) => {
     const context = await browser.newContext({ colorScheme: "light" });
     const page = await context.newPage();
     await page.goto("/");
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "daylight");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "workspace-blue");
     await context.close();
   });
 });

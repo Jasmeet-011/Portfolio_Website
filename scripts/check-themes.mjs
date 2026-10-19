@@ -21,7 +21,6 @@ const TOKENS = [
   "statusbar",
   "on-statusbar",
   "comment",
-  "highlight",
   "tag",
   "assistant",
   "on-assistant",
@@ -38,8 +37,8 @@ const PAIRS = [
     ["text", bg, 4.5],
     ["muted", bg, 4.5],
   ]),
-  // Accent text: links, comment-style lines, the wordmark accent, tags.
-  ...["link", "comment", "highlight", "tag", "assistant-text"].flatMap((fg) => [
+  // Accent text: links, comment-style lines, tags.
+  ...["link", "comment", "tag", "assistant-text"].flatMap((fg) => [
     [fg, "editor", 4.5],
     [fg, "chrome", 4.5],
   ]),

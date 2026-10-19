@@ -63,7 +63,7 @@ What we do instead, grounded in who Jasmeet is (AI engineer focused on AI and ag
 
 ## 4. Design tokens (first proposal, refine in Phase 2)
 
-Spend the boldness in one place: blue, and blue marks interactive things only. Everything else stays quiet and close to how a real editor feels. Pink and purple are rare accents.
+Spend the boldness in one place: blue, and blue marks interactive things only. Everything else stays quiet and close to how a real editor feels. The name renders in one color. The assistant panel's colors are pending a choice between two non-purple options.
 
 **Default theme, "Workspace Blue" (dark).** VS Code Dark+ greys. Decided 2026-10-18; values in `src/themes/workspace-blue.css`.
 
@@ -80,7 +80,6 @@ Spend the boldness in one place: blue, and blue marks interactive things only. E
 | `--accent` | `#007ACC` | fills only: status bar, primary button, selected-row accent. White text on it. Never text on dark. |
 | `--link`, `--focus` | `#4FC3F7` | links, accent text, highlighted keywords, focus rings |
 | `--comment` | `#4EC9B0` | comment-style lines, small status dots |
-| `--highlight` | `#F868D8` | the surname accent (pill borders and the underline are also allowed) |
 | `--tag` | `#C586C0` | secondary dot or tag |
 | `--assistant` / `--assistant-text` / `--assistant-panel` | `#6840C8` / `#B088F8` / `#302840` | assistant panel only. `#6840C8` is a fill, never text. |
 
@@ -107,7 +106,7 @@ The build's theme check (`scripts/check-themes.mjs`) enforces AA on every text p
 
 **"Solarized Dark".** Public palette, included as a familiar alternative.
 
-All colors are CSS variables on `:root[data-theme=...]`. Components never hardcode colors. Theme choice persists in `localStorage` and defaults to the OS preference (dark → Workspace Blue, light → Daylight). Browsers report "no preference" as light, so it gets Daylight.
+All colors are CSS variables on `:root[data-theme=...]`. Components never hardcode colors. Theme choice persists in `localStorage` and every first visit gets Workspace Blue, whatever the OS prefers. A saved choice wins, and the theme is applied before first paint.
 
 **Motion.** One orchestrated moment only: on a first visit the workspace "opens" (explorer fills in, Welcome tab slides into place) in under 1.2s. Skipped on return visits and with `prefers-reduced-motion`. Everything else animates only in response to the visitor (menus, tabs, panels).
 
