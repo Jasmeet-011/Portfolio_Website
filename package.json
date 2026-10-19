@@ -9,7 +9,7 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "check:themes": "node scripts/check-themes.mjs",
-    "test:e2e": "playwright test shell",
+    "test:e2e": "playwright test --grep-invert screenshots",
     "screenshots": "playwright test screenshots",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

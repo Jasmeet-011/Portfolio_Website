@@ -40,6 +40,20 @@
   --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
 }
 
+:root {
+  --shiki-foreground: var(--text);
+  --shiki-background: transparent;
+  --shiki-token-keyword: var(--link);
+  --shiki-token-constant: var(--link);
+  --shiki-token-link: var(--link);
+  --shiki-token-comment: var(--comment);
+  --shiki-token-string: var(--text);
+  --shiki-token-string-expression: var(--text);
+  --shiki-token-function: var(--text);
+  --shiki-token-parameter: var(--text);
+  --shiki-token-punctuation: var(--muted);
+}
+
 html {
   background: var(--editor);
 }
