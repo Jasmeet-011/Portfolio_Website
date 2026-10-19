@@ -4,9 +4,9 @@ import { projects } from "./projects";
 /**
  * Skills are derived, never listed by hand: a technology appears only if some
  * project or role has it in its `stack`, or a project is written in it (`language`).
- * This file only groups them.
- * A technology missing from `categoryOf` still appears, under "Other", so adding
- * a project never requires editing this file.
+ * This file only groups and describes them.
+ * A technology missing from `catalog` still appears, under "Other" with no description,
+ * so adding a project never requires editing this file.
  */
 export type SkillCategory =
   | "Languages"
@@ -18,41 +18,140 @@ export type SkillCategory =
   | "APIs and services"
   | "Other";
 
-const categoryOf: Record<string, SkillCategory> = {
-  Python: "Languages",
-  TypeScript: "Languages",
-  JavaScript: "Languages",
+/** Display order of the categories. */
+export const skillCategories: SkillCategory[] = [
+  "Languages",
+  "AI and retrieval",
+  "Backend",
+  "Data stores",
+  "Frontend and mobile",
+  "Blockchain",
+  "APIs and services",
+  "Other",
+];
 
-  Claude: "AI and retrieval",
-  Gemini: "AI and retrieval",
-  "Gemini Live": "AI and retrieval",
-  Whisper: "AI and retrieval",
-  RAG: "AI and retrieval",
-  BM25: "AI and retrieval",
-  Evals: "AI and retrieval",
+/** One plain line per technology, describing the technology itself (not Jasmeet). */
+const catalog: Record<string, { category: SkillCategory; description: string }> = {
+  Python: {
+    category: "Languages",
+    description:
+      "A general-purpose programming language, widely used for backends and machine learning.",
+  },
+  TypeScript: {
+    category: "Languages",
+    description: "JavaScript with static types, checked at compile time.",
+  },
+  JavaScript: {
+    category: "Languages",
+    description: "The programming language of the web, in browsers and on servers through Node.js.",
+  },
 
-  FastAPI: "Backend",
-  Express: "Backend",
-  Celery: "Backend",
+  Claude: {
+    category: "AI and retrieval",
+    description: "Anthropic's family of large language models, used through its API.",
+  },
+  Gemini: {
+    category: "AI and retrieval",
+    description: "Google's family of large language models, used through its API.",
+  },
+  "Gemini Live": {
+    category: "AI and retrieval",
+    description: "Google's API for real-time voice and video conversations with Gemini.",
+  },
+  Whisper: {
+    category: "AI and retrieval",
+    description: "OpenAI's open-source speech recognition model.",
+  },
+  RAG: {
+    category: "AI and retrieval",
+    description:
+      "Retrieval-augmented generation: a model answers from documents retrieved for each question.",
+  },
+  BM25: {
+    category: "AI and retrieval",
+    description: "A keyword ranking function for search that scores documents by term frequency.",
+  },
+  Evals: {
+    category: "AI and retrieval",
+    description: "Test sets and metrics that measure how well an LLM system answers.",
+  },
 
-  MongoDB: "Data stores",
-  SQLite: "Data stores",
-  Qdrant: "Data stores",
-  Pinecone: "Data stores",
-  Neo4j: "Data stores",
-  Supabase: "Data stores",
+  FastAPI: {
+    category: "Backend",
+    description: "A Python web framework for building typed HTTP APIs.",
+  },
+  Express: {
+    category: "Backend",
+    description: "A minimal web framework for Node.js.",
+  },
+  Celery: {
+    category: "Backend",
+    description: "A Python task queue that runs work in background workers.",
+  },
 
-  React: "Frontend and mobile",
-  "Next.js": "Frontend and mobile",
-  "React Native": "Frontend and mobile",
-  Expo: "Frontend and mobile",
-  Streamlit: "Frontend and mobile",
+  MongoDB: {
+    category: "Data stores",
+    description: "A document database that stores JSON-like records.",
+  },
+  SQLite: {
+    category: "Data stores",
+    description: "An embedded SQL database stored in a single file.",
+  },
+  Qdrant: {
+    category: "Data stores",
+    description: "A vector database for similarity search over embeddings.",
+  },
+  Pinecone: {
+    category: "Data stores",
+    description: "A managed vector database for similarity search.",
+  },
+  Neo4j: {
+    category: "Data stores",
+    description: "A graph database queried with the Cypher language.",
+  },
+  Supabase: {
+    category: "Data stores",
+    description: "A hosted Postgres platform with auth, storage and generated APIs.",
+  },
 
-  Solana: "Blockchain",
-  Aptos: "Blockchain",
+  React: {
+    category: "Frontend and mobile",
+    description: "A JavaScript library for building user interfaces from components.",
+  },
+  "Next.js": {
+    category: "Frontend and mobile",
+    description: "A React framework with file-based routing and server rendering.",
+  },
+  "React Native": {
+    category: "Frontend and mobile",
+    description: "A framework for building native mobile apps with React.",
+  },
+  Expo: {
+    category: "Frontend and mobile",
+    description: "A toolkit and platform for building and shipping React Native apps.",
+  },
+  Streamlit: {
+    category: "Frontend and mobile",
+    description: "A Python library that turns scripts into interactive web apps.",
+  },
 
-  Twilio: "APIs and services",
-  "GitHub API": "APIs and services",
+  Solana: {
+    category: "Blockchain",
+    description: "A high-throughput layer 1 blockchain.",
+  },
+  Aptos: {
+    category: "Blockchain",
+    description: "A layer 1 blockchain built around the Move language.",
+  },
+
+  Twilio: {
+    category: "APIs and services",
+    description: "A cloud API for sending SMS, voice calls and other messages.",
+  },
+  "GitHub API": {
+    category: "APIs and services",
+    description: "GitHub's REST API for repository data such as stars, issues and languages.",
+  },
 };
 
 export interface SkillUse {
@@ -62,14 +161,30 @@ export interface SkillUse {
 
 export interface Skill {
   name: string;
+  /** URL-safe id, used for /skills#<slug>. */
+  slug: string;
   category: SkillCategory;
+  description: string | null;
   usedIn: SkillUse[];
 }
+
+export const skillSlug = (name: string): string =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
 function deriveSkills(): Skill[] {
   const byName = new Map<string, Skill>();
   const add = (name: string, use: SkillUse) => {
-    const skill = byName.get(name) ?? { name, category: categoryOf[name] ?? "Other", usedIn: [] };
+    const entry = catalog[name];
+    const skill = byName.get(name) ?? {
+      name,
+      slug: skillSlug(name),
+      category: entry?.category ?? "Other",
+      description: entry?.description ?? null,
+      usedIn: [],
+    };
     if (!skill.usedIn.some((u) => u.kind === use.kind && u.slug === use.slug))
       skill.usedIn.push(use);
     byName.set(name, skill);
