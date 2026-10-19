@@ -3,7 +3,8 @@ import { projects } from "./projects";
 
 /**
  * Skills are derived, never listed by hand: a technology appears only if some
- * project or role has it in its `stack`. This file only groups them.
+ * project or role has it in its `stack`, or a project is written in it (`language`).
+ * This file only groups them.
  * A technology missing from `categoryOf` still appears, under "Other", so adding
  * a project never requires editing this file.
  */
@@ -19,6 +20,8 @@ export type SkillCategory =
 
 const categoryOf: Record<string, SkillCategory> = {
   Python: "Languages",
+  TypeScript: "Languages",
+  JavaScript: "Languages",
 
   Claude: "AI and retrieval",
   Gemini: "AI and retrieval",
@@ -67,11 +70,14 @@ function deriveSkills(): Skill[] {
   const byName = new Map<string, Skill>();
   const add = (name: string, use: SkillUse) => {
     const skill = byName.get(name) ?? { name, category: categoryOf[name] ?? "Other", usedIn: [] };
-    skill.usedIn.push(use);
+    if (!skill.usedIn.some((u) => u.kind === use.kind && u.slug === use.slug))
+      skill.usedIn.push(use);
     byName.set(name, skill);
   };
   for (const project of projects) {
-    for (const name of project.stack) add(name, { kind: "project", slug: project.slug });
+    const use = { kind: "project", slug: project.slug } as const;
+    add(project.language, use);
+    for (const name of project.stack) add(name, use);
   }
   for (const role of roles) {
     for (const name of role.stack) add(name, { kind: "role", slug: role.slug });

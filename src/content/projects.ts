@@ -20,15 +20,13 @@ export interface ProjectLinks {
   paper?: string;
 }
 
-export interface Project {
+interface ProjectBase {
   slug: string;
   name: string;
   /** Extension follows the repo's main language on GitHub. */
   fileName: string;
   language: ProjectLanguage;
   status: ProjectStatus;
-  /** Shown on the Welcome tab. */
-  featured: boolean | Todo;
   period: string | Todo;
   oneLiner: string;
   problem: string | Todo;
@@ -42,7 +40,18 @@ export interface Project {
   context?: string | Todo;
 }
 
-const pickFeatured = () => todo("TODO(jasmeet): pick three projects for the Welcome tab");
+/**
+ * Where a project shows up. Featured projects appear on the Welcome tab: shipped ones
+ * as featured work, building ones in the "Currently building" slot as a feature branch.
+ * Archived projects live in projects/archive/, stay in search and Plain view, and are
+ * left out of the Welcome tab and the assistant's suggested questions.
+ * A project can't be both featured and archived.
+ */
+type ProjectPlacement =
+  { featured: boolean; archived: false } | { featured: false; archived: true };
+
+export type Project = ProjectBase & ProjectPlacement;
+
 const noPeriod = () => todo("TODO(jasmeet): project dates, no source gives them");
 
 export const projects: Project[] = [
@@ -52,7 +61,8 @@ export const projects: Project[] = [
     fileName: "agentguard.py",
     language: "Python",
     status: "shipped",
-    featured: pickFeatured(),
+    featured: true,
+    archived: false,
     period: noPeriod(),
     oneLiner:
       "A research assistant for financial advisors over 10 SEC Form ADV brochures (746 chunks), with hybrid dense and BM25 retrieval, reranking, and an eval harness that measures what each component adds.",
@@ -79,7 +89,8 @@ export const projects: Project[] = [
     fileName: "chainlens.py",
     language: "Python",
     status: "shipped",
-    featured: pickFeatured(),
+    featured: true,
+    archived: false,
     period: noPeriod(),
     oneLiner:
       "One portfolio across Aptos and Solana wallets, with CoinGecko pricing, history snapshots, concentration and chain-exposure insights, scheduled email price alerts, and a Gemini chat that answers questions about your holdings.",
@@ -105,7 +116,8 @@ export const projects: Project[] = [
     fileName: "silentsos.ts",
     language: "TypeScript",
     status: "shipped",
-    featured: pickFeatured(),
+    featured: true,
+    archived: false,
     period: noPeriod(),
     oneLiner:
       "An emergency app for people who can't speak or type. A Gemini Live agent watches through the camera and asks yes/no questions, answered with a nod or a tap, then texts emergency contacts a structured summary with GPS location.",
@@ -128,7 +140,8 @@ export const projects: Project[] = [
     fileName: "llm_gateway.py",
     language: "Python",
     status: "building",
-    featured: pickFeatured(),
+    featured: true,
+    archived: false,
     period: noPeriod(),
     oneLiner:
       "A FastAPI gateway in front of Claude and Gemini, designed to put auth, rate limits, caching, retries, provider fallback and per-key cost accounting behind one API.",
@@ -154,7 +167,8 @@ export const projects: Project[] = [
     fileName: "synapsemeet.py",
     language: "Python",
     status: "building",
-    featured: pickFeatured(),
+    featured: false,
+    archived: false,
     period: noPeriod(),
     oneLiner:
       "A meeting-intelligence pipeline that transcribes meetings, extracts summaries, action items and topics with structured LLM output, and links people and topics across meetings in a knowledge graph.",
@@ -178,7 +192,8 @@ export const projects: Project[] = [
     fileName: "reposcope.js",
     language: "JavaScript",
     status: "shipped",
-    featured: pickFeatured(),
+    featured: false,
+    archived: true,
     period: noPeriod(),
     oneLiner:
       "Pulls a repository's stars, forks, open issues and languages from the GitHub API, and asks Gemini for code suggestions.",
@@ -196,7 +211,8 @@ export const projects: Project[] = [
     fileName: "codemate.js",
     language: "JavaScript",
     status: "shipped",
-    featured: pickFeatured(),
+    featured: false,
+    archived: true,
     period: noPeriod(),
     oneLiner:
       "Ask a coding question, pick a target language, and get a Gemini answer with syntax-highlighted code. An Express API with per-IP rate limiting saves every question and answer to MongoDB for a history view.",

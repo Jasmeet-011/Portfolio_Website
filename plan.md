@@ -50,7 +50,7 @@ What we do instead, grounded in who Jasmeet is (AI engineer focused on AI and ag
 
 | Area | Our version |
 |---|---|
-| Landing | VS Code's **Welcome tab**, rewritten as Jasmeet's: name, current role, one sentence, and "Start" actions (Open projects, Ask the assistant, Download resume). The README is a separate file, not the landing. |
+| Landing | VS Code's **Welcome tab**, rewritten as Jasmeet's: name, current role, one sentence, and "Start" actions (Open projects, Ask the assistant, Download resume). Featured shipped projects, plus a separate **"Currently building"** slot that shows each featured project with status `building` as a feature branch (`feat/llm-gateway`) with its status visible. It must never look like a finished project. The README is a separate file, not the landing. |
 | File tree | A believable engineer's repo with real folders, not one file per section. See section 5. |
 | Projects | A `projects/` folder, one file per project, extension matching the project's main language (`llm_gateway.py`, `chainlens.py`, `silentsos.ts`). Each file has a **Preview / Source** toggle like VS Code's Markdown preview. Source view shows the same project as actual code via Shiki. |
 | Experience | The **Source Control** view renders the career as a git graph. Each role is a commit, degrees and certifications are tags. `git log` in the terminal prints the same thing. |
@@ -100,15 +100,16 @@ JASMEET-WADHWA
 ├── README.md                → short intro, stack summary, links      /readme
 ├── about.py                 → bio, now, education, certs, publication /about
 ├── projects/
+│   ├── archive/             (collapsed by default; archived projects)
+│   │   ├── codemate.js                                                /projects/codemate
+│   │   └── reposcope.js
 │   ├── agentguard.py        → one file per project                    /projects/agentguard
 │   ├── chainlens.py
-│   ├── silentsos.ts
 │   ├── llm_gateway.py
-│   ├── synapsemeet.py
-│   ├── reposcope.js
-│   └── codemate.js          (generated from src/content/projects.ts, see section 10)
+│   ├── silentsos.ts
+│   └── synapsemeet.py       (generated from src/content/projects.ts, see section 10)
 ├── contact.http             → contact form as an HTTP request         /contact
-└── resume.pdf               → PDF preview + download                  /resume
+└── resume.pdf               → PDF preview + download                  /resume (shown once public/resume.pdf exists)
 ```
 
 Activity bar views:
@@ -137,7 +138,8 @@ type Project = {
   fileName: string;        // "llm_gateway.py"
   language: "Python" | "TypeScript" | "JavaScript" | "Go" | "Solidity" | string;
   status: "shipped" | "building";
-  featured: boolean;       // shows on Welcome tab
+  featured: boolean;       // shows on Welcome tab; "building" ones go in the "Currently building" slot
+  archived: boolean;       // projects/archive/; never featured, not in suggested questions
   period: string;          // "Mon YYYY to Mon YYYY" or "Mon YYYY to Present"; TODO(jasmeet) when unknown
   oneLiner: string;
   problem: string;
@@ -164,7 +166,7 @@ type Role = {
 };
 
 // skills.ts: categories and one-line descriptions only.
-// "Used in" is computed from projects[].stack and roles[].stack.
+// "Used in" is computed from projects[].stack, projects[].language and roles[].stack.
 
 // profile.ts: name, headline, shortBio, longBio, location, availability?, email (no photo, no phone)
 // education.ts: degrees, certifications, publications
@@ -237,7 +239,7 @@ Tab completion for commands and file names, up/down history, unknown commands ge
 - **Rate limiting:** server-side per IP (Vercel KV or Upstash, e.g. 10 messages per hour) plus a visible counter in the UI. Graceful message when the limit is hit.
 - **Trace:** each answer logs retrieved chunk ids, model, latency, token counts to Output > Assistant trace.
 - **Evals:** `evals/assistant.jsonl` with about 20 questions and expected facts; `npm run eval:assistant` checks answers contain expected facts and cite the right files. Run before deploys that change content or prompts.
-- **Suggested questions:** generated from content (featured projects, current role), not hardcoded marketing lines.
+- **Suggested questions:** generated from content (featured projects, current role), not hardcoded marketing lines. Archived projects are never used.
 
 ### 7.8 Settings
 
@@ -297,11 +299,18 @@ Title bar, menu bar (structure only, wired in Phase 4), activity bar, sidebar wi
 
 Done when: clicking explorer files opens and closes tabs, URLs update, back button works, themes swap every color, layout matches the breakpoints in section 8.
 
-**STOP.** Jasmeet reviews the look on desktop and phone before content work.
+Playwright (dev dependency) loads the app in a real browser, fails on any console error or warning, and screenshots desktop (1440px) and mobile (375px) for every theme. Review the screenshots and fix what looks wrong before showing them.
+
+**STOP.** Jasmeet reviews the look on desktop and phone, with the screenshots, before content work.
 
 ### Phase 3: Content files
 
 Welcome tab, README.md, about.py, projects folder with Preview/Source toggle, Source Control git graph, Extensions skills view, contact.http with working Formspree submit, resume.pdf preview and download, Plain view.
+
+Copy pass, before rendering, for Jasmeet to review:
+- Every project `oneLiner` under 20 words. Numbers move out of one-liners into `results`.
+- Every `built` bullet rewritten in first person ("I built...", "I chose...").
+- One plain line per skill in `skills.ts` describing the technology itself (not Jasmeet), written by Claude.
 
 Done when: every piece of content in `src/content` is visible somewhere, adding a dummy project to `projects.ts` makes it appear in explorer, palette, search, Extensions "Used in", sitemap, and Plain view with no other edits (then remove the dummy).
 
@@ -382,6 +391,8 @@ Exactly as on the resume.
 
 Describe each project only from what its repo shows. File extensions follow each repo's main language on GitHub (checked 2026-10-18). Every `period` is TODO(jasmeet): no source gives project dates.
 
+Placement (decided 2026-10-18): AgentGuard, ChainLens and SilentSOS are featured shipped work. LLM Gateway is featured in the "Currently building" slot as `feat/llm-gateway`. SynapseMeet is not featured. RepoScope and CodeMate are archived.
+
 | Project | File | Language | Status | Links | Notes |
 |---|---|---|---|---|---|
 | AgentGuard | `agentguard.py` | Python | shipped | github `Jasmeet-011/AgentGuard` | A single pipeline (policy guard, decompose, retrieve, fuse, rerank, generate, verify) over 10 SEC Form ADV brochures. Results only with their caveat (8 held-out questions). |
@@ -394,11 +405,9 @@ Describe each project only from what its repo shows. File extensions follow each
 
 - Dropped: WalkWise, CloudMart.
 - `Jasmeet-011/codemate-chat` also exists: a later TypeScript chat UI with an Express backend and no database. Not linked. TODO(jasmeet): keep it unlinked, or link it as well?
-- Featured: TODO(jasmeet), see section 11.
-
 ### Skills
 
-Derived only from `projects[].stack` and `roles[].stack`. A technology no project or role uses does not appear. Nothing comes from the old Skills section or from a separate skills list.
+Derived only from `projects[].stack`, `projects[].language` and `roles[].stack`. A technology no project or role uses does not appear. Nothing comes from the old Skills section or from a separate skills list. Each skill gets one plain line describing the technology, written in Phase 3 and reviewed by Jasmeet.
 
 ### Images and contact
 
@@ -409,8 +418,8 @@ Derived only from `projects[].stack` and `roles[].stack`. A technology no projec
 
 - The headline and a two-sentence bio in his own voice.
 - `public/resume.pdf`.
-- Which three projects are featured on the Welcome tab.
 - Project periods for all seven projects.
+- Review of the Phase 3 copy pass and skill descriptions.
 - ChainLens `context`, if there is one.
 - A real result for each featured project where none exists yet (ChainLens, SilentSOS, LLM Gateway, SynapseMeet have none measured).
 - Whether to link `codemate-chat`.
