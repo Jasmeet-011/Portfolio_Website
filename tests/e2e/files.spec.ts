@@ -54,3 +54,57 @@ test.describe("README.md and about.py", () => {
     ).toHaveAttribute("href", /ieeexplore/);
   });
 });
+
+test.describe("project files", () => {
+  test("a shipped project shows problem, what I built, results and stack", async ({ page }) => {
+    await page.goto("/projects/agentguard");
+    await expect(editor(page).getByRole("heading", { level: 1 })).toHaveText("AgentGuard");
+    await expect(editor(page)).toContainText("shipped");
+    for (const heading of ["Problem", "What I built", "Results", "Stack"]) {
+      await expect(editor(page).getByRole("heading", { name: heading })).toBeVisible();
+    }
+    await expect(editor(page)).toContainText("read this as an anecdote, not a benchmark");
+    await expect(editor(page).getByRole("link", { name: "Claude", exact: true })).toHaveAttribute(
+      "href",
+      "/skills#claude",
+    );
+  });
+
+  test("a building project says so and shows its feature branch", async ({ page }) => {
+    await page.goto("/projects/llm-gateway");
+    await expect(editor(page)).toContainText("building");
+    await expect(editor(page)).toContainText("feat/llm-gateway is still being built");
+    await expect(editor(page).getByRole("heading", { name: "Results" })).toBeVisible();
+  });
+
+  test("an archived project is marked archived", async ({ page }) => {
+    await page.goto("/projects/codemate");
+    await expect(editor(page)).toContainText("Archived. Kept here for the record.");
+    await expect(editor(page).getByRole("link", { name: /Live app/ })).toHaveAttribute(
+      "href",
+      "https://codemate-taupe.vercel.app",
+    );
+  });
+
+  test("Todo fields never render", async ({ page }) => {
+    for (const slug of ["chainlens", "reposcope", "synapsemeet"]) {
+      await page.goto(`/projects/${slug}`);
+      await expect(editor(page)).not.toContainText("TODO");
+      await page.goto(`/projects/${slug}?view=source`);
+      await expect(page.getByLabel("Source", { exact: true })).not.toContainText("TODO");
+    }
+  });
+
+  test("source is written in the project's language", async ({ page }) => {
+    await page.goto("/projects/agentguard?view=source");
+    await expect(page.getByLabel("Source", { exact: true })).toContainText("agentguard = Project(");
+    await page.goto("/projects/silentsos?view=source");
+    await expect(page.getByLabel("Source", { exact: true })).toContainText(
+      "export const silentsos = {",
+    );
+    await page.goto("/projects/codemate?view=source");
+    await expect(page.getByLabel("Source", { exact: true })).toContainText(
+      "export const codemate = {",
+    );
+  });
+});

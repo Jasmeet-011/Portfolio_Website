@@ -15,3 +15,8 @@ export const todo = (note: TodoNote): Todo => ({ todo: note });
 
 export const isTodo = (value: unknown): value is Todo =>
   typeof value === "object" && value !== null && "todo" in value;
+
+/** The value, or undefined while it is still a Todo. Lets renderers skip unknowns. */
+export function known<T>(value: T | Todo | undefined): Exclude<T, Todo> | undefined {
+  return value === undefined || isTodo(value) ? undefined : (value as Exclude<T, Todo>);
+}

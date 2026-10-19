@@ -1,6 +1,7 @@
 import type { Doc } from "@/workspace/documents";
 import { About } from "./About";
 import { Placeholder } from "./Placeholder";
+import { ProjectFile } from "./ProjectFile";
 import { Readme } from "./Readme";
 
 /** Picks the renderer for a document. */
@@ -10,6 +11,8 @@ export function DocumentView({ doc }: { doc: Doc }) {
       return <Readme doc={doc} />;
     case "about":
       return <About doc={doc} />;
+    case "project":
+      return <ProjectFile doc={doc} />;
     default:
       return <Placeholder doc={doc} />;
   }
