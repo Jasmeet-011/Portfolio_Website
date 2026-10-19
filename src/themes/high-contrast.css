@@ -1,0 +1,17 @@
+/* High Contrast: pure black, white text, yellow focus outlines. */
+[data-theme="high-contrast"] {
+  color-scheme: dark;
+  --chrome: #000000;
+  --editor: #000000;
+  --surface: #333333;
+  --hover: #1f1f1f;
+  --border: #6fc3df;
+  --text: #ffffff;
+  --muted: #d6d6d6;
+  --accent: #ffd600;
+  --on-accent: #000000;
+  --link: #21a6ff;
+  --focus: #ffd600;
+  --statusbar: #000000;
+  --on-statusbar: #ffffff;
+}

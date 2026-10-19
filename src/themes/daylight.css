@@ -1,0 +1,17 @@
+/* Daylight, the light theme. Base values from plan.md section 4. */
+[data-theme="daylight"] {
+  color-scheme: light;
+  --chrome: #eceff3;
+  --editor: #f7f8fa;
+  --surface: #dde2e9;
+  --hover: #e3e7ec;
+  --border: #d0d6de;
+  --text: #1c2330;
+  --muted: #5b6576;
+  --accent: #b7791f;
+  --on-accent: #0b0e13;
+  --link: #0f6e8c;
+  --focus: #0f6e8c;
+  --statusbar: #b7791f;
+  --on-statusbar: #0b0e13;
+}

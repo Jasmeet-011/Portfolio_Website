@@ -1,13 +1,18 @@
-/* Floodlight, the default dark theme. Values from plan.md section 4. */
+/* Floodlight, the default dark theme. Base values from plan.md section 4. */
 :root,
-:root[data-theme="floodlight"] {
+[data-theme="floodlight"] {
   color-scheme: dark;
   --chrome: #0d1015;
   --editor: #12161c;
   --surface: #1a2029;
+  --hover: #161b22;
   --border: #262e3a;
   --text: #d5dbe3;
   --muted: #7c8696;
   --accent: #f0b429;
+  --on-accent: #0d1015;
   --link: #4fb6c9;
+  --focus: #f0b429;
+  --statusbar: #f0b429;
+  --on-statusbar: #0d1015;
 }

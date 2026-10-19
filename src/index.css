@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "./themes/floodlight.css";
+@import "./themes/daylight.css";
+@import "./themes/high-contrast.css";
+@import "./themes/solarized-dark.css";
 
 /*
  * Tailwind's default palette is removed so components can only use theme tokens.
@@ -10,13 +13,19 @@
   --color-chrome: var(--chrome);
   --color-editor: var(--editor);
   --color-surface: var(--surface);
+  --color-hover: var(--hover);
   --color-border: var(--border);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
   --color-link: var(--link);
+  --color-focus: var(--focus);
+  --color-statusbar: var(--statusbar);
+  --color-on-statusbar: var(--on-statusbar);
 
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans:
+    "IBM Plex Sans Variable", "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
 }
 
@@ -25,5 +34,20 @@ html {
 }
 
 body {
-  @apply bg-editor font-sans text-text antialiased;
+  @apply bg-editor font-sans text-sm text-text antialiased;
+  overflow: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+::selection {
+  background: var(--surface);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }

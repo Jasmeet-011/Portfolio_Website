@@ -3,3 +3,6 @@ docs
 .claude
 package-lock.json
 *.md
+screenshots
+test-results
+playwright-report

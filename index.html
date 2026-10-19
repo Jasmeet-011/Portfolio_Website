@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:," />
     <title>Jasmeet Singh Wadhwa</title>
+    <script>
+      // Apply the saved or OS theme before first paint. Ids match src/themes/themes.ts.
+      (function () {
+        var ids = ["floodlight", "daylight", "high-contrast", "solarized-dark"];
+        var theme = null;
+        try {
+          theme = localStorage.getItem("theme");
+        } catch (e) {}
+        if (ids.indexOf(theme) < 0) {
+          theme = matchMedia("(prefers-color-scheme: light)").matches ? "daylight" : "floodlight";
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

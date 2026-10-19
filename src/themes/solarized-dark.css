@@ -1,0 +1,17 @@
+/* Solarized Dark, from the public Solarized palette (Ethan Schoonover). */
+[data-theme="solarized-dark"] {
+  color-scheme: dark;
+  --chrome: #00212b;
+  --editor: #002b36;
+  --surface: #073642;
+  --hover: #01262f;
+  --border: #0b4b5b;
+  --text: #93a1a1;
+  --muted: #839496;
+  --accent: #b58900;
+  --on-accent: #002b36;
+  --link: #2aa198;
+  --focus: #b58900;
+  --statusbar: #b58900;
+  --on-statusbar: #002b36;
+}

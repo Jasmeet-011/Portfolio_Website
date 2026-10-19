@@ -10,5 +10,10 @@ dist
 .env.*
 !.env.example
 
+# Playwright output
+test-results
+playwright-report
+screenshots
+
 # Local Claude Code settings
 .claude/settings.local.json
