@@ -305,3 +305,73 @@ test.describe("plain view", () => {
     await expect(page.getByRole("link", { name: "Back to the workspace" })).toBeHidden();
   });
 });
+
+test.describe("welcome", () => {
+  test("introduces Jasmeet, features shipped work and keeps building work separate", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(editor(page).getByRole("heading", { level: 1 })).toHaveText(
+      "Jasmeet Singh Wadhwa",
+    );
+    await expect(editor(page)).toContainText(
+      "// AI engineer focused on AI and agentic backend systems",
+    );
+    await expect(editor(page)).toContainText("Research Engineer, NYU, Prof. Dennis Shasha");
+
+    const featured = editor(page).getByRole("region", { name: "Featured" });
+    await expect(featured.getByRole("link")).toHaveText([/AgentGuard/, /ChainLens/, /SilentSOS/]);
+
+    const building = editor(page).getByRole("region", { name: "Currently building" });
+    await expect(building).toContainText("feat/llm-gateway");
+    await expect(building).toContainText("building");
+    await expect(building.getByRole("link", { name: "LLM Gateway" })).toHaveAttribute(
+      "href",
+      "/projects/llm-gateway",
+    );
+
+    for (const archived of ["RepoScope", "CodeMate"]) {
+      await expect(editor(page)).not.toContainText(archived);
+    }
+  });
+
+  test("Open projects reveals the projects folder in the explorer", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Explorer" }).click(); // hide the sidebar
+    await editor(page)
+      .getByRole("button", { name: /Open projects/ })
+      .click();
+    await expect(
+      page.getByRole("navigation", { name: "Explorer" }).getByRole("button", { name: "projects" }),
+    ).toBeFocused();
+  });
+
+  test("every Start action goes somewhere real", async ({ page }) => {
+    await page.goto("/");
+    for (const [name, url] of [
+      [/About me/, "/about"],
+      [/Career history/, "/experience"],
+      [/Send a message/, "/contact"],
+      [/Plain view/, "/plain"],
+    ] as const) {
+      await page.goto("/");
+      await editor(page).getByRole("link", { name }).click();
+      await expect(page).toHaveURL(url);
+    }
+  });
+});
+
+test.describe("welcome on a phone", () => {
+  test.use({ viewport: { width: 320, height: 700 }, hasTouch: true });
+
+  test("the name stays on one line and the plain view is one tap away", async ({ page }) => {
+    await page.goto("/");
+    const name = editor(page).getByRole("heading", { level: 1 });
+    const box = await name.boundingBox();
+    const lineHeight = await name.evaluate((el) => parseFloat(getComputedStyle(el).lineHeight));
+    expect(box?.height ?? 0).toBeLessThan(lineHeight * 1.5);
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(320);
+    await editor(page).getByRole("link", { name: "Read the plain view" }).click();
+    await expect(page).toHaveURL("/plain");
+  });
+});
