@@ -9,6 +9,7 @@ const TOKENS = [
   "activitybar",
   "titlebar",
   "surface",
+  "input",
   "hover",
   "selection",
   "border",
@@ -29,7 +30,16 @@ const TOKENS = [
 ];
 
 // Every surface that text can sit on.
-const SURFACES = ["editor", "chrome", "activitybar", "titlebar", "surface", "hover", "selection"];
+const SURFACES = [
+  "editor",
+  "chrome",
+  "activitybar",
+  "titlebar",
+  "surface",
+  "input",
+  "hover",
+  "selection",
+];
 
 // [foreground, background, minimum ratio]. 4.5 for text, 3 for focus rings and fills.
 const PAIRS = [

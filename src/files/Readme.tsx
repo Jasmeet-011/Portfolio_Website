@@ -21,7 +21,7 @@ const FILES = [
   {
     name: "projects/",
     to: "/projects/agentguard",
-    text: "one file per project: the problem, what I built, results.",
+    text: "one file per project, with the problem, what I built and the results.",
   },
   { name: "contact.http", to: "/contact", text: "a message form, sent as an HTTP request." },
   { name: "Git Graph", to: "/experience", text: "my career as a commit history." },

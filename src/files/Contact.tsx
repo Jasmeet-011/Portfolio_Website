@@ -55,7 +55,7 @@ function source(fields: Fields): string {
 }
 
 const input =
-  "w-full rounded border border-border bg-surface px-2 py-1 font-mono text-[13px] text-text placeholder:text-muted";
+  "w-full rounded border border-border bg-input px-2 py-1 font-mono text-[13px] text-text placeholder:text-muted";
 
 function Line({ children, className }: { children?: ReactNode; className?: string }) {
   return <div className={cx("min-h-6", className)}>{children}</div>;

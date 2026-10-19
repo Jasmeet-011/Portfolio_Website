@@ -17,6 +17,7 @@
   --color-activitybar: var(--activitybar);
   --color-titlebar: var(--titlebar);
   --color-surface: var(--surface);
+  --color-input: var(--input);
   --color-hover: var(--hover);
   --color-selection: var(--selection);
   --color-border: var(--border);
