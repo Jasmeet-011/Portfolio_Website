@@ -22,6 +22,7 @@ const TOKENS = [
   "statusbar",
   "on-statusbar",
   "comment",
+  "success",
   "tag",
   "assistant",
   "on-assistant",
@@ -65,6 +66,10 @@ const PAIRS = [
   ["focus", "titlebar", 3],
   ["accent", "editor", 3],
   ["accent", "chrome", 3],
+  // Status dots.
+  ["success", "editor", 3],
+  ["success", "chrome", 3],
+  ["success", "surface", 3],
 ];
 
 // Fill-only tokens: below AA as text on the dark surfaces, so never used as a text color.

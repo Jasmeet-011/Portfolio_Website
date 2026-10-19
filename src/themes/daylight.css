@@ -19,9 +19,10 @@
   --titlebar: #eceff3;
   --selection: #dde2e9;
   --comment: #16705e;
+  --success: #388a34;
   --tag: #8f3f8a;
-  --assistant: #6840c8;
+  --assistant: #16705e;
   --on-assistant: #ffffff;
-  --assistant-text: #6840c8;
-  --assistant-panel: #efeafb;
+  --assistant-text: #16705e;
+  --assistant-panel: #eceff3;
 }

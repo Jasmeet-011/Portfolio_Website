@@ -63,7 +63,7 @@ What we do instead, grounded in who Jasmeet is (AI engineer focused on AI and ag
 
 ## 4. Design tokens (first proposal, refine in Phase 2)
 
-Spend the boldness in one place: blue, and blue marks interactive things only. Everything else stays quiet and close to how a real editor feels. The name renders in one color. The assistant panel's colors are pending a choice between two non-purple options.
+Spend the boldness in one place: blue, and blue marks interactive things only. Everything else stays quiet and close to how a real editor feels. The name renders in one color.
 
 **Default theme, "Workspace Blue" (dark).** VS Code Dark+ greys. Decided 2026-10-18; values in `src/themes/workspace-blue.css`.
 
@@ -79,9 +79,10 @@ Spend the boldness in one place: blue, and blue marks interactive things only. E
 | `--text` / `--muted` | `#F5F5F5` / `#A8A8A8` | text |
 | `--accent` | `#007ACC` | fills only: status bar, primary button, selected-row accent. White text on it. Never text on dark. |
 | `--link`, `--focus` | `#4FC3F7` | links, accent text, highlighted keywords, focus rings |
-| `--comment` | `#4EC9B0` | comment-style lines, small status dots |
+| `--comment` | `#4EC9B0` | comment-style lines |
 | `--tag` | `#C586C0` | secondary dot or tag |
-| `--assistant` / `--assistant-text` / `--assistant-panel` | `#6840C8` / `#B088F8` / `#302840` | assistant panel only. `#6840C8` is a fill, never text. |
+| `--assistant` / `--assistant-text` / `--assistant-panel` | `#4EC9B0` / `#4EC9B0` / `#252526` | assistant panel only (teal, chosen 2026-10-18). Text on the teal fill is `#1E1E1E` (8.18:1). |
+| `--success` | `#89D185` | the shipped status dot and success states (VS Code Dark+ green; the palette has none) |
 
 The build's theme check (`scripts/check-themes.mjs`) enforces AA on every text pair and fails if a fill-only token (`accent`, `assistant`, `statusbar`) is used as a text color.
 

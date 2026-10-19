@@ -172,7 +172,7 @@ function Preview({
             <>
               <p className="flex items-center gap-2 font-semibold">
                 <span
-                  className={cx("size-2 rounded-full", response.ok ? "bg-comment" : "bg-tag")}
+                  className={cx("size-2 rounded-full", response.ok ? "bg-success" : "bg-tag")}
                   aria-hidden
                 />
                 {response.statusLine}

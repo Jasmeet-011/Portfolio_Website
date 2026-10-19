@@ -30,6 +30,7 @@
   --color-statusbar: var(--statusbar);
   --color-on-statusbar: var(--on-statusbar);
   --color-comment: var(--comment);
+  --color-success: var(--success);
   --color-tag: var(--tag);
   --color-assistant: var(--assistant);
   --color-on-assistant: var(--on-assistant);

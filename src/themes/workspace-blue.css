@@ -1,7 +1,7 @@
 /*
  * Workspace Blue, the default dark theme: VS Code Dark+ greys with blue as the one bold color.
- * Blue marks interactive things only. --accent (#007acc) and --assistant (#6840c8) are fills
- * and borders, never text: links and accent text use --link, purple text uses --assistant-text.
+ * Blue marks interactive things only. --accent (#007acc) is a fill and border, never text:
+ * links and accent text use --link. The assistant is teal; shipped status is --success green.
  */
 :root,
 [data-theme="workspace-blue"] {
@@ -24,9 +24,10 @@
   --statusbar: #007acc;
   --on-statusbar: #ffffff;
   --comment: #4ec9b0;
+  --success: #89d185;
   --tag: #c586c0;
-  --assistant: #6840c8;
-  --on-assistant: #ffffff;
-  --assistant-text: #b088f8;
-  --assistant-panel: #302840;
+  --assistant: #4ec9b0;
+  --on-assistant: #1e1e1e;
+  --assistant-text: #4ec9b0;
+  --assistant-panel: #252526;
 }

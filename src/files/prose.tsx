@@ -89,9 +89,9 @@ export function Chip({ children, to }: { children: ReactNode; to?: string }) {
   );
 }
 
-/** Status with a small dot: teal for shipped, mauve for building, muted for archived. */
+/** Status with a small dot: green for shipped, mauve for building, muted for archived. */
 export function StatusPill({ status }: { status: "shipped" | "building" | "archived" }) {
-  const dot = { shipped: "bg-comment", building: "bg-tag", archived: "bg-muted" }[status];
+  const dot = { shipped: "bg-success", building: "bg-tag", archived: "bg-muted" }[status];
   return (
     <span className="inline-flex h-6 items-center gap-1.5 rounded-full border border-border px-2.5 text-xs text-text">
       <span className={cx("size-1.5 rounded-full", dot)} aria-hidden />
