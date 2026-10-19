@@ -1,71 +1,70 @@
 import type { Page } from "@playwright/test";
-import { themes } from "../../src/themes/themes";
+import { themes, type ThemeId } from "../../src/themes/themes";
 import { test } from "./fixtures";
 
-const OUT = "screenshots/phase-2";
+const OUT = "screenshots/phase-3";
 
 const VIEWPORTS = [
   { name: "desktop", width: 1440, height: 900 },
   { name: "mobile", width: 375, height: 812 },
 ] as const;
 
-/** Welcome, agentguard.py and contact.http open, agentguard.py active. */
-async function openSampleTabs(page: Page, desktop: boolean) {
-  await page.goto("/");
-  if (desktop) {
-    const explorer = page.getByRole("navigation", { name: "Explorer" });
-    await explorer.getByRole("link", { name: "agentguard.py" }).click();
-    await explorer.getByRole("link", { name: "contact.http" }).click();
-    await page.getByRole("tab", { name: "agentguard.py" }).click();
-  } else {
-    await page.goto("/contact");
-    await page.goto("/projects/agentguard");
+const PAGES = {
+  welcome: "/",
+  project: "/projects/agentguard",
+  building: "/projects/llm-gateway",
+  source: "/projects/agentguard?view=source",
+  "git-graph": "/experience",
+  extensions: "/skills",
+  contact: "/contact",
+  about: "/about",
+  readme: "/readme",
+  plain: "/plain",
+} as const;
+
+type PageName = keyof typeof PAGES;
+
+/** Default theme: every page. The two themes furthest from it: the key pages. Others: Welcome. */
+const MATRIX: Record<ThemeId, PageName[]> = {
+  "workspace-blue": Object.keys(PAGES) as PageName[],
+  daylight: ["welcome", "project", "source", "git-graph", "contact"],
+  "high-contrast": ["welcome", "project", "source", "git-graph", "contact"],
+  floodlight: ["welcome"],
+  "solarized-dark": ["welcome"],
+};
+
+async function open(page: Page, theme: ThemeId, path: string) {
+  await page.addInitScript((id) => localStorage.setItem("theme", id), theme);
+  await page.goto(path);
+  if (path.includes("view=source")) {
+    await page.locator('pre[data-highlighted="true"]').waitFor();
   }
   await page.evaluate(() => document.fonts.ready);
 }
 
 for (const theme of themes) {
-  for (const viewport of VIEWPORTS) {
-    test(`${theme.id} ${viewport.name}`, async ({ page }) => {
-      await page.setViewportSize(viewport);
-      await page.addInitScript((id) => localStorage.setItem("theme", id), theme.id);
-      await openSampleTabs(page, viewport.name === "desktop");
-      await page.screenshot({ path: `${OUT}/${theme.id}-${viewport.name}.png` });
-    });
+  for (const name of MATRIX[theme.id]) {
+    for (const viewport of VIEWPORTS) {
+      test(`screenshots ${theme.id} ${name} ${viewport.name}`, async ({ page }) => {
+        await page.setViewportSize(viewport);
+        await open(page, theme.id, PAGES[name]);
+        await page.screenshot({ path: `${OUT}/${theme.id}-${name}-${viewport.name}.png` });
+      });
+    }
   }
 }
 
-test("default theme desktop, panel and settings open", async ({ page }) => {
+test("screenshots default theme mobile, explorer drawer open", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await open(page, "workspace-blue", "/projects/agentguard");
+  await page.getByRole("button", { name: "Open explorer" }).click();
+  await page.screenshot({ path: `${OUT}/workspace-blue-drawer-mobile.png` });
+});
+
+test("screenshots default theme desktop, panel open on the git graph", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await openSampleTabs(page, true);
-  await page.getByRole("button", { name: "Settings" }).click();
+  await open(page, "workspace-blue", "/experience");
   await page.getByRole("button", { name: /^Problems/ }).click();
   await page.getByRole("tab", { name: "Terminal" }).click();
-  await page.screenshot({ path: `${OUT}/default-desktop-panel.png` });
-});
-
-test("default theme desktop, 1280px", async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await openSampleTabs(page, true);
-  await page.screenshot({ path: `${OUT}/default-1280.png` });
-});
-
-test("default theme tablet, 1024px", async ({ page }) => {
-  await page.setViewportSize({ width: 1024, height: 768 });
-  await openSampleTabs(page, true);
-  await page.screenshot({ path: `${OUT}/default-tablet.png` });
-});
-
-test("default theme mobile, explorer drawer open", async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await openSampleTabs(page, false);
-  await page.getByRole("button", { name: "Open explorer" }).click();
-  await page.screenshot({ path: `${OUT}/default-mobile-drawer.png` });
-});
-
-test("default theme mobile, theme picker open", async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await openSampleTabs(page, false);
-  await page.getByRole("button", { name: /^Color theme/ }).click();
-  await page.screenshot({ path: `${OUT}/default-mobile-themes.png` });
+  await page.screenshot({ path: `${OUT}/workspace-blue-panel-desktop.png` });
 });
