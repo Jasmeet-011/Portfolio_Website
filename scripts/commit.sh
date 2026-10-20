@@ -6,8 +6,11 @@ cd "$(dirname "$0")/.."
 message="${1:?usage: scripts/commit.sh <message-file>}"
 test -s "$message"
 
-# The commit message must not carry a banned name either (see gate.sh).
-if grep -i -q -F "$(printf '%s' YmFja3N0b3A= | base64 -d)" "$message"; then
+# The commit message must not carry a banned name either (see gate.sh). Plain bash
+# matching, lowercased: this machine's grep aborts on -i -F, which would read as "no match".
+banned="$(printf '%s' YmFja3N0b3A= | base64 -d)"
+text="$(cat "$message")"
+if [[ "${text,,}" == *"${banned,,}"* ]]; then
   echo "the commit message contains a banned name"; exit 1
 fi
 
