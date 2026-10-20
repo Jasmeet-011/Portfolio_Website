@@ -5,6 +5,6 @@ import viteConfig from "./vite.config.ts";
 export default mergeConfig(
   viteConfig,
   defineConfig({
-    test: { include: ["src/**/*.test.ts"] },
+    test: { include: ["src/**/*.test.ts", "api/**/*.test.ts"] },
   }),
 );
