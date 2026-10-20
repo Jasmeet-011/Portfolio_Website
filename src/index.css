@@ -79,6 +79,13 @@ html[data-page="plain"] body {
   background: var(--selection);
 }
 
+/* Search matches in the open file (CSS Custom Highlight API, set by Editor.tsx). */
+::highlight(search) {
+  background-color: var(--selection);
+  color: var(--text);
+  text-decoration: underline 2px var(--focus);
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;

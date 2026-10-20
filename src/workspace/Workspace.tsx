@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { findState } from "@/lib/search";
 import { useIsDesktop } from "@/lib/useMediaQuery";
 import { usePreferences } from "@/store/preferences";
 import { useWorkspace } from "@/store/workspace";
@@ -40,14 +41,17 @@ export function Workspace() {
   const commands = useCommandList(active);
   useShortcuts(commands);
 
+  // A search result keeps the Search view open, like VS Code, even on a view's tab.
+  const fromSearch = findState(location.state) !== undefined;
+
   useLayoutEffect(() => {
     if (!active) return;
     const ws = useWorkspace.getState();
     ws.openTab(active.id);
     ws.touchRecent(active.id);
     ws.expandFolders(ancestorKeys(active));
-    if (active.view) ws.showView(active.view);
-  }, [active]);
+    if (active.view && !fromSearch) ws.showView(active.view);
+  }, [active, fromSearch]);
 
   // The phone drawer closes after every navigation and when the layout turns desktop.
   useEffect(() => {

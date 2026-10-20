@@ -3,6 +3,7 @@ import { ThemeOptions } from "../ThemeOptions";
 import { VIEW_TITLES } from "../views";
 import { Explorer } from "./Explorer";
 import { ExtensionsView } from "./ExtensionsView";
+import { SearchView } from "./SearchView";
 import { SourceControlView } from "./SourceControlView";
 
 /** The active view's contents. Shared by the desktop sidebar and the phone drawer. */
@@ -19,7 +20,7 @@ export function SidebarContent({
     case "explorer":
       return <Explorer activeId={activeId} touch={touch} />;
     case "search":
-      return <p className="px-4 py-1 text-muted">Full-text search arrives in Phase 4.</p>;
+      return <SearchView />;
     case "scm":
       return <SourceControlView />;
     case "extensions":

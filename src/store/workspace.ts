@@ -35,6 +35,8 @@ interface WorkspaceState {
   aboutOpen: boolean;
   toast: { id: number; text: string } | null;
   focus: { target: FocusTarget; id: number } | null;
+  /** The Search view's query, kept while other views are open. */
+  searchQuery: string;
 
   openTab: (id: string) => void;
   closeTab: (id: string) => void;
@@ -59,6 +61,7 @@ interface WorkspaceState {
   requestFocus: (target: FocusTarget) => void;
   /** Claims a pending focus request for `target`. True once per request. */
   takeFocus: (target: FocusTarget) => boolean;
+  setSearchQuery: (query: string) => void;
 }
 
 let nextId = 1;
@@ -80,6 +83,7 @@ export const useWorkspace = create<WorkspaceState>()(
       aboutOpen: false,
       toast: null,
       focus: null,
+      searchQuery: "",
 
       openTab: (id) => set((s) => (s.tabs.includes(id) ? s : { tabs: [...s.tabs, id] })),
       closeTab: (id) => set((s) => ({ tabs: s.tabs.filter((t) => t !== id) })),
@@ -131,6 +135,7 @@ export const useWorkspace = create<WorkspaceState>()(
         set({ focus: null });
         return true;
       },
+      setSearchQuery: (query) => set({ searchQuery: query }),
     }),
     {
       name: "workspace",
