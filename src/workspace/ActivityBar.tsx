@@ -1,13 +1,14 @@
-import { Blocks, BugPlay, Files, GitBranch, Search, Settings, Sparkles } from "lucide-react";
+import { Blocks, Files, GitBranch, Search, Settings } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cx } from "@/lib/cx";
 import { useWorkspace, type SidebarView } from "@/store/workspace";
 
+// Run and Debug is out until a second project has a running demo (plan.md Decisions log).
+// The assistant joins in Phase 5.
 const VIEWS: { view: SidebarView; label: string; Icon: LucideIcon }[] = [
   { view: "explorer", label: "Explorer", Icon: Files },
   { view: "search", label: "Search", Icon: Search },
   { view: "scm", label: "Source control", Icon: GitBranch },
-  { view: "run", label: "Run and debug", Icon: BugPlay },
   { view: "extensions", label: "Extensions", Icon: Blocks },
 ];
 
@@ -46,15 +47,6 @@ export function ActivityBar() {
         {VIEWS.map((v) => (
           <ViewButton key={v.view} {...v} />
         ))}
-        <button
-          type="button"
-          aria-label="Assistant"
-          aria-disabled="true"
-          title="The assistant arrives in Phase 5"
-          className={itemClass}
-        >
-          <Sparkles className="size-6" strokeWidth={1.5} aria-hidden />
-        </button>
       </div>
       <ViewButton view="settings" label="Settings" Icon={Settings} />
     </div>

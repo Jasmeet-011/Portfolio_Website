@@ -2,21 +2,30 @@ import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useWorkspace } from "@/store/workspace";
 import { EXPLORER_TOGGLE_ID } from "./MobileTopBar";
-import { Explorer } from "./Sidebar/Explorer";
+import { SidebarContent } from "./Sidebar/Sidebar";
+import { VIEW_TITLES } from "./views";
 
-const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex="0"]';
+const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex="0"]';
 
-/** The explorer as a modal drawer on phones. Traps focus and returns it on close. */
-export function ExplorerDrawer({ activeId }: { activeId: string | undefined }) {
+/**
+ * The sidebar as a modal drawer on phones: the explorer from the top bar, or any other
+ * view opened from the palette. Traps focus and returns it on close.
+ */
+export function SidebarDrawer({ activeId }: { activeId: string | undefined }) {
   const open = useWorkspace((s) => s.drawerOpen);
+  const view = useWorkspace((s) => s.sidebarView);
   const setDrawerOpen = useWorkspace((s) => s.setDrawerOpen);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const panel = panelRef.current;
     if (!open || !panel) return;
-    const current = panel.querySelector<HTMLElement>('[aria-current="page"]');
-    (current ?? panel.querySelector<HTMLElement>(FOCUSABLE))?.focus();
+    // A view that asked for focus (the search box, say) takes it; otherwise the active file.
+    if (!panel.contains(document.activeElement)) {
+      const current = panel.querySelector<HTMLElement>('[aria-current="page"]');
+      (current ?? panel.querySelector<HTMLElement>(FOCUSABLE))?.focus();
+    }
+    const returnTo = document.getElementById(EXPLORER_TOGGLE_ID);
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setDrawerOpen(false);
@@ -35,7 +44,7 @@ export function ExplorerDrawer({ activeId }: { activeId: string | undefined }) {
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.getElementById(EXPLORER_TOGGLE_ID)?.focus();
+      returnTo?.focus();
     };
   }, [open, setDrawerOpen]);
 
@@ -49,17 +58,17 @@ export function ExplorerDrawer({ activeId }: { activeId: string | undefined }) {
       />
       <div
         ref={panelRef}
-        id="explorer-drawer"
+        id="sidebar-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Explorer"
+        aria-label={VIEW_TITLES[view]}
         className="absolute inset-y-0 left-0 flex w-[min(20rem,85vw)] flex-col border-r border-border bg-chrome"
       >
         <div className="flex h-11 shrink-0 items-center justify-between pr-0 pl-4">
-          <h2 className="text-xs font-medium text-muted">Explorer</h2>
+          <h2 className="text-xs font-medium text-muted">{VIEW_TITLES[view]}</h2>
           <button
             type="button"
-            aria-label="Close explorer"
+            aria-label={`Close ${VIEW_TITLES[view].toLowerCase()}`}
             onClick={() => setDrawerOpen(false)}
             className="grid size-11 place-items-center text-text"
           >
@@ -67,7 +76,7 @@ export function ExplorerDrawer({ activeId }: { activeId: string | undefined }) {
           </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <Explorer activeId={activeId} touch />
+          <SidebarContent view={view} activeId={activeId} touch />
         </div>
       </div>
     </div>
