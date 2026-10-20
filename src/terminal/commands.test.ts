@@ -4,7 +4,8 @@ import { roles } from "@/content/experience";
 import { links } from "@/content/links";
 import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
-import { complete, execute, type TerminalContext } from "./commands";
+import marks from "@/assets/logo/marks.json";
+import { ART, complete, execute, type TerminalContext } from "./commands";
 import type { Segment } from "./store";
 
 function context(overrides: Partial<TerminalContext> = {}): TerminalContext {
@@ -89,6 +90,13 @@ describe("complete", () => {
 const NL = String.fromCharCode(10);
 
 describe("phase 4.5 commands", () => {
+  it("neofetch draws the site's chosen mark, J_", () => {
+    expect(marks.chosen).toBe("prompt");
+    const narrow = run("neofetch", context({ columns: 40 }));
+    expect(narrow.slice(0, ART.length)).toEqual(ART);
+    expect(ART.join("")).toContain("_____");
+  });
+
   it("neofetch shows the card beside the art when wide, below it when narrow", () => {
     const wide = run("neofetch");
     expect(wide.join(NL)).toContain(profile.name);

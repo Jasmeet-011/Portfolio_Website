@@ -116,14 +116,8 @@ function linkFor(arg: string): { href: string; label: string } | undefined {
   return github ? { href: github, label: `${project.name} on GitHub, ${bare(github)}` } : undefined;
 }
 
-/** "JW" in figlet's standard font. */
-const ART = [
-  "     _ __        __",
-  "    | |\\ \\      / /",
-  " _  | | \\ \\ /\\ / /",
-  "| |_| |  \\ V  V /",
-  " \\___/    \\_/\\_/",
-];
+/** The site's mark, "J_" (option C in docs/logo), in figlet's standard font. */
+export const ART = ["     _", "    | |", " _  | |", "| |_| | _____", " \\___/ |_____|"];
 const ART_WIDTH = Math.max(...ART.map((l) => l.length)) + 3;
 
 function neofetch(ctx: TerminalContext): Output {

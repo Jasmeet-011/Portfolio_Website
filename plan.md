@@ -6,9 +6,9 @@ Repo: github.com/Jasmeet-011/Portfolio_Website, branch `revamp/vscode`
 
 ## Status (2026-10-19)
 
-- **Done:** Phases 0 to 4 and the Phase 4.5 polish pass (traffic lights, larger type, logo, more terminal commands, hidden failed live links). Phase 4.5 awaits Jasmeet's review.
+- **Done:** Phases 0 to 4 and the Phase 4.5 polish pass (traffic lights, larger type, logo, more terminal commands, hidden failed live links). Phase 4.5 reviewed; logo C chosen.
 - **Current:** Phase 5, the assistant. Not started.
-- **Open `TODO(jasmeet)` items:** pick the logo (A, B or C; A is in place provisionally); headline, short bio, long bio; `public/resume.pdf`; periods for all seven projects; AWS certification month; ChainLens `context`; measured results for ChainLens, SilentSOS, LLM Gateway, SynapseMeet; `problem` and `built` for RepoScope, `problem` for CodeMate; whether to link `codemate-chat`; verify Formspree form `mzdarpdv`; review the Phase 3 copy pass and skill descriptions; bring the ChainLens, RepoScope and CodeMate backends back up (down when checked on 2026-10-19, see `liveCheck` in `src/content/projects.ts`).
+- **Open `TODO(jasmeet)` items:** headline, short bio, long bio; `public/resume.pdf`; periods for all seven projects; AWS certification month; ChainLens `context`; measured results for ChainLens, SilentSOS, LLM Gateway, SynapseMeet; `problem` and `built` for RepoScope, `problem` for CodeMate; whether to link `codemate-chat`; verify Formspree form `mzdarpdv`; review the Phase 3 copy pass and skill descriptions; bring the ChainLens, RepoScope and CodeMate backends back up (down when checked on 2026-10-19, see `liveCheck` in `src/content/projects.ts`).
 - **Pushing:** local commits only until Jasmeet says otherwise (see Decisions log).
 
 ---
@@ -483,3 +483,4 @@ Where an entry here conflicts with an earlier section of this file or with `CLAU
 | 2026-10-19 | **Logo:** an original mark, never the VS Code logo or anything like it (Microsoft's trademark). Workspace Blue, readable at 16px, used as the favicon (SVG plus PNG fallback and an Apple touch icon), in the title bar and in Help > About. All of it is generated from `src/assets/logo/marks.json` by `scripts/build-favicon.mjs`. Options A (JW monogram), B ([J] bracket) and C (J_ prompt) are in `docs/logo/`. Choice pending; A is in place provisionally. |
 | 2026-10-19 | **Terminal additions:** `neofetch`, `open <github|linkedin|email|project-slug>` (a project opens its live app only while its check passes, otherwise its GitHub repo; files still win, and `cat` stays files only), `education`, `certs` (certification and the IEEE paper), `echo`, `date`, `pwd`, and `sudo` with a short refusal. All output comes from `src/content`. |
 | 2026-10-19 | **Every commit goes through `scripts/commit.sh`**, which runs the full gate (format, theme contrast, types, build, lint with zero warnings, unit tests, e2e) and stops at the first failure. No commit while any step fails. |
+| 2026-10-20 | **Logo is option C, the `J_` prompt mark** (`"chosen": "prompt"` in `src/assets/logo/marks.json`). It is the favicon (SVG, 32px PNG, Apple touch icon), the title bar mark, the mark in Help > About and Settings, and `neofetch` draws it as `J_` in figlet's standard font. A unit test keeps the terminal art and the chosen mark in step. Options A and B stay in `docs/logo/` for the record. |
