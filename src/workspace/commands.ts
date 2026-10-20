@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { links } from "@/content/links";
 import { projects } from "@/content/projects";
 import { known } from "@/content/todo";
+import { shownLinks } from "@/lib/projects";
 import { useIsDesktop } from "@/lib/useMediaQuery";
 import { usePreferences } from "@/store/preferences";
 import { useTheme } from "@/store/theme";
@@ -44,7 +45,7 @@ const siteSource = links.others.find((l) => l.label === "Site source")?.href;
 const resume = known(links.resume);
 
 /** Projects whose live demo passed its last check (plan.md Decisions log, 2026-10-19). */
-const liveDemos = projects.filter((p) => p.links.live && p.liveCheck?.ok);
+const liveDemos = projects.filter((p) => shownLinks(p).live);
 
 function subscribeFullscreen(onChange: () => void) {
   document.addEventListener("fullscreenchange", onChange);
@@ -352,7 +353,7 @@ export function useCommandList(active: Doc | undefined): Command[] {
         id: `live.${p.slug}`,
         title: `Open ${p.name} live${p.archived ? " (archived)" : ""}`,
         label: `${p.name} live`,
-        run: () => openExternal(p.links.live ?? ""),
+        run: () => openExternal(shownLinks(p).live ?? ""),
       })),
     ];
     return list.filter((c): c is Command => c !== false);

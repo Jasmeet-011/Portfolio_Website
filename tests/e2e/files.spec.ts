@@ -81,9 +81,9 @@ test.describe("project files", () => {
   test("an archived project is marked archived", async ({ page }) => {
     await page.goto("/projects/codemate");
     await expect(editor(page)).toContainText("Archived. Kept here for the record.");
-    await expect(editor(page).getByRole("link", { name: /Live app/ })).toHaveAttribute(
+    await expect(editor(page).getByRole("link", { name: /Code on GitHub/ })).toHaveAttribute(
       "href",
-      "https://codemate-taupe.vercel.app",
+      "https://github.com/Jasmeet-011/Codemate",
     );
   });
 

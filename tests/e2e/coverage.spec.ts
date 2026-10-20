@@ -6,6 +6,7 @@ import { projects } from "../../src/content/projects";
 import * as skills from "../../src/content/skills";
 import { isTodo } from "../../src/content/todo";
 import { formatMonth } from "../../src/lib/dates";
+import { shownLinks } from "../../src/lib/projects";
 import { expect, test } from "./fixtures";
 
 /**
@@ -60,7 +61,15 @@ test("every piece of content is visible somewhere on the site", async ({ page })
   }
   const site = texts.join("\n").replace(/\s+/g, " ");
   const content = strings(
-    { education, experience, links, profile, projects, skills: skills.skills },
+    {
+      education,
+      experience,
+      links,
+      profile,
+      // A live app whose check failed is hidden on purpose (plan.md Decisions log).
+      projects: projects.map((p) => ({ ...p, links: shownLinks(p) })),
+      skills: skills.skills,
+    },
     "content",
   );
   const missing = content

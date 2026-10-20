@@ -2,7 +2,7 @@ import { GitBranch } from "lucide-react";
 import { projects, type Project } from "@/content/projects";
 import { skillSlug } from "@/content/skills";
 import { known } from "@/content/todo";
-import { branchName } from "@/lib/projects";
+import { branchName, shownLinks } from "@/lib/projects";
 import type { Doc } from "@/workspace/documents";
 import { FileView } from "./FileView";
 import { camelCase, js, py, snakeCase, type Value } from "./source/serialize";
@@ -18,7 +18,7 @@ function data(p: Project): { [key: string]: Value } {
     period: known(p.period),
     context: known(p.context),
     stack: p.stack,
-    links: { ...p.links },
+    links: { ...shownLinks(p) },
     problem: known(p.problem),
     built: known(p.built),
     results: known(p.results),
@@ -60,6 +60,7 @@ function Preview({ project: p, doc }: { project: Project; doc: Doc }) {
   const problem = known(p.problem);
   const period = known(p.period);
   const context = known(p.context);
+  const links = shownLinks(p);
   return (
     <Page>
       <FilePath>{doc.path.join("/")}</FilePath>
@@ -85,10 +86,10 @@ function Preview({ project: p, doc }: { project: Project; doc: Doc }) {
       {context && <Muted className="mt-2">{context}</Muted>}
 
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
-        {p.links.github && <External href={p.links.github}>Code on GitHub</External>}
-        {p.links.live && <External href={p.links.live}>Live app</External>}
-        {p.links.demo && <External href={p.links.demo}>Demo</External>}
-        {p.links.paper && <External href={p.links.paper}>Paper</External>}
+        {links.github && <External href={links.github}>Code on GitHub</External>}
+        {links.live && <External href={links.live}>Live app</External>}
+        {links.demo && <External href={links.demo}>Demo</External>}
+        {links.paper && <External href={links.paper}>Paper</External>}
       </div>
       {p.credits && (
         <p className="mt-3 text-muted">

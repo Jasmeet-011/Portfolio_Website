@@ -7,7 +7,7 @@ import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { isTodo, known } from "@/content/todo";
 import { formatMonth, formatRange } from "@/lib/dates";
-import { branchName } from "@/lib/projects";
+import { branchName, shownLinks } from "@/lib/projects";
 import { skillGroups } from "@/lib/skills";
 
 const link = "text-link underline underline-offset-2";
@@ -107,6 +107,7 @@ export function PlainView() {
               const built = known(p.built);
               const results = known(p.results);
               const context = known(p.context);
+              const live = shownLinks(p).live;
               return (
                 <Entry key={p.slug}>
                   <h3 className="font-semibold">
@@ -140,11 +141,11 @@ export function PlainView() {
                       )}
                     </p>
                   )}
-                  {p.links.live && (
+                  {live && (
                     <p>
                       Live:{" "}
-                      <a href={p.links.live} className={link}>
-                        {p.links.live.replace(/^https:\/\//, "")}
+                      <a href={live} className={link}>
+                        {live.replace(/^https:\/\//, "")}
                       </a>
                     </p>
                   )}

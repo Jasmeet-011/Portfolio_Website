@@ -3,7 +3,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export const SIDEBAR_VIEWS = ["explorer", "search", "scm", "extensions", "settings"] as const;
 export type SidebarView = (typeof SIDEBAR_VIEWS)[number];
-export type PanelTab = "terminal" | "problems" | "output";
+// "output" joins with the assistant trace in Phase 5.
+export const PANEL_TABS = ["terminal", "problems"] as const;
+export type PanelTab = (typeof PANEL_TABS)[number];
 
 /** Something that should take focus once it renders, e.g. the search box. */
 export type FocusTarget = "search" | "terminal" | "shortcuts";
@@ -150,11 +152,12 @@ export const useWorkspace = create<WorkspaceState>()(
         panelTab: s.panelTab,
         expanded: s.expanded,
       }),
-      // A session saved before a view was removed (Run and Debug) falls back to the explorer.
+      // A session saved with a view or panel tab that no longer exists falls back to the default.
       merge: (persisted, current) => {
         const saved = (persisted ?? {}) as Partial<WorkspaceState>;
         const view = SIDEBAR_VIEWS.find((v) => v === saved.sidebarView) ?? "explorer";
-        return { ...current, ...saved, sidebarView: view };
+        const panelTab = PANEL_TABS.find((t) => t === saved.panelTab) ?? "terminal";
+        return { ...current, ...saved, sidebarView: view, panelTab };
       },
     },
   ),

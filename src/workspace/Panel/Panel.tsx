@@ -7,7 +7,6 @@ import { Terminal } from "@/terminal/Terminal";
 const TABS: { id: PanelTab; label: string }[] = [
   { id: "terminal", label: "Terminal" },
   { id: "problems", label: "Problems" },
-  { id: "output", label: "Output" },
 ];
 
 function Body({ tab }: { tab: PanelTab }) {
@@ -16,16 +15,12 @@ function Body({ tab }: { tab: PanelTab }) {
       return <Terminal />;
     case "problems":
       return <p className="text-muted">No problems have been detected in the workspace.</p>;
-    case "output":
-      return (
-        <p className="text-muted">
-          Output channels, including the assistant trace, arrive in Phase 5.
-        </p>
-      );
   }
 }
 
-/** Terminal, Problems and Output. Docked under the editor on desktop, a bottom sheet on phones. */
+/**
+ * Terminal and Problems. The Output tab (with the assistant trace) joins in Phase 5.
+ * Docked under the editor on desktop, a bottom sheet on phones. */
 export function Panel({ isDesktop }: { isDesktop: boolean }) {
   const tab = useWorkspace((s) => s.panelTab);
   const setPanelTab = useWorkspace((s) => s.setPanelTab);
