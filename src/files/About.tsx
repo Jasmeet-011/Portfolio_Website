@@ -73,7 +73,7 @@ function Preview() {
       </Lead>
       {bio && <p className="mt-3">{bio}</p>}
 
-      <H2>Now</H2>
+      <H2 id="now">Now</H2>
       {current.map((r) => (
         <div key={r.slug} className="mb-4">
           <p className="font-semibold">
@@ -87,7 +87,7 @@ function Preview() {
         <Open to="/experience">Full history in the Git Graph</Open>
       </p>
 
-      <H2>Education</H2>
+      <H2 id="education">Education</H2>
       {degrees.map((d) => (
         <div key={d.slug} className="mb-4">
           <p className="font-semibold">{d.degree}</p>
@@ -98,7 +98,7 @@ function Preview() {
         </div>
       ))}
 
-      <H2>Certification</H2>
+      <H2 id="certification">Certification</H2>
       {certifications.map((c) => (
         <div key={c.slug} className="mb-4">
           <p>
@@ -111,7 +111,7 @@ function Preview() {
         </div>
       ))}
 
-      <H2>Publication</H2>
+      <H2 id="publication">Publication</H2>
       {publications.map((p) => (
         <div key={p.slug} className="mb-4">
           <p>

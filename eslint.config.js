@@ -7,7 +7,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["dist", "test-results", "playwright-report", "screenshots"]),
+  globalIgnores(["dist", "test-results", "playwright-report", "screenshots", "api/_generated"]),
   {
     files: ["src/**/*.{ts,tsx}"],
     extends: [
@@ -19,7 +19,7 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ["*.config.ts", "tests/**/*.ts"],
+    files: ["*.config.ts", "tests/**/*.ts", "api/**/*.ts", "evals/**/*.ts", "src/**/*.test.ts"],
     extends: [js.configs.recommended, tseslint.configs.strict],
     languageOptions: { globals: globals.node },
   },

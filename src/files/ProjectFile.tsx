@@ -100,19 +100,19 @@ function Preview({ project: p, doc }: { project: Project; doc: Doc }) {
 
       {problem && (
         <>
-          <H2>Problem</H2>
+          <H2 id="problem">Problem</H2>
           <p>{problem}</p>
         </>
       )}
       {built && (
         <>
-          <H2>What I built</H2>
+          <H2 id="built">What I built</H2>
           <Bullets items={built} />
         </>
       )}
       {results && (
         <>
-          <H2>Results</H2>
+          <H2 id="results">Results</H2>
           <Bullets items={results} />
         </>
       )}

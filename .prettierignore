@@ -6,3 +6,4 @@ package-lock.json
 screenshots
 test-results
 playwright-report
+api/_generated
