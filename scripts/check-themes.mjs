@@ -28,6 +28,9 @@ const TOKENS = [
   "on-assistant",
   "assistant-text",
   "assistant-panel",
+  "window-close",
+  "window-minimize",
+  "window-zoom",
 ];
 
 // Every surface that text can sit on.

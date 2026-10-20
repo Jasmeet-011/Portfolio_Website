@@ -25,4 +25,8 @@
   --on-assistant: #000000;
   --assistant-text: #ffffff;
   --assistant-panel: #000000;
+  /* macOS window controls, the same in every theme. Decorative. */
+  --window-close: #ff5f57;
+  --window-minimize: #febc2e;
+  --window-zoom: #28c840;
 }

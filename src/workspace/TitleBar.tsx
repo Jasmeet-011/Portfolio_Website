@@ -5,13 +5,16 @@ import { WORKSPACE_NAME } from "./documents";
 import { formatKeys } from "./keys";
 import { MenuBar } from "./MenuBar";
 
-/** Window dots, drawn in the theme's border color rather than macOS colors. */
-function WindowDots() {
+/**
+ * macOS traffic lights: close, minimize, zoom. Decorative, since a web page can't close
+ * its window. The title bar only renders from 768px up, so phones never show them.
+ */
+function TrafficLights() {
   return (
-    <div className="flex shrink-0 gap-2" aria-hidden="true">
-      <span className="size-3 rounded-full bg-border" />
-      <span className="size-3 rounded-full bg-border" />
-      <span className="size-3 rounded-full bg-border" />
+    <div className="flex shrink-0 gap-2" aria-hidden="true" data-testid="traffic-lights">
+      <span className="size-3 rounded-full bg-window-close" />
+      <span className="size-3 rounded-full bg-window-minimize" />
+      <span className="size-3 rounded-full bg-window-zoom" />
     </div>
   );
 }
@@ -22,7 +25,7 @@ export function TitleBar() {
   return (
     <header className="grid h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border bg-titlebar px-3">
       <div className="flex min-w-0 items-center gap-3">
-        <WindowDots />
+        <TrafficLights />
         <MenuBar />
       </div>
       <button

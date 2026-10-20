@@ -36,6 +36,9 @@
   --color-on-assistant: var(--on-assistant);
   --color-assistant-text: var(--assistant-text);
   --color-assistant-panel: var(--assistant-panel);
+  --color-window-close: var(--window-close);
+  --color-window-minimize: var(--window-minimize);
+  --color-window-zoom: var(--window-zoom);
 
   --font-sans:
     "IBM Plex Sans Variable", "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
