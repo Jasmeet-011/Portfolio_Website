@@ -1,5 +1,6 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import type { Redis } from "@upstash/redis";
+import { LIMITS } from "./protocol.js";
 
 /** A counter that allows `limit` hits per window. `reset` is epoch milliseconds. */
 export interface Limiter {
@@ -10,7 +11,7 @@ export interface Limiter {
 }
 
 export const LIMIT_DEFAULTS = {
-  perIpHourly: 10,
+  perIpHourly: LIMITS.hourlyQuestions,
   dailyCap: 300,
   /** Repeat clicks on a cached suggested question: free, but not unlimited. */
   cachedPerIpHourly: 60,

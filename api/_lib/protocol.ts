@@ -13,6 +13,8 @@ export const LIMITS = {
   historyMessageChars: 2000,
   bodyBytes: 8192,
   maxOutputTokens: 1024,
+  /** Default hourly questions per visitor; the server can be configured otherwise. */
+  hourlyQuestions: 10,
 } as const;
 
 export interface ChatTurn {

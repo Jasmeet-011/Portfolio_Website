@@ -3,12 +3,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export const SIDEBAR_VIEWS = ["explorer", "search", "scm", "extensions", "settings"] as const;
 export type SidebarView = (typeof SIDEBAR_VIEWS)[number];
-// "output" joins with the assistant trace in Phase 5.
-export const PANEL_TABS = ["terminal", "problems"] as const;
+export const PANEL_TABS = ["terminal", "problems", "output"] as const;
 export type PanelTab = (typeof PANEL_TABS)[number];
 
 /** Something that should take focus once it renders, e.g. the search box. */
-export type FocusTarget = "search" | "terminal" | "shortcuts";
+export type FocusTarget = "search" | "terminal" | "shortcuts" | "assistant";
 
 const RECENT_LIMIT = 10;
 

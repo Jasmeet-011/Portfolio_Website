@@ -17,6 +17,8 @@ export const test = base.extend({
       // Chrome logs every non-2xx fetch. contact.http shows Formspree's error responses on
       // purpose, so those are expected; anything else still fails the test.
       if (msg.location().url.startsWith("https://formspree.io/")) return;
+      // Likewise the assistant's limit responses (429), which the panel shows on purpose.
+      if (new URL(msg.location().url || "about:blank").pathname === "/api/copilot") return;
       if (msg.type() === "error" || msg.type() === "warning") {
         problems.push(`${msg.type()}: ${msg.text()}`);
       }

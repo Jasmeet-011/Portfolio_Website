@@ -27,6 +27,8 @@ export interface TerminalContext {
   now: () => Date;
   /** Characters that fit on one line, so wide output can fall back to a narrow layout. */
   columns: number;
+  /** Sends a question to the assistant; the answer streams in below. */
+  ask: (question: string) => void;
   setTheme: (id: ThemeId) => void;
   currentTheme: ThemeId;
   closePanel: () => void;
@@ -219,6 +221,20 @@ const COMMANDS: TerminalCommand[] = [
     args: "<file>",
     description: "open a file in a tab",
     run: (args, ctx) => openFile("cat", args, ctx),
+  },
+  {
+    name: "ask",
+    args: "<question>",
+    description: "ask the assistant; answers cite their sources",
+    run: (args, ctx) => {
+      const question = args
+        .join(" ")
+        .replace(/^(["'])(.*)\1$/, "$2")
+        .trim();
+      if (!question) return say('usage: ask "what did Jasmeet build in AgentGuard?"');
+      ctx.ask(question);
+      return [];
+    },
   },
   {
     name: "projects",

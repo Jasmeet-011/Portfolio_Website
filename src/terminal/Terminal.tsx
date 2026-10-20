@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { chunkById } from "@/assistant/format";
+import { runAssistant } from "@/assistant/store";
 import { cx } from "@/lib/cx";
 import { useTheme } from "@/store/theme";
 import { useWorkspace } from "@/store/workspace";
@@ -53,6 +55,42 @@ function columnsOf(el: HTMLElement | null): number {
 }
 
 /**
+ * `ask`: the answer streams into one line, then its sources follow as links. Shares the
+ * panel's limits, quota and trace.
+ */
+function askInTerminal(question: string) {
+  const term = useTerminal.getState();
+  const id = term.printLive([{ text: "Looking through the workspace…", tone: "muted" }]);
+  void runAssistant(
+    { question },
+    { question, chip: false, source: "terminal" },
+    { onText: (text) => useTerminal.getState().update(id, [{ text }]) },
+  ).then((result) => {
+    const { update, print } = useTerminal.getState();
+    if (result.error && !result.text) {
+      const at = result.error.resetAt
+        ? ` It resets at ${new Date(result.error.resetAt).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}.`
+        : "";
+      update(id, [{ text: `ask: ${result.error.message}${at}` }]);
+      return;
+    }
+    const sources = result.declined
+      ? []
+      : result.citations.map((c) => chunkById.get(c)).filter((c) => c !== undefined);
+    if (sources.length)
+      print([
+        [
+          { text: "Sources: ", tone: "muted" },
+          ...sources.flatMap((c, i): Segment[] => [
+            ...(i > 0 ? [{ text: ", " }] : []),
+            { text: c.label, tone: "link", to: c.route },
+          ]),
+        ],
+      ]);
+  });
+}
+
+/**
  * A terminal that takes the commands in plan.md 7.6. Enter runs, up and down walk the
  * history, Tab completes (and moves focus on as usual when the line is empty).
  */
@@ -88,6 +126,7 @@ export function Terminal() {
       openExternal,
       now: () => new Date(),
       columns: columnsOf(rootRef.current),
+      ask: askInTerminal,
       setTheme: (id) => useTheme.getState().setTheme(id),
       currentTheme: useTheme.getState().theme,
       closePanel: () => useWorkspace.getState().closePanel(),

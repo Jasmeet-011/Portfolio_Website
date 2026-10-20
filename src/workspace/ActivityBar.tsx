@@ -1,10 +1,10 @@
-import { Blocks, Files, GitBranch, Search, Settings } from "lucide-react";
+import { Blocks, Files, GitBranch, Search, Settings, Sparkles } from "lucide-react";
+import { useAssistant } from "@/assistant/store";
 import type { LucideIcon } from "lucide-react";
 import { cx } from "@/lib/cx";
 import { useWorkspace, type SidebarView } from "@/store/workspace";
 
 // Run and Debug is out until a second project has a running demo (plan.md Decisions log).
-// The assistant joins in Phase 5.
 const VIEWS: { view: SidebarView; label: string; Icon: LucideIcon }[] = [
   { view: "explorer", label: "Explorer", Icon: Files },
   { view: "search", label: "Search", Icon: Search },
@@ -36,6 +36,31 @@ function ViewButton({ view, label, Icon }: { view: SidebarView; label: string; I
   );
 }
 
+/** Opens the assistant panel; not a sidebar view. */
+function AssistantButton() {
+  const open = useAssistant((s) => s.open);
+  const requestFocus = useWorkspace((s) => s.requestFocus);
+  return (
+    <button
+      type="button"
+      aria-label="Assistant"
+      aria-pressed={open}
+      title="Assistant"
+      onClick={() => {
+        useAssistant.getState().setOpen(!open);
+        if (!open) requestFocus("assistant");
+      }}
+      className={itemClass}
+    >
+      <span
+        className={cx("absolute inset-y-1.5 left-0 w-0.5 bg-text", !open && "hidden")}
+        aria-hidden
+      />
+      <Sparkles className="size-6" strokeWidth={1.5} aria-hidden />
+    </button>
+  );
+}
+
 export function ActivityBar() {
   return (
     <div
@@ -47,6 +72,7 @@ export function ActivityBar() {
         {VIEWS.map((v) => (
           <ViewButton key={v.view} {...v} />
         ))}
+        <AssistantButton />
       </div>
       <ViewButton view="settings" label="Settings" Icon={Settings} />
     </div>

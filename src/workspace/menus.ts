@@ -39,8 +39,10 @@ const LAYOUT: { label: string; items: string[] }[] = [
       "view.scm",
       "view.extensions",
       "view.settings",
+      "assistant.toggle",
       "-",
       "view.terminal",
+      "view.output",
       "-",
       "view.toggleSidebar",
       "view.zen",
@@ -69,7 +71,7 @@ const LAYOUT: { label: string; items: string[] }[] = [
     label: "Help",
     items: ["help.welcome", "help.shortcuts", "-", "help.source", "help.plain", "-", "help.about"],
   },
-  // The Assistant menu (Open Chat, Clear Conversation, Show Trace) arrives in Phase 5.
+  { label: "Assistant", items: ["assistant.open", "assistant.clear", "-", "assistant.trace"] },
 ];
 
 const RECENT_IN_MENU = 5;

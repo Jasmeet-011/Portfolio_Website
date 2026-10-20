@@ -161,7 +161,7 @@ test.describe("desktop", () => {
       await context.route("https://github.com/**", (route) => route.fulfill({ body: "" }));
       await page.goto("/about");
       const labels = await menubar(page).getByRole("menuitem").allInnerTexts();
-      expect(labels).toEqual(["File", "Edit", "View", "Go", "Terminal", "Help"]);
+      expect(labels).toEqual(["File", "Edit", "View", "Go", "Terminal", "Help", "Assistant"]);
       for (const label of labels) {
         const count = await (
           await openMenu(page, label)

@@ -1,7 +1,9 @@
 import { useEffect, useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { findState } from "@/lib/search";
-import { useIsDesktop } from "@/lib/useMediaQuery";
+import { AssistantPanel } from "@/assistant/AssistantPanel";
+import { useAssistant } from "@/assistant/store";
+import { useIsDesktop, useMediaQuery } from "@/lib/useMediaQuery";
 import { usePreferences } from "@/store/preferences";
 import { useWorkspace } from "@/store/workspace";
 import { AboutDialog } from "./AboutDialog";
@@ -33,6 +35,9 @@ export function Workspace() {
   const doc = docForPath(location.pathname);
   const active = doc && !isClosedAll(location.state) ? doc : undefined;
   const isDesktop = useIsDesktop();
+  // plan.md 8: the assistant splits the editor from 1280px, overlays it from 768px.
+  const isWide = useMediaQuery("(min-width: 1280px)");
+  const assistantOpen = useAssistant((s) => s.open);
   const sidebarOpen = useWorkspace((s) => s.sidebarOpen);
   const panelOpen = useWorkspace((s) => s.panelOpen);
   // Zen mode is a desktop layout; phones are already minimal.
@@ -75,7 +80,9 @@ export function Workspace() {
             <Editor doc={doc} active={active} pathname={location.pathname} />
             {panelOpen && <Panel isDesktop={isDesktop} />}
           </div>
+          {assistantOpen && isWide && <AssistantPanel mode="split" />}
         </div>
+        {assistantOpen && !isWide && <AssistantPanel mode={isDesktop ? "overlay" : "sheet"} />}
         {!zen && <StatusBar doc={active} />}
         {!isDesktop && <SidebarDrawer activeId={active?.id} />}
         <CommandPalette />

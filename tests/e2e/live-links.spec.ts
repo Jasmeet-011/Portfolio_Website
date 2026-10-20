@@ -34,10 +34,10 @@ test("a project page with no passing check has no Live app link", async ({ page 
   }
 });
 
-test("the panel has no Output tab until the assistant arrives", async ({ page }) => {
+test("the panel has Terminal, Problems and Output, and no placeholder text", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /^Problems/ }).click();
   const panel = page.getByRole("region", { name: "Panel" });
-  await expect(panel.getByRole("tab")).toHaveText(["Terminal", "Problems"]);
+  await expect(panel.getByRole("tab")).toHaveText(["Terminal", "Problems", "Output"]);
   await expect(page.getByText(/arrive in Phase 5/)).toHaveCount(0);
 });

@@ -1,4 +1,5 @@
-import { CircleX, GitBranch, TriangleAlert } from "lucide-react";
+import { CircleX, GitBranch, Sparkles, TriangleAlert } from "lucide-react";
+import { useAssistant } from "@/assistant/store";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { cx } from "@/lib/cx";
@@ -30,6 +31,38 @@ function Clock() {
     <Item className="hidden sm:flex">
       <time dateTime={now.toISOString()}>{label}</time>
     </Item>
+  );
+}
+
+/** Assistant status (plan.md 7.5): idle, thinking or rate limited. Toggles the panel. */
+function AssistantStatus() {
+  const open = useAssistant((s) => s.open);
+  const status = useAssistant((s) =>
+    s.busy
+      ? "thinking"
+      : s.notice?.code === "unavailable"
+        ? "unavailable"
+        : s.notice
+          ? "rate limited"
+          : "idle",
+  );
+  const requestFocus = useWorkspace((s) => s.requestFocus);
+  return (
+    <button
+      type="button"
+      aria-label={`Assistant: ${status}`}
+      aria-pressed={open}
+      onClick={() => {
+        useAssistant.getState().setOpen(!open);
+        if (!open) requestFocus("assistant");
+      }}
+      className={button}
+    >
+      <Sparkles className="size-3.5" aria-hidden />
+      <span className="hidden sm:inline">
+        {status === "idle" ? "Assistant" : `Assistant ${status}`}
+      </span>
+    </button>
   );
 }
 
@@ -117,6 +150,7 @@ export function StatusBar({ doc }: { doc: Doc | undefined }) {
         <Item className="hidden sm:flex">{WORKSPACE_NAME}</Item>
       </div>
       <div className="flex h-full items-center">
+        <AssistantStatus />
         <Link to="/plain" className={button}>
           Plain view
         </Link>

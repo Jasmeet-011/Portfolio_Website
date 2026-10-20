@@ -52,6 +52,9 @@ const EFFECTS: Record<string, (page: Page) => Promise<void>> = {
   "View: Open Next Editor": async (page) => {
     await expect(page).toHaveURL("/");
   },
+  "View: Toggle Assistant": async (page) => {
+    await expect(page.getByRole("complementary", { name: "Assistant" })).toBeVisible();
+  },
   "View: Open Previous Editor": async (page) => {
     await expect(page).toHaveURL("/");
   },

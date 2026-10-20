@@ -3,10 +3,12 @@ import { useEffect, type KeyboardEvent } from "react";
 import { cx } from "@/lib/cx";
 import { useWorkspace, type PanelTab } from "@/store/workspace";
 import { Terminal } from "@/terminal/Terminal";
+import { OutputView } from "./OutputView";
 
 const TABS: { id: PanelTab; label: string }[] = [
   { id: "terminal", label: "Terminal" },
   { id: "problems", label: "Problems" },
+  { id: "output", label: "Output" },
 ];
 
 function Body({ tab }: { tab: PanelTab }) {
@@ -15,11 +17,13 @@ function Body({ tab }: { tab: PanelTab }) {
       return <Terminal />;
     case "problems":
       return <p className="text-muted">No problems have been detected in the workspace.</p>;
+    case "output":
+      return <OutputView />;
   }
 }
 
 /**
- * Terminal and Problems. The Output tab (with the assistant trace) joins in Phase 5.
+ * Terminal, Problems, and Output with the Assistant trace channel.
  * Docked under the editor on desktop, a bottom sheet on phones. */
 export function Panel({ isDesktop }: { isDesktop: boolean }) {
   const tab = useWorkspace((s) => s.panelTab);

@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo, useSyncExternalStore } from "react"
 import { useNavigate } from "react-router-dom";
 import { links } from "@/content/links";
 import { projects } from "@/content/projects";
+import { useAssistant } from "@/assistant/store";
 import { known } from "@/content/todo";
 import { shownLinks } from "@/lib/projects";
 import { useIsDesktop } from "@/lib/useMediaQuery";
@@ -11,7 +12,7 @@ import { useWorkspace, type SidebarView } from "@/store/workspace";
 import { useTerminal } from "@/terminal/store";
 import { themes } from "@/themes/themes";
 import { docById, type Doc } from "./documents";
-import type { KeyCombo } from "./keys";
+import { ASSISTANT_KEYS, type KeyCombo } from "./keys";
 import { currentDoc, useCloseTab } from "./navigation";
 
 /**
@@ -69,6 +70,7 @@ export function useCommandList(active: Doc | undefined): Command[] {
   const tabs = useWorkspace((s) => s.tabs);
   const zen = useWorkspace((s) => s.zen !== null);
   const theme = useTheme((s) => s.theme);
+  const hasConversation = useAssistant((s) => s.messages.length > 0);
   const fullscreen = useSyncExternalStore(subscribeFullscreen, isFullscreen);
 
   return useMemo(() => {
@@ -293,6 +295,50 @@ export function useCommandList(active: Doc | undefined): Command[] {
       { id: "go.back", title: "Go: Go Back", label: "Back", run: () => navigate(-1) },
       { id: "go.forward", title: "Go: Go Forward", label: "Forward", run: () => navigate(1) },
 
+      {
+        id: "view.output",
+        title: "View: Toggle Output",
+        label: "Output",
+        run: () => ws().togglePanel("output"),
+      },
+      {
+        id: "assistant.toggle",
+        title: "View: Toggle Assistant",
+        label: "Assistant",
+        keys: [ASSISTANT_KEYS],
+        run: () => {
+          const open = !useAssistant.getState().open;
+          useAssistant.getState().setOpen(open);
+          if (open) ws().requestFocus("assistant");
+        },
+      },
+
+      // Assistant
+      {
+        id: "assistant.open",
+        title: "Assistant: Open Chat",
+        label: "Open Chat",
+        run: () => {
+          useAssistant.getState().setOpen(true);
+          ws().requestFocus("assistant");
+        },
+      },
+      {
+        id: "assistant.clear",
+        title: "Assistant: Clear Conversation",
+        label: "Clear Conversation",
+        enabled: hasConversation,
+        run: () => useAssistant.getState().clear(),
+      },
+      {
+        id: "assistant.trace",
+        title: "Assistant: Show Trace",
+        label: "Show Trace",
+        run: () => {
+          if (!ws().panelOpen || ws().panelTab !== "output") ws().togglePanel("output");
+        },
+      },
+
       // Terminal
       {
         id: "terminal.new",
@@ -357,7 +403,7 @@ export function useCommandList(active: Doc | undefined): Command[] {
       })),
     ];
     return list.filter((c): c is Command => c !== false);
-  }, [active, closeTab, fullscreen, isDesktop, navigate, tabs.length, theme, zen]);
+  }, [active, closeTab, fullscreen, hasConversation, isDesktop, navigate, tabs.length, theme, zen]);
 }
 
 export const CommandsContext = createContext<Command[]>([]);

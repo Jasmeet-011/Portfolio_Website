@@ -76,7 +76,8 @@ const PAIRS = [
 ];
 
 // Fill-only tokens: below AA as text on the dark surfaces, so never used as a text color.
-const FILL_ONLY = /\b(?:text|placeholder|caret)-(?:accent|assistant|statusbar)\b/;
+// The name must end there: text-assistant-text is the AA-checked text token, not a misuse.
+const FILL_ONLY = /\b(?:text|placeholder|caret)-(?:accent|assistant|statusbar)(?![\w-])/;
 
 const luminance = (hex) => {
   const [r, g, b] = [1, 3, 5]

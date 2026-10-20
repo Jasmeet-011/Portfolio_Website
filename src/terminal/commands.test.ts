@@ -14,6 +14,7 @@ function context(overrides: Partial<TerminalContext> = {}): TerminalContext {
     openExternal: vi.fn(),
     now: () => new Date(2026, 9, 19, 22, 31, 5),
     columns: 120,
+    ask: vi.fn(),
     setTheme: vi.fn(),
     currentTheme: "workspace-blue",
     closePanel: vi.fn(),
@@ -166,5 +167,19 @@ describe("phase 4.5 commands", () => {
     // The project slug and the file share a prefix: the first Tab extends to it, the next lists both.
     expect(complete("open agentg").value).toBe("open agentguard");
     expect(complete("open agentguard").options).toEqual(["agentguard", "agentguard.py"]);
+  });
+});
+
+describe("ask", () => {
+  it("sends the question, without surrounding quotes, to the assistant", () => {
+    const ctx = context();
+    expect(run('ask "What did Jasmeet build in AgentGuard?"', ctx)).toEqual([]);
+    expect(ctx.ask).toHaveBeenCalledWith("What did Jasmeet build in AgentGuard?");
+  });
+
+  it("shows usage when there is no question, and is in help and completion", () => {
+    expect(run("ask")[0]).toMatch(/^usage: ask/);
+    expect(run("help").join("|")).toContain("ask <question>");
+    expect(complete("as").value).toBe("ask ");
   });
 });

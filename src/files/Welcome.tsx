@@ -6,6 +6,7 @@ import {
   GitBranch,
   GitGraph,
   Send,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -19,6 +20,9 @@ import { known } from "@/content/todo";
 import { branchName } from "@/lib/projects";
 import { documents } from "@/workspace/documents";
 import { useRevealFolder } from "@/workspace/navigation";
+import { ASSISTANT_KEYS, formatKeys } from "@/workspace/keys";
+import { useAssistant } from "@/assistant/store";
+import { useWorkspace } from "@/store/workspace";
 import { StatusPill } from "./prose";
 
 const current = roles.filter((r) => r.end === null);
@@ -122,6 +126,15 @@ export function Welcome() {
                 label="Open projects"
                 hint="projects/"
                 onClick={() => reveal("projects")}
+              />
+              <Action
+                icon={Sparkles}
+                label="Ask the assistant"
+                hint={formatKeys(ASSISTANT_KEYS)}
+                onClick={() => {
+                  useAssistant.getState().setOpen(true);
+                  useWorkspace.getState().requestFocus("assistant");
+                }}
               />
               <Action icon={BookOpen} label="About me" hint="about.py" to="/about" />
               <Action icon={GitGraph} label="Career history" hint="Git Graph" to="/experience" />

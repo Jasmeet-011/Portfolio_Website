@@ -47,9 +47,9 @@ test("help lists every command, and unknown ones get a hint", async ({ page }) =
     "exit",
   ])
     await expect(output(page)).toContainText(name);
-  // resume appears only once public/resume.pdf exists; ask arrives in Phase 5.
+  // resume appears only once public/resume.pdf exists.
   await expect(output(page)).not.toContainText("resume");
-  await expect(output(page)).not.toContainText("ask");
+  await expect(output(page)).toContainText("ask <question>");
   await run(page, "frobnicate");
   await expect(output(page)).toContainText("command not found: frobnicate. Try help.");
   await run(page, "sudo rm -rf /");

@@ -15,6 +15,11 @@ export interface KeyCombo {
 export const isMac =
   typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.platform);
 
+/** Ctrl+Alt+I, or Cmd+Ctrl+I on macOS, like VS Code's chat (Decisions log, 2026-10-20). */
+export const ASSISTANT_KEYS: KeyCombo = isMac
+  ? { code: "KeyI", mod: true, ctrl: true }
+  : { code: "KeyI", ctrl: true, alt: true };
+
 export function matches(event: KeyboardEvent, combo: KeyCombo): boolean {
   const ctrl = !!combo.ctrl || (!!combo.mod && !isMac);
   const meta = !!combo.mod && isMac;

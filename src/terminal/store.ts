@@ -26,6 +26,9 @@ interface TerminalState {
   /** Commands entered this session, oldest first. */
   history: string[];
   print: (lines: Segment[][]) => void;
+  /** Prints a line that can change later, e.g. a streaming answer. Returns its id. */
+  printLive: (segments: Segment[]) => number;
+  update: (id: number, segments: Segment[]) => void;
   remember: (command: string) => void;
   clear: () => void;
   /** A fresh session: greeting only, history kept like a shell's history file. */
@@ -36,6 +39,13 @@ export const useTerminal = create<TerminalState>((set) => ({
   lines: [line(GREETING)],
   history: [],
   print: (lines) => set((s) => ({ lines: [...s.lines, ...lines.map(line)] })),
+  printLive: (segments) => {
+    const created = line(segments);
+    set((s) => ({ lines: [...s.lines, created] }));
+    return created.id;
+  },
+  update: (id, segments) =>
+    set((s) => ({ lines: s.lines.map((l) => (l.id === id ? { ...l, segments } : l)) })),
   remember: (command) =>
     set((s) => (s.history.at(-1) === command ? s : { history: [...s.history, command] })),
   clear: () => set({ lines: [] }),
