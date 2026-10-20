@@ -38,6 +38,11 @@ interface ProjectBase {
   /** Feeds the Extensions view. Only what the built code uses. */
   stack: string[];
   links: ProjectLinks;
+  /**
+   * The last check that `links.live` loads and works end to end. Only a passing check
+   * gets an "Open <name> live" command in the palette. Maintenance data, not copy.
+   */
+  liveCheck?: { date: string; ok: boolean; note: string };
   context?: string | Todo;
   /** Work by other people, credited in one line. Never listed under built. */
   credits?: { text: string; href?: string };
@@ -112,6 +117,12 @@ export const projects: Project[] = [
     links: {
       github: "https://github.com/Jasmeet-011/On-Chain-Portfolio",
       live: "https://on-chain-portfolio.vercel.app",
+    },
+    // TODO(jasmeet): the ChainLens backend is down. Bring it back up, or drop the live link.
+    liveCheck: {
+      date: "2026-10-19",
+      ok: false,
+      note: "The frontend loads, but its API at chainiq.onrender.com timed out on every request, and the deployed bundle calls localhost:8000 for portfolio, insights and alerts.",
     },
     context: todo("TODO(jasmeet): event or context, if any"),
   },
@@ -225,6 +236,12 @@ export const projects: Project[] = [
       github: "https://github.com/Jasmeet-011/RepoScope",
       live: "https://repo-scope.vercel.app",
     },
+    // TODO(jasmeet): the RepoScope backend is down. Bring it back up, or drop the live link.
+    liveCheck: {
+      date: "2026-10-19",
+      ok: false,
+      note: "The frontend loads, but analyzing a repository fails: the API at reposcope.onrender.com answers 500.",
+    },
   },
   {
     slug: "codemate",
@@ -246,6 +263,12 @@ export const projects: Project[] = [
     links: {
       github: "https://github.com/Jasmeet-011/Codemate",
       live: "https://codemate-taupe.vercel.app",
+    },
+    // TODO(jasmeet): the CodeMate backend is down. Bring it back up, or drop the live link.
+    liveCheck: {
+      date: "2026-10-19",
+      ok: false,
+      note: "The frontend loads, but the API at codemate-ub8x.onrender.com answers 500 for the history view. Asking a question was not tested, since it spends Gemini quota.",
     },
   },
 ];

@@ -7,8 +7,8 @@ Repo: github.com/Jasmeet-011/Portfolio_Website, branch `revamp/vscode`
 ## Status (2026-10-19)
 
 - **Done:** Phases 0 to 3 (preserve, scaffold, workspace shell, content files).
-- **Current:** Phase 4, interactions. Not started.
-- **Open `TODO(jasmeet)` items:** headline, short bio, long bio; `public/resume.pdf`; periods for all seven projects; AWS certification month; ChainLens `context`; measured results for ChainLens, SilentSOS, LLM Gateway, SynapseMeet; `problem` and `built` for RepoScope, `problem` for CodeMate; whether to link `codemate-chat`; verify Formspree form `mzdarpdv`; review the Phase 3 copy pass and skill descriptions.
+- **Current:** Phase 4, interactions. In progress.
+- **Open `TODO(jasmeet)` items:** headline, short bio, long bio; `public/resume.pdf`; periods for all seven projects; AWS certification month; ChainLens `context`; measured results for ChainLens, SilentSOS, LLM Gateway, SynapseMeet; `problem` and `built` for RepoScope, `problem` for CodeMate; whether to link `codemate-chat`; verify Formspree form `mzdarpdv`; review the Phase 3 copy pass and skill descriptions; the ChainLens, RepoScope and CodeMate live demos are down (checked 2026-10-19, see `liveCheck` in `src/content/projects.ts`).
 - **Pushing:** local commits only until Jasmeet says otherwise (see Decisions log).
 
 ---
@@ -471,3 +471,7 @@ Where an entry here conflicts with an earlier section of this file or with `CLAU
 | 2026-10-18 | **"Built" covers only Jasmeet's own commits.** Every `built` bullet is checked against `git shortlog` / `git log --author` on that project's repo, and work by others is not claimed. For SilentSOS, "I built" covers only Jasmeet's commits, and Tejas's pull request #1 gets a one-line credit linked to the PR. This adds an optional `credits` field to `Project` in section 6. |
 | 2026-10-18 | **LLM Gateway keeps "I built"** in its `built` bullets, limited to what exists in the repo (section 10). |
 | 2026-10-19 | **Commit locally, never push** to any remote (branches or tags) until Jasmeet says so. This overrides any push step elsewhere in this file or in `CLAUDE.md`. |
+| 2026-10-19 | **Shortcuts the browser keeps are replaced** (overrides 7.2): Alt+W closes a tab, Alt+] and Alt+[ move to the next and previous tab, F1 opens the command palette as well as Ctrl/Cmd+Shift+P. The assistant's shortcut is decided in Phase 5. |
+| 2026-10-19 | **No browser zoom override** (overrides 7.1 and 7.8): Ctrl+= and Ctrl+- stay the browser's. Workspace zoom lives in the View menu, the palette and Settings only. |
+| 2026-10-19 | **Cut:** Run in Terminal, scripted terminal demos and the minimap toggle. `ask` arrives with the assistant in Phase 5. `resume` and File > Download Resume appear once `public/resume.pdf` exists. |
+| 2026-10-19 | **No Run and Debug view and no Run menu for now** (overrides sections 3, 5 and 7.1). Each project with a live link instead gets a palette command, "Open ChainLens live", with archived projects labeled as archived. A demo is linked only after a recorded check (`liveCheck` in `src/content/projects.ts`) shows it loads and works. On 2026-10-19 all three (ChainLens, RepoScope, CodeMate) were down, so none is linked. Revisit the Run and Debug view when another project has a running demo. |

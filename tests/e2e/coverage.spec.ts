@@ -14,7 +14,8 @@ import { expect, test } from "./fixtures";
  */
 
 // Internal identifiers, not copy: used in URLs and ids rather than shown as text.
-const INTERNAL_KEYS = new Set(["slug", "kind"]);
+// liveCheck is maintenance data that decides whether a live demo gets a palette command.
+const INTERNAL_KEYS = new Set(["slug", "kind", "liveCheck"]);
 
 function strings(value: unknown, path: string, out: [string, string][] = []): [string, string][] {
   if (typeof value === "string") out.push([path, value]);
