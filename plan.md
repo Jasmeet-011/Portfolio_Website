@@ -6,8 +6,8 @@ Repo: github.com/Jasmeet-011/Portfolio_Website, branch `revamp/vscode`
 
 ## Status (2026-10-19)
 
-- **Done:** Phases 0 to 3 (preserve, scaffold, workspace shell, content files).
-- **Current:** Phase 4, interactions. In progress.
+- **Done:** Phases 0 to 4 (preserve, scaffold, workspace shell, content files, interactions). Phase 4 awaits Jasmeet's review.
+- **Current:** Phase 5, the assistant. Not started.
 - **Open `TODO(jasmeet)` items:** headline, short bio, long bio; `public/resume.pdf`; periods for all seven projects; AWS certification month; ChainLens `context`; measured results for ChainLens, SilentSOS, LLM Gateway, SynapseMeet; `problem` and `built` for RepoScope, `problem` for CodeMate; whether to link `codemate-chat`; verify Formspree form `mzdarpdv`; review the Phase 3 copy pass and skill descriptions; the ChainLens, RepoScope and CodeMate live demos are down (checked 2026-10-19, see `liveCheck` in `src/content/projects.ts`).
 - **Pushing:** local commits only until Jasmeet says otherwise (see Decisions log).
 

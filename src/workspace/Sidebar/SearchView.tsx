@@ -4,8 +4,8 @@ import { FileIcon } from "@/assets/file-icons/FileIcon";
 import { MIN_QUERY, search, type FindState, type Match } from "@/lib/search";
 import { useWorkspace } from "@/store/workspace";
 
-/** Context kept on each side of a match in the results list. */
-const CONTEXT = 28;
+/** Characters kept before a match, so the match itself fits the narrow sidebar. */
+const CONTEXT = 12;
 
 function Snippet({ match, length }: { match: Match; length: number }) {
   const from = Math.max(0, match.start - CONTEXT);
