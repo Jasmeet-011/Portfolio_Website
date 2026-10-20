@@ -6,12 +6,23 @@ cd "$(dirname "$0")/.."
 echo "== format";  npx prettier --check .
 echo "== build";   npm run build          # theme contrast check, typecheck, vite build
 echo "== secrets"
-# The API key and server settings must never reach the client bundle or git.
-if grep -rlE "sk-ant-|ANTHROPIC_API_KEY|UPSTASH_REDIS|IP_HASH_SALT|KV_REST_API" dist; then
+# API keys and server settings must never reach the client bundle or git. Key shapes:
+# Anthropic sk-ant-..., Google AIza plus 35 characters. Names cover the site's and the
+# eval's keys. Each key's value from .env.local is checked too, without printing it.
+# grep exits 1 for no match; above 1 is an error, which fails the gate, never passes it.
+search() {
+  local rc=0
+  grep -rl "$@" dist || rc=$?
+  if [ "$rc" -gt 1 ]; then echo "secret search failed ($rc)"; exit 1; fi
+  return "$rc"
+}
+if search -E "sk-ant-|AIza[0-9A-Za-z_-]{35}|ANTHROPIC_API_KEY|GEMINI_API_KEY|GEMINI_EVAL_API_KEY|UPSTASH_REDIS|IP_HASH_SALT|KV_REST_API"; then
   echo "server secret or setting name found in dist/"; exit 1
 fi
-key="$(grep -s '^ANTHROPIC_API_KEY=' .env.local | cut -d= -f2- || true)"
-if [ -n "$key" ] && grep -rlF "$key" dist; then echo "API key value found in dist/"; exit 1; fi
+for name in ANTHROPIC_API_KEY GEMINI_API_KEY GEMINI_EVAL_API_KEY; do
+  key="$(grep -s "^$name=" .env.local | cut -d= -f2- | tr -d '\r"'"'" || true)"
+  if [ -n "$key" ] && search -F -- "$key"; then echo "$name value found in dist/"; exit 1; fi
+done
 if git ls-files | grep -E '(^|/)\.env' | grep -v '\.env\.example$'; then
   echo ".env file tracked by git"; exit 1
 fi

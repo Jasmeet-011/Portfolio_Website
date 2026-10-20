@@ -1,31 +1,54 @@
 import { Redis } from "@upstash/redis";
 import { CONTEXT } from "../_generated/context.js";
 import type { Deps } from "./handler.js";
-import { LIMIT_DEFAULTS, memoryLimiter, upstashLimiter } from "./limits.js";
-import { createProvider } from "./provider/index.js";
+import {
+  freeTierLimits,
+  LIMIT_DEFAULTS,
+  memoryCounter,
+  memoryLimiter,
+  pacificDayLimiter,
+  redisCounter,
+  upstashLimiter,
+} from "./limits.js";
+import { providerSpec, type ProviderSpec } from "./provider/index.js";
 import {
   memoryAnswerCache,
   memoryQuestionLog,
+  memoryQuotaLatch,
   upstashAnswerCache,
   upstashQuestionLog,
+  upstashQuotaLatch,
 } from "./store.js";
-
-/** Claude Haiku 5.5, checked against Anthropic's models overview on 2026-10-20. */
-export const DEFAULT_MODEL = "claude-haiku-5-5";
-/** Set from the eval run's time-to-first-words comparison (evals/report.md). */
-export const DEFAULT_THINKING: "adaptive" | "off" = "off";
 
 type Env = Record<string, string | undefined>;
 
-const int = (value: string | undefined, fallback: number) => {
+const int = (value: string | undefined): number | null => {
   const n = Number(value);
-  return Number.isInteger(n) && n > 0 ? n : fallback;
+  return Number.isInteger(n) && n > 0 ? n : null;
 };
 
+/** Claude is paid per token, so its caps are about cost, not a quota. */
+const PAID_LIMITS = { dailyCap: 300, perMinute: 60 };
+/** Local dev only, while a free tier's numbers are unknown. Vercel never uses these. */
+const LOCAL_LIMITS = { dailyCap: 50, perMinute: 5 };
+
 /**
- * Production wiring from environment variables (see .env.example). On Vercel the
- * assistant fails closed: without Upstash and the IP salt it answers 503 rather than
- * run with no limits. Off Vercel (npm run dev) limits and logs live in memory.
+ * The daily cap and per-minute limit: an env override, else 80% of the free tier
+ * (limits.ts, freeTierLimits), else null when neither is known.
+ */
+export function siteLimits(spec: ProviderSpec & { name: string }, env: Env) {
+  const base =
+    spec.name === "anthropic" ? PAID_LIMITS : spec.freeTier ? freeTierLimits(spec.freeTier) : null;
+  const dailyCap = int(env.ASSISTANT_DAILY_CAP) ?? base?.dailyCap ?? null;
+  const perMinute = int(env.ASSISTANT_PER_MINUTE) ?? base?.perMinute ?? null;
+  return dailyCap !== null && perMinute !== null ? { dailyCap, perMinute } : null;
+}
+
+/**
+ * Production wiring from environment variables (see .env.example). ASSISTANT_PROVIDER
+ * picks the provider (default gemini). On Vercel the assistant fails closed: without the
+ * key, Upstash, the IP salt and known limits it answers 503 rather than run unbounded.
+ * Off Vercel (npm run dev) limits and logs live in memory.
  */
 export function depsFromEnv(env: Env = process.env): Deps {
   const onVercel = env.VERCEL === "1";
@@ -33,33 +56,41 @@ export function depsFromEnv(env: Env = process.env): Deps {
   const token = env.UPSTASH_REDIS_REST_TOKEN ?? env.KV_REST_API_TOKEN;
   const redis = url && token ? new Redis({ url, token }) : null;
   const salt = env.IP_HASH_SALT;
-  const ready = Boolean(env.ANTHROPIC_API_KEY) && (!onVercel || (redis !== null && Boolean(salt)));
+  const spec = providerSpec(env.ASSISTANT_PROVIDER);
+  const apiKey = spec ? env[spec.keyEnv] : undefined;
+  const known = spec ? siteLimits(spec, env) : null;
+  const limits = known ?? LOCAL_LIMITS;
+  const ready =
+    spec !== null &&
+    Boolean(apiKey) &&
+    (!onVercel || (redis !== null && Boolean(salt) && known !== null));
 
-  const perIpHourly = int(env.ASSISTANT_PER_IP_HOURLY, LIMIT_DEFAULTS.perIpHourly);
-  const dailyCap = int(env.ASSISTANT_DAILY_CAP, LIMIT_DEFAULTS.dailyCap);
+  const perIpHourly = int(env.ASSISTANT_PER_IP_HOURLY) ?? LIMIT_DEFAULTS.perIpHourly;
   const thinking =
-    env.ASSISTANT_THINKING === "adaptive" || env.ASSISTANT_THINKING === "off"
+    spec && env.ASSISTANT_THINKING && spec.thinkingModes.includes(env.ASSISTANT_THINKING)
       ? env.ASSISTANT_THINKING
-      : DEFAULT_THINKING;
+      : spec?.defaultThinking;
 
   return {
-    provider: ready
-      ? createProvider({
-          apiKey: env.ANTHROPIC_API_KEY ?? "",
-          model: env.ASSISTANT_MODEL || DEFAULT_MODEL,
-          effort: "low",
-          thinking,
-        })
-      : null,
+    provider:
+      ready && spec
+        ? spec.create({
+            apiKey: apiKey ?? "",
+            model: env.ASSISTANT_MODEL || spec.defaultModel,
+            thinking: thinking ?? spec.defaultThinking,
+          })
+        : null,
     perIp: redis
-      ? upstashLimiter(redis, "ip", perIpHourly, "1 h", "sliding")
+      ? upstashLimiter(redis, "ip", perIpHourly, "1 h")
       : memoryLimiter(perIpHourly, "1 h"),
     cachedPerIp: redis
-      ? upstashLimiter(redis, "cached", LIMIT_DEFAULTS.cachedPerIpHourly, "1 h", "sliding")
+      ? upstashLimiter(redis, "cached", LIMIT_DEFAULTS.cachedPerIpHourly, "1 h")
       : memoryLimiter(LIMIT_DEFAULTS.cachedPerIpHourly, "1 h"),
-    global: redis
-      ? upstashLimiter(redis, "global", dailyCap, "1 d", "fixed")
-      : memoryLimiter(dailyCap, "1 d"),
+    perMinute: redis
+      ? upstashLimiter(redis, "minute", limits.perMinute, "1 m")
+      : memoryLimiter(limits.perMinute, "1 m"),
+    global: pacificDayLimiter(redis ? redisCounter(redis) : memoryCounter(), limits.dailyCap),
+    latch: redis ? upstashQuotaLatch(redis) : memoryQuotaLatch(),
     cache: redis ? upstashAnswerCache(redis) : memoryAnswerCache(),
     log: redis ? upstashQuestionLog(redis) : memoryQuestionLog(),
     context: CONTEXT,

@@ -4,13 +4,13 @@ import { links } from "../../src/content/links";
 import { expect, runFromPalette, test } from "./fixtures";
 
 /**
- * The assistant panel against a mocked /api/copilot: no test here ever reaches the
- * Claude API. The API itself is covered by unit tests (api/_lib/handler.test.ts).
+ * The assistant panel against a mocked /api/copilot: no test here ever reaches a
+ * provider API. The API itself is covered by unit tests (api/_lib/handler.test.ts).
  */
 const TRACE: Trace = {
-  model: "claude-haiku-5-5",
-  effort: "low",
-  thinking: "off",
+  model: "gemini-3.5-flash-lite",
+  effort: null,
+  thinking: "minimal",
   contextVersion: "test",
   citedChunks: ["projects/agentguard.py#built", "projects/agentguard.py#results"],
   cachedAnswer: false,
@@ -68,6 +68,9 @@ test.describe("desktop", () => {
     await expect(
       panel(page).getByRole("button", { name: "What is Jasmeet working on now?" }),
     ).toBeVisible();
+    await expect(panel(page)).toContainText(
+      "Questions are sent to Google's Gemini API free tier, and Google may use them to improve its products.",
+    );
     await expect(panel(page)).toContainText(
       "Your questions are saved anonymously for 30 days to improve the assistant, with no IP address or identifier attached.",
     );
@@ -207,7 +210,7 @@ test.describe("desktop", () => {
     await page.getByRole("menuitem", { name: "Show Trace" }).click();
     const trace = page.getByRole("list", { name: "Assistant trace" });
     await expect(trace).toContainText('question: "What is AgentGuard?"');
-    await expect(trace).toContainText("claude-haiku-5-5");
+    await expect(trace).toContainText("gemini-3.5-flash-lite");
     await expect(trace).toContainText("projects/agentguard.py#built");
     await expect(trace).toContainText("first words 420 ms");
     await expect(trace).toContainText("7 of 10 left this hour");

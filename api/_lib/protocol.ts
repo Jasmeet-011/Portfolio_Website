@@ -36,7 +36,14 @@ export interface Quota {
 }
 
 export type ErrorCode =
-  "invalid" | "rate_limited" | "daily_cap" | "unavailable" | "refused" | "upstream";
+  | "invalid"
+  | "rate_limited"
+  | "daily_cap"
+  /** The provider's per-minute limit, or the site's: try again in a minute. */
+  | "busy"
+  | "unavailable"
+  | "refused"
+  | "upstream";
 
 export interface ErrorBody {
   code: ErrorCode;
@@ -49,8 +56,10 @@ export interface ErrorBody {
 /** Shown in Output > Assistant trace. Nothing secret, nothing about other visitors. */
 export interface Trace {
   model: string;
-  effort: string;
-  thinking: "adaptive" | "off";
+  /** Claude's effort setting; null for providers without one (Gemini). */
+  effort: string | null;
+  /** "adaptive" or "off" for Claude, a thinking level for Gemini. */
+  thinking: string;
   contextVersion: string;
   citedChunks: string[];
   /** Served from the suggested-question cache: no model call, no cost. */
@@ -60,6 +69,8 @@ export interface Trace {
   outputTokens: number;
   cacheReadTokens: number;
   cacheWriteTokens: number;
+  /** Thinking tokens, part of outputTokens, where the provider reports them. */
+  thoughtTokens?: number;
   /** Time to the first words of the answer. */
   ttftMs: number | null;
   totalMs: number;

@@ -74,3 +74,38 @@ export function memoryQuestionLog(): QuestionLog & { entries: LoggedQuestion[] }
     },
   };
 }
+
+/**
+ * Set when the provider says its daily quota is used up: until `until` (midnight
+ * Pacific, when Google resets it) the site answers "done for today" without calling it.
+ */
+export interface QuotaLatch {
+  /** Epoch ms the latch holds until, or null when it isn't set. */
+  until(): Promise<number | null>;
+  set(until: number): Promise<void>;
+}
+
+const LATCH_KEY = "assistant:quota-exhausted";
+
+export function upstashQuotaLatch(redis: Redis, now = () => Date.now()): QuotaLatch {
+  return {
+    async until() {
+      const value = await redis.get<number>(LATCH_KEY);
+      return value && value > now() ? value : null;
+    },
+    async set(until) {
+      const ms = until - now();
+      if (ms > 0) await redis.set(LATCH_KEY, until, { px: ms });
+    },
+  };
+}
+
+export function memoryQuotaLatch(now = () => Date.now()): QuotaLatch {
+  let latched: number | null = null;
+  return {
+    until: async () => (latched !== null && latched > now() ? latched : null),
+    set: async (until) => {
+      latched = until;
+    },
+  };
+}

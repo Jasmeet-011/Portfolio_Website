@@ -23,7 +23,7 @@ function commit(): string {
 /**
  * Serves api/copilot.ts at /api/copilot during `npm run dev`, the way Vercel does in
  * production, so the assistant runs locally without the Vercel CLI. Server-only
- * variables from .env.local (ANTHROPIC_API_KEY and friends) go into this Node process
+ * variables from .env.local (GEMINI_API_KEY and friends) go into this Node process
  * only: Vite exposes just VITE_-prefixed variables to the browser, and the app uses none.
  */
 function assistantDevApi(): Plugin {

@@ -1,6 +1,6 @@
 import { answer, type Context } from "./answer.js";
 import { clientIp, limiterKey } from "./ip.js";
-import type { Limiter } from "./limits.js";
+import { pacificDay, type Limiter } from "./limits.js";
 import { PROMPT_VERSION } from "./prompt.js";
 import {
   LIMITS,
@@ -11,8 +11,13 @@ import {
   type StreamEvent,
   type Trace,
 } from "./protocol.js";
-import type { Provider } from "./provider/index.js";
-import { ANSWER_TTL_SECONDS, type AnswerCache, type QuestionLog } from "./store.js";
+import { ProviderError, type Provider } from "./provider/index.js";
+import {
+  ANSWER_TTL_SECONDS,
+  type AnswerCache,
+  type QuestionLog,
+  type QuotaLatch,
+} from "./store.js";
 
 export interface Deps {
   /** Null when the assistant isn't configured (no API key): every request gets 503. */
@@ -20,7 +25,12 @@ export interface Deps {
   perIp: Limiter;
   /** Repeat clicks on cached suggested questions. */
   cachedPerIp: Limiter;
+  /** Everyone, per minute: a little under the provider's per-minute limit. */
+  perMinute: Limiter;
+  /** Everyone, per Pacific day: a little under the provider's daily quota. */
   global: Limiter;
+  /** Set when the provider reports its daily quota used up. */
+  latch: QuotaLatch;
   cache: AnswerCache;
   log: QuestionLog;
   context: Context;
@@ -28,6 +38,10 @@ export interface Deps {
   ipSalt: string;
   now: () => number;
 }
+
+export const DAILY_MESSAGE =
+  "The assistant is done for today. Everything it knows is in these files.";
+export const BUSY_MESSAGE = "The assistant is busy. Try again in a minute.";
 
 const json = (status: number, body: ErrorBody) =>
   new Response(JSON.stringify(body), {
@@ -137,14 +151,20 @@ export function createHandler(deps: Deps) {
 
     const hourly = await deps.perIp.limit(visitor);
     if (!hourly.success) return rateLimited(toQuota(hourly));
-    const daily = await deps.global.limit("global");
-    if (!daily.success)
+    const doneForToday = (resetAt: number) =>
+      json(429, { code: "daily_cap", message: DAILY_MESSAGE, resetAt, quota: toQuota(hourly) });
+    const latched = await deps.latch.until();
+    if (latched !== null) return doneForToday(latched);
+    const minute = await deps.perMinute.limit("global");
+    if (!minute.success)
       return json(429, {
-        code: "daily_cap",
-        message: "The assistant is done for today. Everything it knows is in these files.",
-        resetAt: daily.reset,
+        code: "busy",
+        message: BUSY_MESSAGE,
+        resetAt: minute.reset,
         quota: toQuota(hourly),
       });
+    const daily = await deps.global.limit("global");
+    if (!daily.success) return doneForToday(daily.reset);
 
     const quota = toQuota(hourly);
     const history = parsed.kind === "question" ? parsed.history : [];
@@ -175,6 +195,7 @@ export function createHandler(deps: Deps) {
               outputTokens: event.usage.outputTokens,
               cacheReadTokens: event.usage.cacheReadTokens,
               cacheWriteTokens: event.usage.cacheWriteTokens,
+              thoughtTokens: event.usage.thoughtTokens,
               ttftMs: event.ttftMs,
               totalMs: event.totalMs,
             },
@@ -195,12 +216,19 @@ export function createHandler(deps: Deps) {
               ANSWER_TTL_SECONDS,
             );
         }
-      } catch {
-        send({
-          type: "error",
-          code: "upstream",
-          message: "The assistant couldn't answer just now. Please try again in a moment.",
-        });
+      } catch (error) {
+        // The provider's own limits read like the site's; nothing raw reaches the visitor.
+        if (error instanceof ProviderError && error.kind === "daily_quota") {
+          await deps.latch.set(pacificDay(deps.now()).resetAt).catch(() => undefined);
+          send({ type: "error", code: "daily_cap", message: DAILY_MESSAGE });
+        } else if (error instanceof ProviderError)
+          send({ type: "error", code: "busy", message: BUSY_MESSAGE });
+        else
+          send({
+            type: "error",
+            code: "upstream",
+            message: "The assistant couldn't answer just now. Please try again in a moment.",
+          });
       }
     });
   };

@@ -23,6 +23,7 @@
     "@anthropic-ai/sdk": "^0.135.0",
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@google/genai": "^2.30.0",
     "@upstash/ratelimit": "^2.2.0",
     "@upstash/redis": "^1.39.0",
     "cmdk": "^1.1.1",

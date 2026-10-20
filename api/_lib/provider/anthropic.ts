@@ -1,6 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Provider, ProviderConfig, ProviderEvent, ProviderRequest } from "./types.js";
 
+/** Claude's effort setting for the assistant: short grounded answers need little. */
+const EFFORT = "low";
+
 /**
  * The Claude API through the official SDK. The grounding goes in as one document with a
  * content block per section and citations on, so every citation names a real section
@@ -32,7 +35,7 @@ export function anthropicProvider(config: ProviderConfig): Provider {
 
   return {
     model: config.model,
-    effort: config.effort,
+    effort: EFFORT,
     thinking: config.thinking,
     async *stream(request, signal): AsyncIterable<ProviderEvent> {
       const stream = client.messages.stream(
@@ -41,7 +44,7 @@ export function anthropicProvider(config: ProviderConfig): Provider {
           max_tokens: request.maxTokens,
           system: request.system,
           messages: messages(request),
-          output_config: { effort: config.effort },
+          output_config: { effort: EFFORT },
           // Claude Haiku 5.5 thinks by default; "off" is allowed at effort high or below.
           ...(config.thinking === "off" ? { thinking: { type: "disabled" } } : {}),
         },

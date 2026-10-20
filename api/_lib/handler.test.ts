@@ -1,31 +1,36 @@
 import { describe, expect, it } from "vitest";
 import { CONTEXT } from "../_generated/context";
-import { createHandler, type Deps } from "./handler";
-import { memoryLimiter } from "./limits";
+import { BUSY_MESSAGE, createHandler, DAILY_MESSAGE, type Deps } from "./handler";
+import { memoryCounter, memoryLimiter, pacificDayLimiter } from "./limits";
 import { DECLINE } from "./prompt";
 import type { StreamEvent } from "./protocol";
 import { defaultEvents, fakeProvider } from "./provider/fake";
-import type { ProviderEvent } from "./provider/types";
-import { memoryAnswerCache, memoryQuestionLog } from "./store";
+import { ProviderError, type ProviderEvent } from "./provider/types";
+import { memoryAnswerCache, memoryQuestionLog, memoryQuotaLatch } from "./store";
+
+const NOW = Date.UTC(2026, 9, 20, 12);
 
 function setup(overrides: Partial<Deps> = {}, events?: ProviderEvent[]) {
   const provider = fakeProvider(events);
   const cache = memoryAnswerCache();
   const log = memoryQuestionLog();
+  const latch = memoryQuotaLatch(() => NOW);
   const deps: Deps = {
     provider,
     perIp: memoryLimiter(10, "1 h"),
     cachedPerIp: memoryLimiter(60, "1 h"),
-    global: memoryLimiter(300, "1 d"),
+    perMinute: memoryLimiter(100, "1 m"),
+    global: pacificDayLimiter(memoryCounter(), 300, () => NOW),
+    latch,
     cache,
     log,
     context: CONTEXT,
     onVercel: true,
     ipSalt: "test-salt",
-    now: () => Date.UTC(2026, 9, 20, 12),
+    now: () => NOW,
     ...overrides,
   };
-  return { handle: createHandler(deps), provider, cache, log };
+  return { handle: createHandler(deps), provider, cache, log, latch };
 }
 
 function post(body: unknown, headers: Record<string, string> = { "x-real-ip": "203.0.113.7" }) {
@@ -175,12 +180,73 @@ describe("limits", () => {
   });
 
   it("stops everyone at the daily cap", async () => {
-    const { handle } = setup({ global: memoryLimiter(3, "1 d") });
+    const { handle } = setup({ global: pacificDayLimiter(memoryCounter(), 3, () => NOW) });
     for (let i = 0; i < 3; i++)
       expect((await handle(post(ask, { "x-real-ip": `198.51.100.${i}` }))).status).toBe(200);
     const capped = await handle(post(ask, { "x-real-ip": "198.51.100.99" }));
     expect(capped.status).toBe(429);
-    expect(await capped.json()).toMatchObject({ code: "daily_cap" });
+    expect(await capped.json()).toMatchObject({ code: "daily_cap", message: DAILY_MESSAGE });
+  });
+
+  it("says busy, not done for today, past the per-minute limit", async () => {
+    const { handle, provider } = setup({ perMinute: memoryLimiter(2, "1 m", () => NOW) });
+    for (let i = 0; i < 2; i++)
+      expect((await handle(post(ask, { "x-real-ip": `198.51.100.${i}` }))).status).toBe(200);
+    const busy = await handle(post(ask, { "x-real-ip": "198.51.100.50" }));
+    expect(busy.status).toBe(429);
+    expect(await busy.json()).toMatchObject({ code: "busy", message: BUSY_MESSAGE });
+    expect(provider.calls).toHaveLength(2);
+  });
+});
+
+describe("provider quota errors", () => {
+  function failingWith(error: Error, overrides: Partial<Deps> = {}) {
+    const s = setup(overrides);
+    if (!s.provider) throw new Error("no provider");
+    s.provider.stream = async function* () {
+      yield* [];
+      throw error;
+    };
+    return s;
+  }
+
+  it("a used-up daily quota reads as done for today and stops calls until midnight Pacific", async () => {
+    const { handle, provider, latch } = failingWith(new ProviderError("daily_quota", "raw"));
+    const stream = await events(await handle(post(ask)));
+    expect(stream.find((e) => e.type === "error")).toEqual({
+      type: "error",
+      code: "daily_cap",
+      message: DAILY_MESSAGE,
+    });
+    // 2026-10-20 12:00 UTC is 05:00 PDT; the quota resets at 2026-10-21 00:00 PDT.
+    expect(await latch.until()).toBe(Date.UTC(2026, 9, 21, 7));
+
+    const calls = provider.calls.length;
+    const next = await handle(post(ask, { "x-real-ip": "198.51.100.9" }));
+    expect(next.status).toBe(429);
+    expect(await next.json()).toMatchObject({
+      code: "daily_cap",
+      resetAt: Date.UTC(2026, 9, 21, 7),
+    });
+    expect(provider.calls).toHaveLength(calls);
+  });
+
+  it("a per-minute limit reads as busy and sets no latch", async () => {
+    const { handle, latch } = failingWith(new ProviderError("busy", "raw"));
+    const stream = await events(await handle(post(ask)));
+    expect(stream.find((e) => e.type === "error")).toEqual({
+      type: "error",
+      code: "busy",
+      message: BUSY_MESSAGE,
+    });
+    expect(await latch.until()).toBeNull();
+  });
+
+  it("never sends the provider's own error text", async () => {
+    const { handle } = failingWith(new Error("429 RESOURCE_EXHAUSTED quotaId secret detail"));
+    const text = await (await handle(post(ask))).text();
+    expect(text).not.toContain("RESOURCE_EXHAUSTED");
+    expect(text).toContain('"code":"upstream"');
   });
 });
 

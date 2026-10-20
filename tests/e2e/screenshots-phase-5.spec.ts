@@ -30,9 +30,9 @@ const ANSWER: StreamEvent[] = [
   {
     type: "done",
     trace: {
-      model: "claude-haiku-5-5",
-      effort: "low",
-      thinking: "off",
+      model: "gemini-3.5-flash-lite",
+      effort: null,
+      thinking: "minimal",
       contextVersion: "7e6b8c05c908",
       citedChunks: ["projects/agentguard.py#built", "projects/agentguard.py#results"],
       cachedAnswer: false,

@@ -25,7 +25,11 @@ function Entry({ entry }: { entry: TraceEntry }) {
         <>
           {"\n  "}
           <span className="text-muted">model</span> {t.model},{" "}
-          <span className="text-muted">effort</span> {t.effort},{" "}
+          {t.effort !== null && (
+            <>
+              <span className="text-muted">effort</span> {t.effort},{" "}
+            </>
+          )}
           <span className="text-muted">thinking</span> {t.thinking},{" "}
           <span className="text-muted">context</span> {t.contextVersion}
           {"\n  "}
@@ -40,6 +44,7 @@ function Entry({ entry }: { entry: TraceEntry }) {
               <span className="text-muted">tokens</span> input {n(t.inputTokens)} (cache read{" "}
               {n(t.cacheReadTokens)}, cache write {n(t.cacheWriteTokens)}), output{" "}
               {n(t.outputTokens)}
+              {t.thoughtTokens ? ` (thinking ${n(t.thoughtTokens)})` : ""}
               {"\n  "}
               <span className="text-muted">time</span> first words{" "}
               {t.ttftMs === null ? "none" : `${n(t.ttftMs)} ms`}, total {n(t.totalMs)} ms

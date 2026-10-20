@@ -12,6 +12,8 @@ export type AnswerEvent =
       type: "end";
       text: string;
       citedChunks: string[];
+      /** Sources the model named that aren't chunk ids, dropped before any chip. */
+      unknownCitations: string[];
       declined: boolean;
       refused: boolean;
       stopReason: string | null;
@@ -20,6 +22,7 @@ export type AnswerEvent =
         outputTokens: number;
         cacheReadTokens: number;
         cacheWriteTokens: number;
+        thoughtTokens?: number;
       };
       ttftMs: number | null;
       totalMs: number;
@@ -27,7 +30,8 @@ export type AnswerEvent =
 
 /**
  * One answer, grounded in the context: the request the provider sees, citations mapped
- * from section indexes back to chunk ids, and the timings. Shared by the API handler
+ * from section indexes back to chunk ids (an index with no chunk is dropped, so every
+ * chip opens a real section), and the timings. Shared by the API handler
  * and the eval runner, so evals test exactly what visitors get.
  */
 export async function* answer(
@@ -48,6 +52,7 @@ export async function* answer(
       system: SYSTEM_PROMPT,
       documentTitle: DOCUMENT_TITLE,
       sections: context.chunks.map((c) => `[${c.label}]\n${c.text}`),
+      sectionIds: context.chunks.map((c) => c.id),
       history,
       question,
       maxTokens: LIMITS.maxOutputTokens,
@@ -72,6 +77,7 @@ export async function* answer(
         type: "end",
         text,
         citedChunks: cited,
+        unknownCitations: event.unknownSources ?? [],
         declined: refused || isDecline(text),
         refused,
         stopReason: event.stopReason,

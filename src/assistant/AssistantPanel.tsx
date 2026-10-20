@@ -328,9 +328,10 @@ export function AssistantPanel({ mode }: { mode: PanelMode }) {
           )}
         </p>
         <p className="mt-1.5 text-xs leading-snug text-muted">
-          Answers come only from this workspace and can be wrong. Your questions are saved
-          anonymously for 30 days to improve the assistant, with no IP address or identifier
-          attached. A one-way hash of your IP is used only to count the hourly limit.
+          Answers come only from this workspace and can be wrong. Questions are sent to
+          Google&apos;s Gemini API free tier, and Google may use them to improve its products. Your
+          questions are saved anonymously for 30 days to improve the assistant, with no IP address
+          or identifier attached. A one-way hash of your IP is used only to count the hourly limit.
         </p>
       </form>
     </aside>

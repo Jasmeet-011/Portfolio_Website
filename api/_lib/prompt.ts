@@ -3,7 +3,7 @@
  * part of the suggested-question cache key, so cached answers never outlive the prompt
  * that produced them.
  */
-export const PROMPT_VERSION = "1";
+export const PROMPT_VERSION = "2";
 
 /** The exact reply to anything off-topic or any attempt to change the rules. */
 export const DECLINE =
@@ -28,6 +28,12 @@ Rules:
 - Keep answers under 120 words: plain sentences, or a short list of lines starting with "- ". No headings, tables, bold or HTML.
 - Don't use em dashes or en dashes. Use commas, colons or periods.
 - Only include links that appear in the document.`;
+
+/**
+ * Added for providers without native citations (Gemini): the reply is a JSON object whose
+ * `sources` the server checks against the real chunk ids (provider/gemini.ts).
+ */
+export const JSON_REPLY = `Reply with a JSON object. "answer" holds your whole reply, following every rule above, including the exact sentences they give. "sources" lists the id of every section the answer is based on, each exactly as written in that section's id attribute. Use an empty list when the answer uses no section, as with the decline.`;
 
 /** True when an answer is the off-topic or injection decline. */
 export const isDecline = (answer: string): boolean =>
