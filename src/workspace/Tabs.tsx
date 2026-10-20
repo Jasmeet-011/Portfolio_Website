@@ -18,7 +18,7 @@ export function Tabs({ activeId }: { activeId: string | undefined }) {
   const ids = useWorkspace((s) => s.tabs);
   const tabs = ids.map(docById).filter((d): d is Doc => d !== undefined);
   const navigate = useNavigate();
-  const closeTab = useCloseTab(activeId);
+  const closeTab = useCloseTab();
 
   useEffect(() => {
     const active = activeId ? docById(activeId) : undefined;

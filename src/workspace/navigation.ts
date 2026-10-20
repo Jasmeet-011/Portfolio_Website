@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIsDesktop } from "@/lib/useMediaQuery";
 import { useWorkspace } from "@/store/workspace";
-import { docById, type Doc } from "./documents";
+import { docById, docForPath, type Doc } from "./documents";
 import { folderDomId } from "./tree";
 
 /**
@@ -14,14 +14,25 @@ const CLOSED_ALL = { closedAll: true } as const;
 export const isClosedAll = (state: unknown): boolean =>
   typeof state === "object" && state !== null && "closedAll" in state;
 
+/**
+ * The active document right now. Read from the live URL rather than the last render:
+ * React Router navigates in a transition, so the URL can be ahead of what is on screen,
+ * and a shortcut pressed in between must act on where the visitor really is.
+ */
+export function currentDoc(): Doc | undefined {
+  const doc = docForPath(window.location.pathname);
+  return doc && useWorkspace.getState().tabs.includes(doc.id) ? doc : undefined;
+}
+
 /** Closes a tab. Closing the active tab moves to its neighbour, like VS Code. */
-export function useCloseTab(activeId: string | undefined) {
+export function useCloseTab() {
   const navigate = useNavigate();
   return useCallback(
     (id: string) => {
       const { tabs, closeTab } = useWorkspace.getState();
       const index = tabs.indexOf(id);
       if (index < 0) return;
+      const activeId = currentDoc()?.id;
       closeTab(id);
       if (id !== activeId) return;
       const remaining = tabs
@@ -32,7 +43,7 @@ export function useCloseTab(activeId: string | undefined) {
       if (next) navigate(next.route);
       else navigate("/", { state: CLOSED_ALL });
     },
-    [activeId, navigate],
+    [navigate],
   );
 }
 

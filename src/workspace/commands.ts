@@ -11,7 +11,7 @@ import { useTerminal } from "@/terminal/store";
 import { themes } from "@/themes/themes";
 import { docById, type Doc } from "./documents";
 import type { KeyCombo } from "./keys";
-import { useCloseTab } from "./navigation";
+import { currentDoc, useCloseTab } from "./navigation";
 
 /**
  * Every action the visitor can take from a menu, the palette or a shortcut. Menus, the
@@ -58,7 +58,7 @@ const openExternal = (href: string) => window.open(href, "_blank", "noopener,nor
 export function useCommandList(active: Doc | undefined): Command[] {
   const navigate = useNavigate();
   const isDesktop = useIsDesktop();
-  const closeTab = useCloseTab(active?.id);
+  const closeTab = useCloseTab();
   const tabs = useWorkspace((s) => s.tabs);
   const zen = useWorkspace((s) => s.zen !== null);
   const theme = useTheme((s) => s.theme);
@@ -75,7 +75,8 @@ export function useCommandList(active: Doc | undefined): Command[] {
 
     const step = (by: number) => {
       const open = ws().tabs;
-      const index = active ? open.indexOf(active.id) : -1;
+      const now = currentDoc();
+      const index = now ? open.indexOf(now.id) : -1;
       const next = docById(open[(index + by + open.length) % open.length] ?? "");
       if (next) navigate(next.route);
     };
@@ -93,7 +94,10 @@ export function useCommandList(active: Doc | undefined): Command[] {
         title: "View: Close Editor",
         label: "Close Editor",
         keys: [{ code: "KeyW", alt: true }],
-        run: () => closeTab(active.id),
+        run: () => {
+          const now = currentDoc();
+          if (now) closeTab(now.id);
+        },
       },
       tabs.length > 0 && {
         id: "file.closeAll",
@@ -126,7 +130,7 @@ export function useCommandList(active: Doc | undefined): Command[] {
         title: "Edit: Copy Link to This File",
         label: "Copy Link to This File",
         run: () => {
-          const url = new URL(active.route, window.location.origin).href;
+          const url = new URL((currentDoc() ?? active).route, window.location.origin).href;
           navigator.clipboard.writeText(url).then(
             () => ws().notify(`Copied ${url}`),
             () => ws().notify("The browser blocked copying the link."),
@@ -140,6 +144,9 @@ export function useCommandList(active: Doc | undefined): Command[] {
         title: "View: Command Palette",
         label: "Command Palette...",
         keys: [{ code: "KeyP", mod: true, shift: true }, { code: "F1" }],
+        // Neither key means anything while typing, so the palette is reachable from the
+        // terminal and form fields too.
+        inInputs: true,
         run: () => ws().setPalette(">"),
       },
       {
