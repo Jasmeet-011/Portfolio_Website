@@ -93,7 +93,7 @@ export function useMenus(): MenuDef[] {
   const navigate = useNavigate();
 
   return useMemo(() => {
-    const byId = new Map(commands.map((c) => [c.id, c]));
+    const byId = new Map(commands.filter((c) => c.enabled !== false).map((c) => [c.id, c]));
     const recentItems: MenuNode[] = recent
       .slice(0, RECENT_IN_MENU)
       .map(docById)

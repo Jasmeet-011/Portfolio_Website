@@ -63,7 +63,7 @@ function FileItems({ text, onPick }: { text: string; onPick: (doc: Doc) => void 
 }
 
 function CommandItems({ onPick }: { onPick: (command: Command) => void }) {
-  const commands = useCommands();
+  const commands = useCommands().filter((c) => c.enabled !== false);
   const recentIds = useWorkspace((s) => s.recentCommands);
   const recent = recentIds
     .map((id) => commands.find((c) => c.id === id))

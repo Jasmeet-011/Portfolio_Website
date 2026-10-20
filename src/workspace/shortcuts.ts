@@ -28,7 +28,7 @@ export function useShortcuts(commands: Command[]) {
       }
       const typing = isTyping(event.target);
       for (const command of latest.current) {
-        if (typing && !command.inInputs) continue;
+        if (command.enabled === false || (typing && !command.inInputs)) continue;
         if (command.keys?.some((combo) => matches(event, combo))) {
           event.preventDefault();
           command.run();

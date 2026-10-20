@@ -16,8 +16,8 @@ import { currentDoc, useCloseTab } from "./navigation";
 /**
  * Every action the visitor can take from a menu, the palette or a shortcut. Menus, the
  * palette, the keyboard handler and the shortcut reference all read this one list, so a
- * shortcut shown anywhere is a shortcut that works. A command that can't run right now
- * is left out of the list (plan.md 7.1: every item works or is not shown).
+ * shortcut shown anywhere is a shortcut that works. Menus and the palette show only
+ * commands that can act right now (plan.md 7.1: every item works or is not shown).
  */
 export interface Command {
   id: string;
@@ -31,6 +31,12 @@ export interface Command {
   inInputs?: boolean;
   /** Shown as a check mark in menus. */
   checked?: boolean;
+  /**
+   * False while the command can't act (no tab open, say): menus, the palette and the
+   * keyboard skip it, but the shortcut reference still lists it. Commands that can't
+   * exist here at all (no resume yet, no full screen API) are left out of the list.
+   */
+  enabled?: boolean;
   run: () => void;
 }
 
@@ -89,8 +95,9 @@ export function useCommandList(active: Doc | undefined): Command[] {
         label: "Open File...",
         run: () => ws().setPalette(""),
       },
-      !!active && {
+      {
         id: "file.closeEditor",
+        enabled: active !== undefined,
         title: "View: Close Editor",
         label: "Close Editor",
         keys: [{ code: "KeyW", alt: true }],
@@ -99,8 +106,9 @@ export function useCommandList(active: Doc | undefined): Command[] {
           if (now) closeTab(now.id);
         },
       },
-      tabs.length > 0 && {
+      {
         id: "file.closeAll",
+        enabled: tabs.length > 0,
         title: "View: Close All Editors",
         label: "Close All Editors",
         run: () => {
@@ -125,12 +133,15 @@ export function useCommandList(active: Doc | undefined): Command[] {
           ws().requestFocus("search");
         },
       },
-      !!active && {
+      {
         id: "edit.copyLink",
+        enabled: active !== undefined,
         title: "Edit: Copy Link to This File",
         label: "Copy Link to This File",
         run: () => {
-          const url = new URL((currentDoc() ?? active).route, window.location.origin).href;
+          const doc = currentDoc();
+          if (!doc) return;
+          const url = new URL(doc.route, window.location.origin).href;
           navigator.clipboard.writeText(url).then(
             () => ws().notify(`Copied ${url}`),
             () => ws().notify("The browser blocked copying the link."),
@@ -262,15 +273,17 @@ export function useCommandList(active: Doc | undefined): Command[] {
         label: "Go to Project...",
         run: () => ws().setPalette("projects/"),
       },
-      tabs.length > 1 && {
+      {
         id: "go.nextEditor",
+        enabled: tabs.length > 1,
         title: "View: Open Next Editor",
         label: "Next Editor",
         keys: [{ code: "BracketRight", alt: true }],
         run: () => step(1),
       },
-      tabs.length > 1 && {
+      {
         id: "go.previousEditor",
+        enabled: tabs.length > 1,
         title: "View: Open Previous Editor",
         label: "Previous Editor",
         keys: [{ code: "BracketLeft", alt: true }],

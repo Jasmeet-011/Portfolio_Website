@@ -1,9 +1,9 @@
 import { useWorkspace, type SidebarView } from "@/store/workspace";
-import { ThemeOptions } from "../ThemeOptions";
 import { VIEW_TITLES } from "../views";
 import { Explorer } from "./Explorer";
 import { ExtensionsView } from "./ExtensionsView";
 import { SearchView } from "./SearchView";
+import { SettingsView } from "./SettingsView";
 import { SourceControlView } from "./SourceControlView";
 
 /** The active view's contents. Shared by the desktop sidebar and the phone drawer. */
@@ -26,11 +26,7 @@ export function SidebarContent({
     case "extensions":
       return <ExtensionsView />;
     case "settings":
-      return (
-        <div className="px-2 py-1">
-          <ThemeOptions />
-        </div>
-      );
+      return <SettingsView />;
   }
 }
 
