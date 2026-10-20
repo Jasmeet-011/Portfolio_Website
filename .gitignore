@@ -15,5 +15,8 @@ test-results
 playwright-report
 screenshots
 
+# Real visitor questions exported by npm run assistant:questions
+evals/inbox
+
 # Local Claude Code settings
 .claude/settings.local.json

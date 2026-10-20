@@ -15,7 +15,9 @@
     "screenshots": "playwright test screenshots",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "eval:assistant": "vitest run --config vitest.eval.config.ts",
+    "assistant:questions": "node --env-file-if-exists=.env.local scripts/assistant-questions.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
