@@ -1,0 +1,24 @@
+{
+  "chosen": "monogram",
+  "colors": { "accent": "#007acc", "ink": "#ffffff" },
+  "marks": {
+    "monogram": {
+      "label": "A. JW monogram",
+      "strokeWidth": 3.2,
+      "paths": ["M12 8V19a4 4 0 0 1-8 0", "M15.5 8l2.75 16 3.5-11 3.5 11L28 8"],
+      "rects": []
+    },
+    "bracket": {
+      "label": "B. [J] bracket glyph",
+      "strokeWidth": 3,
+      "paths": ["M10 7H6.5v18H10", "M22 7h3.5v18H22", "M18 9v9.5a3 3 0 0 1-6 0"],
+      "rects": []
+    },
+    "prompt": {
+      "label": "C. J_ prompt",
+      "strokeWidth": 3.2,
+      "paths": ["M14 7v11.5a4.5 4.5 0 0 1-9 0"],
+      "rects": [{ "x": 18, "y": 21.5, "width": 9, "height": 3.4, "rx": 1 }]
+    }
+  }
+}

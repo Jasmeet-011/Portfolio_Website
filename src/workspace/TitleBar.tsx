@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import { Logo } from "@/assets/logo/Logo";
 import { useWorkspace } from "@/store/workspace";
 import { useCommands } from "./commands";
 import { WORKSPACE_NAME } from "./documents";
@@ -26,6 +27,7 @@ export function TitleBar() {
     <header className="grid h-10 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border bg-titlebar px-3">
       <div className="flex min-w-0 items-center gap-3">
         <TrafficLights />
+        <Logo size={18} className="shrink-0" />
         <MenuBar />
       </div>
       <button

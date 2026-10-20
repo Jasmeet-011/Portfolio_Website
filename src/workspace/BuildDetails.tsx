@@ -1,3 +1,4 @@
+import { Logo } from "@/assets/logo/Logo";
 import { links } from "@/content/links";
 import { buildInfo } from "@/lib/buildInfo";
 import { WORKSPACE_NAME } from "./documents";
@@ -14,7 +15,10 @@ export function BuildDetails() {
   ];
   return (
     <div>
-      <p className="font-mono text-text">{WORKSPACE_NAME}</p>
+      <p className="flex items-center gap-2.5 font-mono text-text">
+        <Logo size={32} />
+        {WORKSPACE_NAME}
+      </p>
       <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
         {rows.map(([term, value]) => (
           <div key={term} className="contents">
