@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures";
+import { expect, runFromPalette, test } from "./fixtures";
 
 const settings = (page: Page) => page.getByRole("button", { name: "Settings" });
 const shortcutList = (page: Page) =>
@@ -153,8 +153,7 @@ test.describe("phone", () => {
   test("Settings opens in the drawer from the palette", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Command palette" }).click();
-    await page.getByRole("combobox").fill(">open settings");
-    await page.keyboard.press("Enter");
+    await runFromPalette(page, ">open settings", "Preferences: Open Settings");
     const drawer = page.getByRole("dialog", { name: "Settings" });
     await expect(drawer).toBeVisible();
     await expect(drawer.getByRole("group", { name: "Color theme" })).toBeVisible();

@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
+import { certifications, degrees, publications } from "@/content/education";
 import { roles } from "@/content/experience";
+import { links } from "@/content/links";
+import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { complete, execute, type TerminalContext } from "./commands";
 import type { Segment } from "./store";
@@ -7,6 +10,9 @@ import type { Segment } from "./store";
 function context(overrides: Partial<TerminalContext> = {}): TerminalContext {
   return {
     open: vi.fn(),
+    openExternal: vi.fn(),
+    now: () => new Date(2026, 9, 19, 22, 31, 5),
+    columns: 120,
     setTheme: vi.fn(),
     currentTheme: "workspace-blue",
     closePanel: vi.fn(),
@@ -77,5 +83,80 @@ describe("complete", () => {
 
   it("leaves input alone when nothing matches", () => {
     expect(complete("zzz")).toEqual({ value: "zzz", options: [] });
+  });
+});
+
+const NL = String.fromCharCode(10);
+
+describe("phase 4.5 commands", () => {
+  it("neofetch shows the card beside the art when wide, below it when narrow", () => {
+    const wide = run("neofetch");
+    expect(wide.join(NL)).toContain(profile.name);
+    expect(wide.join(NL)).toContain(profile.location);
+    expect(wide.join(NL)).toContain(links.email);
+    expect(wide[0]).toContain("jasmeet@portfolio");
+    const narrow = run("neofetch", context({ columns: 40 }));
+    expect(narrow[0]).not.toContain("jasmeet@portfolio");
+    expect(narrow.join(NL)).toContain(profile.name);
+  });
+
+  it("open takes github, linkedin, email and project slugs", () => {
+    const ctx = context();
+    run("open github", ctx);
+    run("open LinkedIn", ctx);
+    run("open email", ctx);
+    expect(ctx.openExternal).toHaveBeenNthCalledWith(1, links.github);
+    expect(ctx.openExternal).toHaveBeenNthCalledWith(2, links.linkedin);
+    expect(ctx.openExternal).toHaveBeenNthCalledWith(3, `mailto:${links.email}`);
+  });
+
+  it("open <project> opens its live app only after a passing check, else its repo", () => {
+    for (const p of projects) {
+      const ctx = context();
+      run(`open ${p.slug}`, ctx);
+      const live = p.links.live && p.liveCheck?.ok ? p.links.live : undefined;
+      expect(ctx.openExternal).toHaveBeenCalledWith(live ?? p.links.github);
+    }
+  });
+
+  it("open still prefers files, and reports unknown targets", () => {
+    const ctx = context();
+    run("open about.py", ctx);
+    expect(ctx.open).toHaveBeenCalledWith("/about");
+    expect(ctx.openExternal).not.toHaveBeenCalled();
+    expect(run("open nowhere")).toEqual(["open: nowhere: No such file or link"]);
+  });
+
+  it("cat opens files only", () => {
+    expect(run("cat github")).toEqual(["cat: github: No such file"]);
+  });
+
+  it("education and certs print degrees, the certification and the paper", () => {
+    const education = run("education").join(NL);
+    for (const d of degrees) expect(education).toContain(d.school);
+    const certs = run("certs").join(NL);
+    for (const c of certifications) expect(certs).toContain(c.name);
+    for (const p of publications) expect(certs).toContain(p.title);
+  });
+
+  it("echo, date and pwd", () => {
+    expect(run('echo "hello there"')).toEqual(["hello there"]);
+    expect(run("date")).toEqual(["Mon Oct 19 22:31:05 2026"]);
+    expect(run("pwd")).toEqual(["/home/jasmeet"]);
+  });
+
+  it("sudo refuses, playfully", () => {
+    expect(run("sudo rm -rf /")[0]).toMatch(/^Nice try[.]/);
+  });
+
+  it("help lists every new command, and Tab completes them", () => {
+    const help = run("help").join(NL);
+    for (const name of ["neofetch", "education", "certs", "echo", "date", "pwd", "sudo"])
+      expect(help).toContain(name);
+    expect(complete("neo").value).toBe("neofetch ");
+    expect(complete("open git").value).toBe("open github ");
+    // The project slug and the file share a prefix: the first Tab extends to it, the next lists both.
+    expect(complete("open agentg").value).toBe("open agentguard");
+    expect(complete("open agentguard").options).toEqual(["agentguard", "agentguard.py"]);
   });
 });

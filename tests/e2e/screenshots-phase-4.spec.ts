@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures";
+import { expect, runFromPalette, test } from "./fixtures";
 
 const OUT = "screenshots/phase-4";
 
@@ -72,8 +72,7 @@ test.describe("screenshots phase 4", () => {
       if (name === "desktop") await page.keyboard.press("Control+Backquote");
       else {
         await page.getByRole("button", { name: "Command palette" }).click();
-        await page.getByRole("combobox").fill(">toggle terminal");
-        await page.keyboard.press("Enter");
+        await runFromPalette(page, ">toggle terminal", "View: Toggle Terminal");
       }
       await terminalWith(page, ["help", "git log"]);
       await shot(page, `terminal-${name}`);
@@ -84,8 +83,7 @@ test.describe("screenshots phase 4", () => {
       if (name === "desktop") await page.getByRole("button", { name: "Settings" }).click();
       else {
         await page.getByRole("button", { name: "Command palette" }).click();
-        await page.getByRole("combobox").fill(">open settings");
-        await page.keyboard.press("Enter");
+        await runFromPalette(page, ">open settings", "Preferences: Open Settings");
       }
       await shot(page, `settings-${name}`);
     });
@@ -95,8 +93,7 @@ test.describe("screenshots phase 4", () => {
       if (name === "desktop") await page.keyboard.press("Control+Shift+F");
       else {
         await page.getByRole("button", { name: "Command palette" }).click();
-        await page.getByRole("combobox").fill(">find in workspace");
-        await page.keyboard.press("Enter");
+        await runFromPalette(page, ">find in workspace", "Search: Find in Workspace");
       }
       await page.getByRole("searchbox", { name: "Search" }).fill("retrieval");
       await shot(page, `search-results-${name}`);

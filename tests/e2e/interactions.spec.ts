@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { projects } from "../../src/content/projects";
-import { expect, test } from "./fixtures";
+import { expect, runFromPalette, test } from "./fixtures";
 
 const palette = (page: Page) => page.getByRole("dialog", { name: "Command palette" });
 const paletteInput = (page: Page) => palette(page).getByRole("combobox");
@@ -67,6 +67,7 @@ test.describe("desktop", () => {
       await paletteInput(page).fill(">toggle terminal");
       const option = palette(page).getByRole("option", { name: /View: Toggle Terminal/ });
       await expect(option).toContainText("Ctrl+`");
+      await expect(option).toHaveAttribute("aria-selected", "true");
       await page.keyboard.press("Enter");
       await expect(page.getByRole("region", { name: "Panel" })).toBeVisible();
 
@@ -80,8 +81,7 @@ test.describe("desktop", () => {
     test("Go to Project lists the projects folder", async ({ page }) => {
       await page.goto("/");
       await page.keyboard.press("Control+Shift+P");
-      await paletteInput(page).fill(">Go to Project");
-      await page.keyboard.press("Enter");
+      await runFromPalette(page, ">Go to Project", "Go to Project");
       await expect(paletteInput(page)).toHaveValue("projects/");
       await expect(palette(page).getByRole("option").first()).toContainText(".");
       const names = await palette(page).getByRole("option").allInnerTexts();
@@ -315,8 +315,7 @@ test.describe("phone", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Command palette" }).click();
     await expect(paletteInput(page)).toBeFocused();
-    await paletteInput(page).fill(">show extensions");
-    await page.keyboard.press("Enter");
+    await runFromPalette(page, ">show extensions", "View: Show Extensions");
     await expect(page).toHaveURL("/skills");
   });
 });

@@ -36,6 +36,22 @@ function Output({ segment: s }: { segment: Segment }) {
   return <span className={tone || undefined}>{s.text}</span>;
 }
 
+/** A mailto: link opens the mail app in place; anything else opens in a new tab. */
+function openExternal(href: string) {
+  if (href.startsWith("mailto:")) {
+    const a = document.createElement("a");
+    a.href = href;
+    a.click();
+  } else window.open(href, "_blank", "noopener,noreferrer");
+}
+
+/** How many monospace characters fit across the terminal (Plex Mono is 0.6em wide). */
+function columnsOf(el: HTMLElement | null): number {
+  if (!el) return 80;
+  const size = parseFloat(getComputedStyle(el).fontSize) || 14;
+  return Math.floor(el.clientWidth / (size * 0.6));
+}
+
 /**
  * A terminal that takes the commands in plan.md 7.6. Enter runs, up and down walk the
  * history, Tab completes (and moves focus on as usual when the line is empty).
@@ -48,6 +64,7 @@ export function Terminal() {
   // Position while walking the history; null means editing a new line.
   const [cursor, setCursor] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,6 +85,9 @@ export function Terminal() {
     setCursor(null);
     const result = execute(input, {
       open: (route) => navigate(route),
+      openExternal,
+      now: () => new Date(),
+      columns: columnsOf(rootRef.current),
       setTheme: (id) => useTheme.getState().setTheme(id),
       currentTheme: useTheme.getState().theme,
       closePanel: () => useWorkspace.getState().closePanel(),
@@ -116,6 +136,7 @@ export function Terminal() {
 
   return (
     <div
+      ref={rootRef}
       className="min-h-full font-mono text-[14px] leading-[1.5]"
       onClick={(e) => {
         // A click on the terminal's background focuses the prompt, unless text is selected.

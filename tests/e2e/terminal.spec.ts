@@ -50,8 +50,10 @@ test("help lists every command, and unknown ones get a hint", async ({ page }) =
   // resume appears only once public/resume.pdf exists; ask arrives in Phase 5.
   await expect(output(page)).not.toContainText("resume");
   await expect(output(page)).not.toContainText("ask");
+  await run(page, "frobnicate");
+  await expect(output(page)).toContainText("command not found: frobnicate. Try help.");
   await run(page, "sudo rm -rf /");
-  await expect(output(page)).toContainText("command not found: sudo. Try help.");
+  await expect(output(page)).toContainText("Nice try.");
 });
 
 test("whoami, contact and skills print from content", async ({ page }) => {
@@ -105,7 +107,7 @@ test("ls lists folders and files, open and cat open tabs", async ({ page }) => {
   await run(page, "open projects");
   await expect(output(page)).toContainText("open: projects: Is a directory");
   await run(page, "open");
-  await expect(output(page)).toContainText("usage: open <file>");
+  await expect(output(page)).toContainText("usage: open <file|github|linkedin|email|project>");
 });
 
 test("Tab completes commands, files and themes", async ({ page }) => {
@@ -114,9 +116,13 @@ test("Tab completes commands, files and themes", async ({ page }) => {
   await input(page).press("Tab");
   await expect(input(page)).toHaveValue("projects ");
 
-  await input(page).fill("open agent");
+  await input(page).fill("cat agent");
   await input(page).press("Tab");
-  await expect(input(page)).toHaveValue("open agentguard.py ");
+  await expect(input(page)).toHaveValue("cat agentguard.py ");
+
+  await input(page).fill("open link");
+  await input(page).press("Tab");
+  await expect(input(page)).toHaveValue("open linkedin ");
 
   await input(page).fill("ls pro");
   await input(page).press("Tab");
@@ -129,7 +135,7 @@ test("Tab completes commands, files and themes", async ({ page }) => {
   // Several matches with nothing in common to add: they are listed.
   await input(page).fill("c");
   await input(page).press("Tab");
-  await expect(output(page)).toContainText("cat  clear  contact");
+  await expect(output(page)).toContainText("cat  certs  clear  contact");
 });
 
 test("Tab on an empty line moves focus on, so the terminal never traps it", async ({ page }) => {
@@ -179,4 +185,21 @@ test("Terminal > New Terminal starts a fresh session, Clear Terminal empties it"
   await page.getByRole("menuitem", { name: "New Terminal" }).click();
   await expect(output(page)).toHaveText("Type help to see what works here.");
   await expect(input(page)).toBeFocused();
+});
+
+test("neofetch prints a card from content", async ({ page }) => {
+  await openTerminal(page);
+  await run(page, "neofetch");
+  await expect(output(page)).toContainText("Jasmeet Singh Wadhwa");
+  await expect(output(page)).toContainText("New York, NY");
+  await expect(output(page).getByRole("link", { name: links.email })).toBeVisible();
+});
+
+test("open github opens the profile in a new tab", async ({ page, context }) => {
+  await context.route("https://github.com/**", (route) => route.fulfill({ body: "" }));
+  await openTerminal(page);
+  const popup = page.waitForEvent("popup");
+  await run(page, "open github");
+  expect((await popup).url()).toBe(`${links.github}`);
+  await expect(output(page)).toContainText("Opening github.com/Jasmeet-011");
 });

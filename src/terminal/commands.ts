@@ -1,11 +1,14 @@
+import { certifications, degrees, publications } from "@/content/education";
 import { roles } from "@/content/experience";
 import { links } from "@/content/links";
 import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
+import { skills } from "@/content/skills";
 import { known } from "@/content/todo";
+import { buildInfo } from "@/lib/buildInfo";
 import { commitMessage, graphRows } from "@/lib/career";
 import { formatMonth, formatRange } from "@/lib/dates";
-import { branchName } from "@/lib/projects";
+import { branchName, shownLinks } from "@/lib/projects";
 import { skillGroups } from "@/lib/skills";
 import { themes, type ThemeId } from "@/themes/themes";
 import { documents, type Doc } from "@/workspace/documents";
@@ -17,7 +20,13 @@ import type { Segment } from "./store";
  * src/content, the same data the files and the git graph render.
  */
 export interface TerminalContext {
+  /** Opens a workspace route in a tab. */
   open: (route: string) => void;
+  /** Opens a page outside the site (or a mailto: link). */
+  openExternal: (href: string) => void;
+  now: () => Date;
+  /** Characters that fit on one line, so wide output can fall back to a narrow layout. */
+  columns: number;
   setTheme: (id: ThemeId) => void;
   currentTheme: ThemeId;
   closePanel: () => void;
@@ -83,6 +92,77 @@ function table(rows: Segment[][]): Output {
 
 const current = roles.find((r) => r.end === null);
 const resume = known(links.resume);
+const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+
+/** Places outside the site that open accepts by name. */
+const NAMED_LINKS: Record<string, { href: string; label: string }> = {
+  github: { href: links.github, label: bare(links.github) },
+  linkedin: { href: links.linkedin, label: bare(links.linkedin) },
+  email: { href: `mailto:${links.email}`, label: links.email },
+};
+
+/**
+ * A named link, or a project by slug: its live app while the last check passed,
+ * otherwise its code on GitHub.
+ */
+function linkFor(arg: string): { href: string; label: string } | undefined {
+  const key = arg.toLowerCase();
+  const named = NAMED_LINKS[key];
+  if (named) return named;
+  const project = projects.find((p) => p.slug === key);
+  if (!project) return undefined;
+  const { live, github } = shownLinks(project);
+  if (live) return { href: live, label: `${project.name} live app, ${bare(live)}` };
+  return github ? { href: github, label: `${project.name} on GitHub, ${bare(github)}` } : undefined;
+}
+
+/** "JW" in figlet's standard font. */
+const ART = [
+  "     _ __        __",
+  "    | |\\ \\      / /",
+  " _  | | \\ \\ /\\ / /",
+  "| |_| |  \\ V  V /",
+  " \\___/    \\_/\\_/",
+];
+const ART_WIDTH = Math.max(...ART.map((l) => l.length)) + 3;
+
+function neofetch(ctx: TerminalContext): Output {
+  const key = (k: string) => text(`${k}:`.padEnd(11), "comment");
+  const info: Segment[][] = [
+    [text("jasmeet@portfolio", "link")],
+    [text("-".repeat(17), "muted")],
+    [key("Name"), text(profile.name)],
+    [key("Location"), text(profile.location)],
+    [key("Focus"), text(profile.positioning)],
+    ...(current ? [[key("Now"), text(`${current.title}, ${current.company}`)]] : []),
+    [
+      key("Top stack"),
+      text(
+        skills
+          .slice(0, 6)
+          .map((s) => s.name)
+          .join(", "),
+      ),
+    ],
+    [key("GitHub"), { text: bare(links.github), href: links.github }],
+    [key("LinkedIn"), { text: bare(links.linkedin), href: links.linkedin }],
+    [key("Email"), { text: links.email, href: `mailto:${links.email}` }],
+    [key("Site"), text(`${buildInfo.version} (${buildInfo.commit})`)],
+  ];
+  // Side by side like neofetch when there is room, art above the card when there isn't.
+  if (ctx.columns < ART_WIDTH + 60)
+    return [...ART.map((l) => [text(l, "link")]), [text("")], ...info];
+  return Array.from({ length: Math.max(ART.length, info.length) }, (_, i) => [
+    text((ART[i] ?? "").padEnd(ART_WIDTH), "link"),
+    ...(info[i] ?? []),
+  ]);
+}
+
+/** "Mon Oct 19 22:31:05 2026", like date on a Unix shell. */
+function unixDate(d: Date): string {
+  const [weekday, month, day, year] = d.toDateString().split(" ");
+  return `${weekday} ${month} ${day} ${d.toTimeString().slice(0, 8)} ${year}`;
+}
 
 const COMMANDS: TerminalCommand[] = [
   {
@@ -97,6 +177,11 @@ const COMMANDS: TerminalCommand[] = [
       ),
       [text("Tab completes commands and file names. Up and down walk through history.", "muted")],
     ],
+  },
+  {
+    name: "neofetch",
+    description: "who I am, as a system info card",
+    run: (_, ctx) => neofetch(ctx),
   },
   {
     name: "whoami",
@@ -131,9 +216,15 @@ const COMMANDS: TerminalCommand[] = [
   },
   {
     name: "open",
+    args: "<file|link>",
+    description: "open a file, or github, linkedin, email or a project",
+    run: (args, ctx) => openTarget(args, ctx),
+  },
+  {
+    name: "cat",
     args: "<file>",
-    description: "open a file in a tab (cat works too)",
-    run: (args, ctx) => openFile("open", args, ctx),
+    description: "open a file in a tab",
+    run: (args, ctx) => openFile("cat", args, ctx),
   },
   {
     name: "projects",
@@ -193,6 +284,40 @@ const COMMANDS: TerminalCommand[] = [
       ),
   },
   {
+    name: "education",
+    description: "my degrees",
+    run: () =>
+      table(
+        degrees.map((d) => [
+          text(d.degree),
+          text(d.school),
+          text(formatRange(d.start, d.end), "muted"),
+          text(d.grade, "muted"),
+        ]),
+      ),
+  },
+  {
+    name: "certs",
+    description: "certification and publication",
+    run: () => [
+      [text("Certification", "comment")],
+      ...certifications.map((c) => {
+        const earned = known(c.earned);
+        return [
+          text("  "),
+          { text: c.name, href: c.url },
+          text(`  ${c.issuer}${earned ? `, ${formatMonth(earned)}` : ""}`, "muted"),
+        ];
+      }),
+      [text("")],
+      [text("Publication", "comment")],
+      ...publications.flatMap((p) => [
+        [text("  "), { text: p.title, href: p.url }],
+        [text(`  ${p.venue}`, "muted")],
+      ]),
+    ],
+  },
+  {
     name: "contact",
     description: "email and links",
     run: () => [
@@ -243,12 +368,27 @@ const COMMANDS: TerminalCommand[] = [
       return say(`Theme: ${theme.label}`);
     },
   },
+  {
+    name: "echo",
+    args: "[text]",
+    description: "print text",
+    run: (args) => say(args.join(" ").replace(/^(["'])(.*)\1$/, "$2")),
+  },
+  { name: "date", description: "the date and time", run: (_, ctx) => say(unixDate(ctx.now())) },
+  { name: "pwd", description: "where you are", run: () => say("/home/jasmeet") },
   { name: "clear", description: "clear the terminal", run: () => "clear" },
   {
     name: "history",
     description: "commands you've run",
     run: (_, ctx) =>
       ctx.history.map((h, i) => [text(String(i + 1).padStart(4, " "), "muted"), text(`  ${h}`)]),
+  },
+  {
+    name: "sudo",
+    args: "<command>",
+    description: "try it",
+    run: () =>
+      say("Nice try. You're not in the sudoers file, but you can still reach me: try contact."),
   },
   {
     name: "exit",
@@ -260,8 +400,19 @@ const COMMANDS: TerminalCommand[] = [
   },
 ];
 
-/** cat is open under another name, as plan.md 7.6 asks; help lists it with open. */
-const ALIASES: Record<string, string> = { cat: "open" };
+/** open: a file, then a named link or project, in that order. */
+function openTarget([arg]: string[], ctx: TerminalContext): Output {
+  if (!arg) return say("usage: open <file|github|linkedin|email|project>");
+  const doc = resolveFile(arg);
+  if (doc && doc !== "folder") return openFile("open", [arg], ctx);
+  const link = linkFor(arg);
+  if (link) {
+    ctx.openExternal(link.href);
+    return [[text("Opening "), { text: link.label, href: link.href }]];
+  }
+  if (doc === "folder") return say(`open: ${arg}: Is a directory`);
+  return say(`open: ${arg}: No such file or link`);
+}
 
 function openFile(name: string, [arg]: string[], ctx: TerminalContext): Output {
   if (!arg) return say(`usage: ${name} <file>`);
@@ -275,7 +426,6 @@ function openFile(name: string, [arg]: string[], ctx: TerminalContext): Output {
 export function execute(input: string, ctx: TerminalContext): Output | "clear" {
   const [word = "", ...args] = input.trim().split(/\s+/);
   if (!word) return [];
-  if (ALIASES[word]) return openFile(word, args, ctx);
   const command = COMMANDS.find((c) => c.name === word);
   if (!command) return say(`command not found: ${word}. Try help.`);
   return command.run(args, ctx);
@@ -290,17 +440,20 @@ const commonPrefix = (words: string[]) =>
 
 /** Candidates for the word being typed, given the command before it. */
 function candidates(command: string | undefined, partial: string): string[] {
-  if (command === undefined) return [...COMMANDS.map((c) => c.name), ...Object.keys(ALIASES)];
+  if (command === undefined) return COMMANDS.map((c) => c.name);
   const folders = folderPaths(explorerTree);
-  switch (ALIASES[command] ?? command) {
+  // Full paths once a "/" is typed, otherwise the top level plus file names.
+  const filePaths = partial.includes("/")
+    ? [...files.map(pathOf), ...folders]
+    : [
+        ...explorerTree.map((n) => (n.kind === "folder" ? `${n.name}/` : n.name)),
+        ...files.filter((d) => d.path.length > 1).map((d) => d.title),
+      ];
+  switch (command) {
+    case "cat":
+      return filePaths;
     case "open":
-      // Full paths once a "/" is typed, otherwise the top level plus file names.
-      return partial.includes("/")
-        ? [...files.map(pathOf), ...folders]
-        : [
-            ...explorerTree.map((n) => (n.kind === "folder" ? `${n.name}/` : n.name)),
-            ...files.filter((d) => d.path.length > 1).map((d) => d.title),
-          ];
+      return [...filePaths, ...Object.keys(NAMED_LINKS), ...projects.map((p) => p.slug)];
     case "ls":
       return folders;
     case "theme":

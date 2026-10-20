@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { projects } from "../../src/content/projects";
-import { expect, test } from "./fixtures";
+import { expect, runFromPalette, test } from "./fixtures";
 
 const searchBox = (page: Page) => page.getByRole("searchbox", { name: "Search" });
 const results = (page: Page) => page.getByRole("list", { name: "Search results" });
@@ -99,8 +99,7 @@ test.describe("phone", () => {
   test("Search opens in the drawer and a result closes it", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Command palette" }).click();
-    await page.getByRole("combobox").fill(">find in workspace");
-    await page.keyboard.press("Enter");
+    await runFromPalette(page, ">find in workspace", "Search: Find in Workspace");
     const drawer = page.getByRole("dialog", { name: "Search" });
     await expect(drawer).toBeVisible();
     await expect(searchBox(page)).toBeFocused();

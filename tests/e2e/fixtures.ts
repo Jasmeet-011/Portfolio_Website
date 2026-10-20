@@ -1,4 +1,4 @@
-import { test as base, expect } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
 
 /** Every test fails if the page logs a console error or warning, or throws. */
 export const test = base.extend({
@@ -28,3 +28,15 @@ export const test = base.extend({
 });
 
 export { expect };
+
+/**
+ * Types into the open command palette and presses Enter once the command is the
+ * selected option. cmdk filters asynchronously, so Enter right after typing can land
+ * before the list has caught up.
+ */
+export async function runFromPalette(page: Page, query: string, title: string) {
+  const dialog = page.getByRole("dialog", { name: "Command palette" });
+  await dialog.getByRole("combobox").fill(query);
+  await expect(dialog.getByRole("option", { selected: true })).toContainText(title);
+  await dialog.getByRole("combobox").press("Enter");
+}
