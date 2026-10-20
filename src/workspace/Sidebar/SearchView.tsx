@@ -64,9 +64,9 @@ export function SearchView() {
           placeholder="Search"
           autoComplete="off"
           spellCheck={false}
-          className="h-7 w-full rounded border border-border bg-input px-2 text-text placeholder:text-muted"
+          className="h-8 w-full rounded border border-border bg-input px-2 text-text placeholder:text-muted"
         />
-        <p id="search-summary" role="status" className="mt-2 text-xs text-muted">
+        <p id="search-summary" role="status" className="mt-2 text-[13px] text-muted">
           {summary}
         </p>
       </div>
@@ -74,15 +74,15 @@ export function SearchView() {
         <ul aria-label="Search results">
           {results.map(({ doc, matches, count }) => (
             <li key={doc.id} className="mb-1">
-              <p className="flex h-6 items-center gap-1.5 px-3">
+              <p className="flex h-7 items-center gap-1.5 px-3">
                 <FileIcon icon={doc.icon} />
                 <span className="truncate">{doc.title}</span>
                 {doc.path.length > 1 && (
-                  <span className="truncate text-xs text-muted">
+                  <span className="truncate text-[13px] text-muted">
                     {doc.path.slice(0, -1).join("/")}
                   </span>
                 )}
-                <span className="ml-auto shrink-0 rounded-full bg-surface px-1.5 text-[11px] text-text">
+                <span className="ml-auto shrink-0 rounded-full bg-surface px-1.5 text-xs text-text">
                   {count}
                 </span>
               </p>
@@ -92,7 +92,7 @@ export function SearchView() {
                     <Link
                       to={doc.route}
                       state={{ find: query.trim(), text: m.text } satisfies FindState}
-                      className="block py-0.5 pr-3 pl-8 text-[13px] hover:bg-hover"
+                      className="block py-0.5 pr-3 pl-8 text-sm hover:bg-hover"
                     >
                       <Snippet match={m} length={length} />
                     </Link>

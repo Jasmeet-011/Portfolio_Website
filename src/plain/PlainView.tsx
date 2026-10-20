@@ -44,7 +44,7 @@ export function PlainView() {
 
   return (
     <div className="min-h-dvh bg-editor text-text">
-      <div className="mx-auto max-w-[72ch] px-6 py-10 text-[15px] leading-7 print:px-0 print:py-0">
+      <div className="mx-auto max-w-[72ch] px-6 py-10 text-[16px] leading-[1.65] print:px-0 print:py-0">
         <nav aria-label="Plain view" className="mb-8 flex flex-wrap gap-x-5 gap-y-1 print:hidden">
           <Link to="/" className={link}>
             Back to the workspace
@@ -57,8 +57,8 @@ export function PlainView() {
         </nav>
 
         <header>
-          <h1 className="text-[28px] leading-tight font-semibold">{profile.name}</h1>
-          <p className="mt-1 text-[17px]">
+          <h1 className="text-[30px] leading-tight font-semibold">{profile.name}</h1>
+          <p className="mt-1 text-[18px]">
             {profile.positioning.charAt(0).toUpperCase() + profile.positioning.slice(1)}.
           </p>
           {bio && <p className="mt-2">{bio}</p>}

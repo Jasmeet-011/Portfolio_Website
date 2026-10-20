@@ -25,7 +25,7 @@ function Section({
         ref={headingRef}
         id={id}
         tabIndex={headingRef ? -1 : undefined}
-        className="mb-2 text-xs font-medium text-muted"
+        className="mb-2 text-[13px] font-medium text-muted"
       >
         {title}
       </h3>
@@ -93,7 +93,7 @@ function Motion() {
         Reduce motion
       </label>
       {systemReduces && (
-        <p className="mt-1 text-xs text-muted">Your system already asks for reduced motion.</p>
+        <p className="mt-1 text-[13px] text-muted">Your system already asks for reduced motion.</p>
       )}
     </>
   );
@@ -103,7 +103,7 @@ function Motion() {
 function Shortcuts() {
   const commands = useCommands().filter((c) => c.keys?.length);
   return (
-    <dl className="space-y-1.5 text-[13px]">
+    <dl className="space-y-1.5 text-sm">
       {commands.map((c) => (
         <div key={c.id} className="flex items-baseline justify-between gap-3">
           <dt className="min-w-0">{c.title}</dt>

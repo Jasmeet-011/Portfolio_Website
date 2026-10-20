@@ -12,7 +12,7 @@ const itemsOf = (list: HTMLElement | null) =>
   list ? [...list.querySelectorAll<HTMLElement>(ITEMS)] : [];
 
 const listClass =
-  "absolute z-50 min-w-60 rounded-md border border-border bg-chrome py-1 text-[13px] text-text shadow-xl";
+  "absolute z-50 min-w-64 rounded-md border border-border bg-chrome py-1 text-sm text-text shadow-xl";
 
 /**
  * One dropdown (or submenu). Arrow keys move, Home and End jump, Right opens a submenu
@@ -125,14 +125,16 @@ function MenuList({
                 if (command) onActivate(command);
                 else setSub({ index: at, focus: "first" });
               }}
-              className="flex h-7 w-full items-center gap-2 px-2 text-left focus:bg-selection aria-expanded:bg-selection"
+              className="flex h-8 w-full items-center gap-2 px-2 text-left focus:bg-selection aria-expanded:bg-selection"
             >
               <span className="grid w-4 shrink-0 place-items-center" aria-hidden>
                 {command?.checked && <Check className="size-3.5" />}
               </span>
               <span className="flex-1 truncate pr-4">{label}</span>
               {command?.keys?.[0] && (
-                <span className="shrink-0 text-xs text-muted">{formatKeys(command.keys[0])}</span>
+                <span className="shrink-0 text-[13px] text-muted">
+                  {formatKeys(command.keys[0])}
+                </span>
               )}
               {isSub && <ChevronRight className="size-3.5 shrink-0 text-muted" aria-hidden />}
             </button>
@@ -258,7 +260,7 @@ function MenuRoot({
               }}
               className={cx(
                 "rounded hover:bg-hover aria-expanded:bg-selection",
-                compact ? "grid size-7 place-items-center text-muted" : "h-6 px-1.5 text-[13px]",
+                compact ? "grid size-7 place-items-center text-muted" : "h-7 px-2 text-sm",
               )}
             >
               {compact ? <MenuIcon className="size-4" aria-hidden /> : menu.label}

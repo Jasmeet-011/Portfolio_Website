@@ -24,7 +24,7 @@ const filter = (value: string, search: string, keywords?: string[]) => {
 };
 
 const itemClass =
-  "flex min-h-8 cursor-pointer items-center gap-2 rounded px-2 py-1 data-[selected=true]:bg-selection";
+  "flex min-h-9 cursor-pointer items-center gap-2 rounded px-2 py-1 data-[selected=true]:bg-selection";
 
 function Kbd({ children }: { children: ReactNode }) {
   return <kbd className="ml-auto shrink-0 font-sans text-xs text-muted">{children}</kbd>;
@@ -54,7 +54,7 @@ function FileItems({ text, onPick }: { text: string; onPick: (doc: Doc) => void 
             >
               <FileIcon icon={doc.icon} />
               <span className="truncate">{doc.title}</span>
-              <span className="truncate text-xs text-muted">{docDetail(doc)}</span>
+              <span className="truncate text-[13px] text-muted">{docDetail(doc)}</span>
             </Cmdk.Item>
           ))}
         </Cmdk.Group>
@@ -149,9 +149,9 @@ export function CommandPalette() {
             placeholder={
               commandMode ? "Type a command" : "Search files by name. Type > for commands."
             }
-            className="h-10 w-full border-b border-border bg-input px-3 text-text outline-none placeholder:text-muted"
+            className="h-11 w-full border-b border-border bg-input px-3 text-text outline-none placeholder:text-muted"
           />
-          <Cmdk.List className="max-h-[min(60vh,26rem)] overflow-y-auto p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-muted">
+          <Cmdk.List className="max-h-[min(60vh,26rem)] overflow-y-auto p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-[13px] [&_[cmdk-group-heading]]:text-muted">
             <Cmdk.Empty className="px-2 py-3 text-muted">
               {commandMode ? "No matching commands." : "No matching files."}
             </Cmdk.Empty>

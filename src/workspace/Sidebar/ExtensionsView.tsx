@@ -8,10 +8,10 @@ export function ExtensionsView() {
   const { pathname, hash } = useLocation();
   return (
     <nav aria-label="Extensions" className="pb-3">
-      <p className="px-4 pb-1 text-xs text-muted">Installed, {skills.length}</p>
+      <p className="px-4 pb-1 text-[13px] text-muted">Installed, {skills.length}</p>
       {skillGroups.map((group) => (
         <section key={group.category} className="mt-2">
-          <h3 className="px-4 pb-1 text-xs font-medium text-muted">{group.category}</h3>
+          <h3 className="px-4 pb-1 text-[13px] font-medium text-muted">{group.category}</h3>
           <ul>
             {group.skills.map((skill) => (
               <li key={skill.slug}>
@@ -24,10 +24,12 @@ export function ExtensionsView() {
                   <span className="min-w-0 flex-1">
                     <span className="flex items-baseline justify-between gap-2">
                       <span className="truncate">{skill.name}</span>
-                      <span className="shrink-0 text-[11px] text-muted">{usedInCount(skill)}</span>
+                      <span className="shrink-0 text-xs text-muted">{usedInCount(skill)}</span>
                     </span>
                     {skill.description && (
-                      <span className="block truncate text-xs text-muted">{skill.description}</span>
+                      <span className="block truncate text-[13px] text-muted">
+                        {skill.description}
+                      </span>
                     )}
                   </span>
                 </Link>

@@ -36,7 +36,7 @@ function Preview() {
         items={FILES.map((f) => (
           <>
             <Open to={f.to}>
-              <code className="font-mono text-[14px]">{f.name}</code>
+              <code className="font-mono text-[15px]">{f.name}</code>
             </Open>
             : {f.text}
           </>

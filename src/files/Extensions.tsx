@@ -8,7 +8,7 @@ export function ExtensionIcon({ name, size = "md" }: { name: string; size?: "sm"
       aria-hidden="true"
       className={
         size === "sm"
-          ? "grid size-8 shrink-0 place-items-center rounded border border-border bg-surface font-mono text-[11px] font-semibold text-muted"
+          ? "grid size-8 shrink-0 place-items-center rounded border border-border bg-surface font-mono text-xs font-semibold text-muted"
           : "grid size-11 shrink-0 place-items-center rounded-md border border-border bg-surface font-mono text-sm font-semibold text-muted"
       }
     >

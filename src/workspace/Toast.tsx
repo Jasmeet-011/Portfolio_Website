@@ -13,7 +13,7 @@ export function Toast() {
   }, [toast, dismiss]);
 
   return (
-    <div role="status" className="pointer-events-none fixed right-3 bottom-9 z-50 max-w-sm">
+    <div role="status" className="pointer-events-none fixed right-3 bottom-10 z-50 max-w-sm">
       {toast && (
         <p className="rounded-md border border-border bg-chrome px-3 py-2 text-sm break-all text-text shadow-lg">
           {toast.text}

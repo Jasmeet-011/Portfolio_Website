@@ -16,7 +16,7 @@ interface RowOptions {
 const rowClass = ({ touch }: RowOptions) =>
   cx(
     "flex w-full items-center gap-1.5 pr-3 text-left hover:bg-hover",
-    touch ? "h-11 text-[15px]" : "h-6",
+    touch ? "h-11 text-[16px]" : "h-7",
   );
 
 const indent = ({ depth }: RowOptions): CSSProperties => ({ paddingLeft: 8 + depth * 12 });

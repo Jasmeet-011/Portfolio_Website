@@ -23,7 +23,7 @@ export function TitleBar() {
   const setPalette = useWorkspace((s) => s.setPalette);
   const goToFile = useCommands().find((c) => c.id === "go.file")?.keys?.[0];
   return (
-    <header className="grid h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border bg-titlebar px-3">
+    <header className="grid h-10 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border bg-titlebar px-3">
       <div className="flex min-w-0 items-center gap-3">
         <TrafficLights />
         <MenuBar />
@@ -33,7 +33,7 @@ export function TitleBar() {
         aria-label="Search files and commands"
         title={goToFile ? `Go to File (${formatKeys(goToFile)})` : undefined}
         onClick={() => setPalette("")}
-        className="flex h-6 w-[clamp(12rem,26vw,32rem)] items-center justify-center gap-2 rounded-md border border-border bg-editor px-3 text-xs text-muted hover:border-muted hover:text-text"
+        className="flex h-7 w-[clamp(12rem,26vw,32rem)] items-center justify-center gap-2 rounded-md border border-border bg-editor px-3 text-sm text-muted hover:border-muted hover:text-text"
       >
         <Search className="size-3.5" aria-hidden />
         <span className="truncate">{WORKSPACE_NAME}</span>

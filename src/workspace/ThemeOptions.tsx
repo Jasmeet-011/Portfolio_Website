@@ -31,7 +31,7 @@ export function ThemeOptions({
   const setTheme = useTheme((s) => s.setTheme);
   return (
     <fieldset>
-      <legend className="mb-1.5 px-2 text-xs font-medium text-muted">Color theme</legend>
+      <legend className="mb-1.5 px-2 text-[13px] font-medium text-muted">Color theme</legend>
       {themes.map((t) => (
         <label
           key={t.id}

@@ -116,7 +116,7 @@ export function Terminal() {
 
   return (
     <div
-      className="min-h-full font-mono text-[13px] leading-5"
+      className="min-h-full font-mono text-[14px] leading-[1.5]"
       onClick={(e) => {
         // A click on the terminal's background focuses the prompt, unless text is selected.
         if (e.target === e.currentTarget && !window.getSelection()?.toString())

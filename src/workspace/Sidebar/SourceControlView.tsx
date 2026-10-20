@@ -10,7 +10,7 @@ const row =
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-3">
-      <h3 className="px-4 pb-1 text-xs font-medium text-muted">{title}</h3>
+      <h3 className="px-4 pb-1 text-[13px] font-medium text-muted">{title}</h3>
       <ul>{children}</ul>
     </section>
   );
@@ -26,7 +26,7 @@ export function SourceControlView() {
     <nav aria-label="Source control" className="pb-3">
       <p className="flex items-center gap-2 px-4 py-1">
         <GitBranch className="size-4 text-muted" aria-hidden />
-        <span className="font-mono text-[13px]">main</span>
+        <span className="font-mono text-sm">main</span>
       </p>
       <p className="px-4 pt-1">
         <Link to="/experience" className="text-link underline-offset-2 hover:underline">
@@ -43,7 +43,7 @@ export function SourceControlView() {
                 <span className="block truncate">
                   {c.type === "commit" ? commitMessage(c.role) : ""}
                 </span>
-                <code className="font-mono text-[11px] text-muted">{c.hash}</code>
+                <code className="font-mono text-xs text-muted">{c.hash}</code>
               </span>
             </Link>
           </li>

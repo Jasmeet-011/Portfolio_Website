@@ -25,8 +25,9 @@ function Clock() {
     return () => clearInterval(id);
   }, []);
   const label = now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  // Decorative, so it gives way first on phones, where the bar is full at 14px.
   return (
-    <Item>
+    <Item className="hidden sm:flex">
       <time dateTime={now.toISOString()}>{label}</time>
     </Item>
   );
@@ -96,9 +97,9 @@ export function StatusBar({ doc }: { doc: Doc | undefined }) {
   return (
     <footer
       aria-label="Status bar"
-      className="relative flex h-6 shrink-0 items-center justify-between border-t border-border bg-statusbar px-1 text-xs text-on-statusbar"
+      className="relative flex h-7 shrink-0 items-center justify-between border-t border-border bg-statusbar px-1 text-sm text-on-statusbar"
     >
-      <div className="flex h-full min-w-0 items-center">
+      <div className="flex h-full min-w-0 items-center overflow-hidden">
         <Item>
           <GitBranch className="size-3.5" aria-hidden />
           main

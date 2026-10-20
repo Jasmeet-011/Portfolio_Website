@@ -55,7 +55,7 @@ function source(fields: Fields): string {
 }
 
 const input =
-  "w-full rounded border border-border bg-input px-2 py-1 font-mono text-[13px] text-text placeholder:text-muted";
+  "w-full rounded border border-border bg-input px-2 py-1 font-mono text-[15px] text-text placeholder:text-muted";
 
 function Line({ children, className }: { children?: ReactNode; className?: string }) {
   return <div className={cx("min-h-6", className)}>{children}</div>;
@@ -82,7 +82,7 @@ function Preview({
   );
   return (
     <div className="max-w-[80ch] px-6 pt-4 pb-16 sm:px-10">
-      <form onSubmit={onSubmit} className="font-mono text-[13px] leading-6">
+      <form onSubmit={onSubmit} className="font-mono text-[15px] leading-7">
         <Line className="text-comment">
           # Send me a message. Fill in the fields, then send the request.
         </Line>
@@ -160,10 +160,10 @@ function Preview({
       </form>
 
       <section aria-label="Response" className="mt-8 rounded-md border border-border bg-chrome">
-        <h2 className="border-b border-border px-3 py-1.5 text-xs font-medium text-muted">
+        <h2 className="border-b border-border px-3 py-1.5 text-[13px] font-medium text-muted">
           Response
         </h2>
-        <div aria-live="polite" className="px-3 py-2 font-mono text-[13px] leading-6">
+        <div aria-live="polite" className="px-3 py-2 font-mono text-[15px] leading-7">
           {response.state === "idle" && (
             <p className="text-muted">Send the request to see the response here.</p>
           )}
@@ -188,7 +188,7 @@ function Preview({
         </div>
       </section>
 
-      <p className="mt-6 text-[15px]">
+      <p className="mt-6 text-[16px]">
         Prefer email?{" "}
         <a href={`mailto:${links.email}`} className="text-link underline-offset-2 hover:underline">
           {links.email}

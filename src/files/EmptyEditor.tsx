@@ -21,7 +21,7 @@ export function NoEditor() {
 export function NotFound({ pathname }: { pathname: string }) {
   return (
     <div className="px-6 py-10 sm:px-10">
-      <p className="font-mono text-xs text-muted">{pathname}</p>
+      <p className="font-mono text-[13px] text-muted">{pathname}</p>
       <h1 className="mt-2 text-2xl font-semibold">Nothing lives at this path</h1>
       <p className="mt-4">
         <Link to="/" className={action}>

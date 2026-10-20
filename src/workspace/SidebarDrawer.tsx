@@ -65,7 +65,7 @@ export function SidebarDrawer({ activeId }: { activeId: string | undefined }) {
         className="absolute inset-y-0 left-0 flex w-[min(20rem,85vw)] flex-col border-r border-border bg-chrome"
       >
         <div className="flex h-11 shrink-0 items-center justify-between pr-0 pl-4">
-          <h2 className="text-xs font-medium text-muted">{VIEW_TITLES[view]}</h2>
+          <h2 className="text-sm font-medium text-muted">{VIEW_TITLES[view]}</h2>
           <button
             type="button"
             aria-label={`Close ${VIEW_TITLES[view].toLowerCase()}`}

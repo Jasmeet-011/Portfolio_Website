@@ -51,7 +51,7 @@ export function Panel({ isDesktop }: { isDesktop: boolean }) {
         "flex flex-col border-t border-border",
         isDesktop
           ? "h-56 shrink-0 bg-chrome"
-          : "fixed inset-x-0 bottom-6 z-30 h-[50dvh] rounded-t-lg bg-chrome",
+          : "fixed inset-x-0 bottom-7 z-30 h-[50dvh] rounded-t-lg bg-chrome",
       )}
     >
       <div className="flex h-9 shrink-0 items-center justify-between pr-1 pl-2">
@@ -67,7 +67,7 @@ export function Panel({ isDesktop }: { isDesktop: boolean }) {
               tabIndex={t.id === tab ? 0 : -1}
               onClick={() => setPanelTab(t.id)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className="relative px-2.5 text-xs text-muted hover:text-text aria-selected:text-text"
+              className="relative px-3 text-sm text-muted hover:text-text aria-selected:text-text"
             >
               {t.label}
               {t.id === tab && (
@@ -89,7 +89,7 @@ export function Panel({ isDesktop }: { isDesktop: boolean }) {
         id="panel-body"
         role="tabpanel"
         aria-labelledby={`panel-tab-${tab}`}
-        className="min-h-0 flex-1 overflow-auto px-4 py-1 text-[13px]"
+        className="min-h-0 flex-1 overflow-auto px-4 py-1 text-[14px]"
       >
         <Body tab={tab} />
       </div>

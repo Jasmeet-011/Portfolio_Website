@@ -101,7 +101,7 @@ function Graph({ index }: { index: number }) {
   );
 }
 
-const pill = "rounded border border-border px-1.5 font-mono text-[11px] leading-5 text-text";
+const pill = "rounded border border-border px-1.5 font-mono text-xs leading-5 text-text";
 
 /** The Git Graph tab (/experience): the career, newest first. */
 export function GitGraph() {
@@ -123,7 +123,7 @@ export function GitGraph() {
               {row.type === "commit" ? (
                 <>
                   <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <code className="font-mono text-xs text-muted">{row.hash}</code>
+                    <code className="font-mono text-[13px] text-muted">{row.hash}</code>
                     <span className="font-semibold">{commitMessage(row.role)}</span>
                     {i === 0 && <span className={pill}>HEAD -&gt; main</span>}
                   </p>
@@ -149,7 +149,7 @@ export function GitGraph() {
               ) : (
                 <>
                   <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <code className="font-mono text-xs text-muted">{row.hash}</code>
+                    <code className="font-mono text-[13px] text-muted">{row.hash}</code>
                     <span className={cx(pill, "inline-flex items-center gap-1")}>
                       <Tag className="size-3" aria-hidden />
                       tag: {row.slug}

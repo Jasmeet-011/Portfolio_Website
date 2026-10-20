@@ -28,7 +28,7 @@ export function AboutDialog() {
       }}
       className="m-auto w-[min(26rem,calc(100vw-2rem))] rounded-lg border border-border bg-chrome p-5 text-sm text-text shadow-2xl backdrop:bg-editor/60"
     >
-      <h2 id="about-title" className="mb-3 text-[15px] font-semibold">
+      <h2 id="about-title" className="mb-3 text-[16px] font-semibold">
         About
       </h2>
       <BuildDetails />

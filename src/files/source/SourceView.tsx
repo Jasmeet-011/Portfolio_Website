@@ -37,7 +37,7 @@ export function SourceView({ code, lang }: { code: string; lang: SourceLang }) {
     <pre
       aria-label="Source"
       data-highlighted={highlighted?.code === code}
-      className="py-4 font-mono text-[13px] leading-6"
+      className="py-4 font-mono text-[15px] leading-6"
     >
       <code className="block">
         {lines.map((line, i) => (

@@ -41,7 +41,7 @@ export function FileView({
       aria-pressed={mode === value}
       onClick={() => setMode(value)}
       className={cx(
-        "flex h-7 items-center gap-1.5 px-2.5 text-xs",
+        "flex h-8 items-center gap-1.5 px-3 text-sm",
         mode === value ? "bg-selection text-text" : "text-muted hover:text-text",
       )}
     >

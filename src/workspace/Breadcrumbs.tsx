@@ -19,7 +19,7 @@ export function Breadcrumbs({ doc }: { doc: Doc | undefined }) {
   const segment = "rounded px-1 hover:text-text";
   return (
     <nav aria-label="Breadcrumbs" className="shrink-0 bg-editor">
-      <ol className="flex h-6 items-center overflow-x-auto px-3 text-xs whitespace-nowrap text-muted [scrollbar-width:none]">
+      <ol className="flex h-7 items-center overflow-x-auto px-3 text-sm whitespace-nowrap text-muted [scrollbar-width:none]">
         <li>
           <button type="button" className={segment} onClick={() => reveal("")}>
             {WORKSPACE_NAME}

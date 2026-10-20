@@ -8,7 +8,7 @@ import { cx } from "@/lib/cx";
 export function Page({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <article
-      className={cx("max-w-[72ch] px-6 pt-4 pb-16 text-[15px] leading-7 sm:px-10", className)}
+      className={cx("max-w-[72ch] px-6 pt-4 pb-16 text-[16px] leading-[1.65] sm:px-10", className)}
     >
       {children}
     </article>
@@ -16,23 +16,23 @@ export function Page({ children, className }: { children: ReactNode; className?:
 }
 
 export function FilePath({ children }: { children: ReactNode }) {
-  return <p className="font-mono text-xs text-muted">{children}</p>;
+  return <p className="font-mono text-[13px] text-muted">{children}</p>;
 }
 
 export function H1({ children }: { children: ReactNode }) {
-  return <h1 className="mt-1 text-[28px] leading-tight font-semibold">{children}</h1>;
+  return <h1 className="mt-1 text-[30px] leading-tight font-semibold">{children}</h1>;
 }
 
 export function H2({ children, id }: { children: ReactNode; id?: string }) {
   return (
-    <h2 id={id} className="mt-10 mb-3 border-b border-border pb-1.5 text-[17px] font-semibold">
+    <h2 id={id} className="mt-10 mb-3 border-b border-border pb-1.5 text-[19px] font-semibold">
       {children}
     </h2>
   );
 }
 
 export function Lead({ children }: { children: ReactNode }) {
-  return <p className="mt-3 text-[17px] leading-7 text-text">{children}</p>;
+  return <p className="mt-3 text-[18px] leading-[1.6] text-text">{children}</p>;
 }
 
 export function Muted({ children, className }: { children: ReactNode; className?: string }) {
@@ -79,7 +79,7 @@ export function Open({ to, children }: { to: string; children: ReactNode }) {
 /** A small rounded label. Interactive chips are links, so they use the link color. */
 export function Chip({ children, to }: { children: ReactNode; to?: string }) {
   const base =
-    "inline-flex h-6 items-center rounded-full border border-border bg-surface px-2.5 text-xs";
+    "inline-flex h-7 items-center rounded-full border border-border bg-surface px-3 text-[13px]";
   return to ? (
     <Link to={to} className={cx(base, "text-link hover:border-link")}>
       {children}
@@ -93,7 +93,7 @@ export function Chip({ children, to }: { children: ReactNode; to?: string }) {
 export function StatusPill({ status }: { status: "shipped" | "building" | "archived" }) {
   const dot = { shipped: "bg-success", building: "bg-tag", archived: "bg-muted" }[status];
   return (
-    <span className="inline-flex h-6 items-center gap-1.5 rounded-full border border-border px-2.5 text-xs text-text">
+    <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border px-3 text-[13px] text-text">
       <span className={cx("size-1.5 rounded-full", dot)} aria-hidden />
       {status}
     </span>
