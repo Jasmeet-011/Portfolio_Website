@@ -57,13 +57,15 @@ interface WorkspaceState {
   notify: (text: string) => void;
   dismissToast: (id: number) => void;
   requestFocus: (target: FocusTarget) => void;
+  /** Claims a pending focus request for `target`. True once per request. */
+  takeFocus: (target: FocusTarget) => boolean;
 }
 
 let nextId = 1;
 
 export const useWorkspace = create<WorkspaceState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       tabs: [],
       recent: [],
       recentCommands: [],
@@ -124,6 +126,11 @@ export const useWorkspace = create<WorkspaceState>()(
       notify: (text) => set({ toast: { id: nextId++, text } }),
       dismissToast: (id) => set((s) => (s.toast?.id === id ? { toast: null } : s)),
       requestFocus: (target) => set({ focus: { target, id: nextId++ } }),
+      takeFocus: (target) => {
+        if (get().focus?.target !== target) return false;
+        set({ focus: null });
+        return true;
+      },
     }),
     {
       name: "workspace",

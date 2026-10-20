@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { useEffect, type KeyboardEvent } from "react";
 import { cx } from "@/lib/cx";
 import { useWorkspace, type PanelTab } from "@/store/workspace";
+import { Terminal } from "@/terminal/Terminal";
 
 const TABS: { id: PanelTab; label: string }[] = [
   { id: "terminal", label: "Terminal" },
@@ -12,13 +13,7 @@ const TABS: { id: PanelTab; label: string }[] = [
 function Body({ tab }: { tab: PanelTab }) {
   switch (tab) {
     case "terminal":
-      return (
-        <p className="font-mono">
-          <span className="text-link">jasmeet@portfolio</span>
-          <span className="text-muted">:~$ </span>
-          <span className="text-muted">The terminal takes commands from Phase 4.</span>
-        </p>
-      );
+      return <Terminal />;
     case "problems":
       return <p className="text-muted">No problems have been detected in the workspace.</p>;
     case "output":
