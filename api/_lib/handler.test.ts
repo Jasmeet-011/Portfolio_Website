@@ -63,6 +63,8 @@ describe("validation", () => {
       [post({ ...ask, history: [{ role: "assistant", text: "hi" }] }), 400],
       [post({ ...ask, history: [{ role: "user", text: "hi" }] }), 400],
       [post({ question: "x".repeat(9000) }), 413],
+      // About 3K characters but 9K bytes, with no content-length header to go on.
+      [post({ question: "hi", pad: "€".repeat(3000) }), 413],
     ];
     for (const [request, status] of bad) expect((await handle(request)).status).toBe(status);
     expect(provider.calls).toHaveLength(0);

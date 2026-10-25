@@ -99,7 +99,7 @@ export function createHandler(deps: Deps) {
     if (Number(request.headers.get("content-length") ?? 0) > LIMITS.bodyBytes)
       return json(413, { code: "invalid", message: "That request is too large." });
     const raw = await request.text();
-    if (raw.length > LIMITS.bodyBytes)
+    if (new TextEncoder().encode(raw).byteLength > LIMITS.bodyBytes)
       return json(413, { code: "invalid", message: "That request is too large." });
 
     let body: unknown;
