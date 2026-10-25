@@ -18,5 +18,8 @@ screenshots
 # Real visitor questions exported by npm run assistant:questions
 evals/inbox
 
+# Crash dumps from Git Bash tools
+*.stackdump
+
 # Local Claude Code settings
 .claude/settings.local.json
