@@ -56,8 +56,13 @@ describe("depsFromEnv", () => {
         IP_HASH_SALT: undefined,
       }).provider,
     ).toBeNull();
-    if (PROVIDERS.gemini.freeTier === null)
-      expect(depsFromEnv({ VERCEL: "1", GEMINI_API_KEY: "k", ...upstash }).provider).toBeNull();
+  });
+
+  it("runs Gemini on Vercel at 80% of its recorded free tier, with no limit env vars", () => {
+    expect(PROVIDERS.gemini.freeTier).toMatchObject({ rpm: 15, tpm: 250_000, rpd: 500 });
+    expect(depsFromEnv({ VERCEL: "1", GEMINI_API_KEY: "k", ...upstash }).provider).not.toBeNull();
+    const spec = providerSpec("gemini");
+    expect(spec && siteLimits(spec, {})).toEqual({ dailyCap: 400, perMinute: 12 });
   });
 
   it("runs on Vercel with the key, Upstash, the salt and limits", () => {

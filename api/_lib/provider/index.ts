@@ -35,8 +35,9 @@ export const PROVIDERS = {
     thinkingModes: ["minimal", "low", "medium", "high"],
     defaultThinking: "minimal",
     evalModes: ["minimal", "low"],
-    // TODO(jasmeet): the free-tier RPM, TPM and RPD from aistudio.google.com/rate-limit.
-    freeTier: null,
+    // Read in AI Studio for the site's project on 2026-10-25. 3.1 Flash-Lite's are the
+    // same, so 3.5 stays (Decisions log). The site keeps 400 a day and 12 a minute.
+    freeTier: { rpm: 15, tpm: 250_000, rpd: 500, readOn: "2026-10-25" },
   },
   anthropic: {
     create: anthropicProvider,
