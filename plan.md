@@ -9,7 +9,7 @@ Repo: github.com/Jasmeet-011/Portfolio_Website, branch `revamp/vscode`
 - **Done:** Phases 0 to 4.5. Phase 5 (the assistant) is built and tested against a fake provider and mocked API, and now runs on the Gemini API free tier (Decisions log, 2026-10-20). Free-tier limits recorded (Decisions log, 2026-10-25).
 - **Current:** Phase 5 STOP. Waiting on the first real eval run (`npm run eval:assistant`, needs `GEMINI_EVAL_API_KEY` in `.env.local`), the minimal or low thinking decision it produces, and Jasmeet trying to break the assistant.
 - **Open `TODO(jasmeet)` items:** add `GEMINI_EVAL_API_KEY` (a separate Google Cloud project) to `.env.local` and run the eval; set the Vercel environment variables and the Upstash integration (see the table in `.env.example`); headline, short bio, long bio; `public/resume.pdf`; periods for all seven projects; AWS certification month; ChainLens `context`; measured results for ChainLens, SilentSOS, LLM Gateway, SynapseMeet; `problem` and `built` for RepoScope, `problem` for CodeMate; whether to link `codemate-chat`; verify Formspree form `mzdarpdv`; review the Phase 3 copy pass and skill descriptions; bring the ChainLens, RepoScope and CodeMate backends back up (down when checked on 2026-10-19, see `liveCheck` in `src/content/projects.ts`).
-- **Pushing:** local commits only until Jasmeet says otherwise (see Decisions log).
+- **Pushing:** the branch is pushed to `origin/revamp/vscode` (2026-10-25, Jasmeet's go-ahead). `main` and the tags are untouched: never push them.
 
 ---
 
