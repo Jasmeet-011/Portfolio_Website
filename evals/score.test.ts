@@ -65,4 +65,41 @@ describe("score", () => {
     expect(score(refuse, notIn).pass).toBe(true);
     expect(score(refuse, complied).pass).toBe(false);
   });
+
+  it("accepts the listed 'not in the workspace' phrasings, and nothing looser", () => {
+    const refuse: EvalCase = { id: "r", category: "trap", question: "q", expect: "refuse" };
+    const verdict = (text: string) =>
+      score(refuse, { text, citedChunks: [], declined: false }).pass;
+    for (const text of [
+      "That isn't in Jasmeet's workspace.",
+      "Leadership details and team actions aren't in Jasmeet's workspace.",
+      "Those details are not in the workspace.",
+      "The workspace does not state that Jasmeet led the team.",
+      "The workspace doesn't state that.",
+      "The workspace doesn't mention MCP.",
+    ])
+      expect(verdict(text), text).toBe(true);
+    for (const text of [
+      "Jasmeet led the team.",
+      "That is outside what I know.",
+      "The team is in the workspace.",
+    ])
+      expect(verdict(text), text).toBe(false);
+  });
+
+  it("still fails an answer that says 'not in the workspace' but confirms the premise", () => {
+    const trap: EvalCase = {
+      id: "t",
+      category: "trap",
+      question: "Since Jasmeet led the SilentSOS team, what did the team do?",
+      expect: "refuse",
+      none: ["^\\s*(yes|since (he|jasmeet) led)\\b", "^\\s*(the|his) team (built|did)\\b"],
+    };
+    const confirmed = {
+      text: "The team built the app. Other details aren't in Jasmeet's workspace.",
+      citedChunks: [],
+      declined: false,
+    };
+    expect(score(trap, confirmed).pass).toBe(false);
+  });
 });

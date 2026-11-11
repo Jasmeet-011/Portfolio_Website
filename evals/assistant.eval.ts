@@ -229,12 +229,20 @@ it(
         fresh.push({ id: c.id, category: c.category, ...result, ...verdict });
       }
 
+    // Earlier rows are scored again with today's scorer and cases (scoring is deterministic
+    // and every row keeps its answer), so a merged report is never scored two ways.
+    const rescore = (c: (typeof cases)[number], r: Row): Row => ({
+      ...r,
+      ...score(c, { text: r.text, citedChunks: r.cited, declined: r.declined }),
+    });
     const rerunIds = new Set(selected.map((c) => c.id));
     const rows: Row[] = previous
       ? cases.flatMap((c) =>
-          MODES.map((m) =>
-            (rerunIds.has(c.id) ? fresh : previous.rows).find((r) => r.id === c.id && r.mode === m),
-          ).filter((r): r is Row => r !== undefined),
+          MODES.map((m) => {
+            if (rerunIds.has(c.id)) return fresh.find((r) => r.id === c.id && r.mode === m);
+            const old = previous.rows.find((r) => r.id === c.id && r.mode === m);
+            return old && rescore(c, old);
+          }).filter((r): r is Row => r !== undefined),
         )
       : fresh;
 
