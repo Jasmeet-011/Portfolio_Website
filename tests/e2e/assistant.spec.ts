@@ -37,11 +37,24 @@ const ANSWER: StreamEvent[] = [
   { type: "done", trace: TRACE },
 ];
 
+/** UNAVAILABLE_MESSAGE in api/_lib/handler.ts. */
+const UNAVAILABLE_MESSAGE =
+  "The assistant isn't available right now. Everything it knows is in these files.";
+
 const sse = (events: StreamEvent[]) => events.map((e) => `data: ${JSON.stringify(e)}\n\n`).join("");
 
-async function mock(page: Page, reply: (route: Route) => Promise<void>) {
+/** Answers the page's availability check, then every question with `reply`. */
+async function mock(page: Page, reply: (route: Route) => Promise<void>, available = true) {
   const bodies: unknown[] = [];
   await page.route("**/api/copilot", async (route) => {
+    if (route.request().method() === "GET")
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          available ? { available: true } : { available: false, message: UNAVAILABLE_MESSAGE },
+        ),
+      });
     bodies.push(route.request().postDataJSON());
     await reply(route);
   });
@@ -179,6 +192,32 @@ test.describe("desktop", () => {
     await expect(panel(page).getByRole("button", { name: "Send" })).toBeDisabled();
   });
 
+  test("an unconfigured assistant shows as unavailable from page load, with no request sent", async ({
+    page,
+  }) => {
+    const bodies = await mock(page, answerWith(ANSWER), false);
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: "Assistant: unavailable" })).toBeVisible();
+    const welcome = page.getByRole("main");
+    await expect(welcome.getByRole("button", { name: /Ask the assistant/ })).toContainText(
+      "unavailable",
+    );
+
+    await page.keyboard.press("Control+Backquote");
+    const terminal = page.getByRole("textbox", { name: "Terminal input" });
+    await terminal.fill('ask "What is AgentGuard?"');
+    await terminal.press("Enter");
+    await expect(page.getByRole("log", { name: "Terminal output" })).toContainText(
+      `ask: ${UNAVAILABLE_MESSAGE}`,
+    );
+
+    await page.getByRole("button", { name: "Assistant: unavailable" }).click();
+    await expect(panel(page).getByRole("status")).toContainText(UNAVAILABLE_MESSAGE);
+    await expect(panel(page).getByRole("button", { name: /AgentGuard/ })).toBeDisabled();
+    await expect(panel(page).getByRole("button", { name: "Send" })).toBeDisabled();
+    expect(bodies).toEqual([]);
+  });
+
   test("the daily cap points to the files", async ({ page }) => {
     await mock(
       page,
@@ -251,6 +290,36 @@ test.describe("tablet", () => {
     await expect(panel(page)).toHaveCSS("position", "fixed");
     await page.keyboard.press("Escape");
     await expect(panel(page)).toHaveCount(0);
+  });
+});
+
+test.describe("touch device", () => {
+  test.use({ viewport: { width: 375, height: 812 }, hasTouch: true, isMobile: true });
+
+  test("keyboard shortcut hints are hidden", async ({ page }) => {
+    await mock(page, answerWith(ANSWER));
+    await page.goto("/");
+    const ask = page.getByRole("main").getByRole("button", { name: /Ask the assistant/ });
+    await expect(ask).toBeVisible();
+    await expect(ask.getByText(/Ctrl|⌘/)).toBeHidden();
+    await page.getByRole("button", { name: "Command palette" }).click();
+    const dialog = page.getByRole("dialog", { name: "Command palette" });
+    await page.keyboard.type(">toggle terminal");
+    await expect(dialog.getByRole("option", { name: /Toggle Terminal/ })).toBeVisible();
+    const hints = dialog.locator("kbd");
+    expect(await hints.count()).toBeGreaterThan(0);
+    for (const hint of await hints.all()) await expect(hint).toBeHidden();
+  });
+});
+
+test.describe("desktop hints", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("keyboard shortcut hints show with a mouse", async ({ page }) => {
+    await mock(page, answerWith(ANSWER));
+    await page.goto("/");
+    const ask = page.getByRole("main").getByRole("button", { name: /Ask the assistant/ });
+    await expect(ask.getByText(/Ctrl\+Alt\+I|⌘/)).toBeVisible();
   });
 });
 

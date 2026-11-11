@@ -77,19 +77,24 @@ export const projects: Project[] = [
     problem:
       "Advisors and compliance teams read hundreds of pages of Form ADV filings to answer questions about fees, conflicts and disciplinary history. In a regulated business, an LLM that invents a fee number is worse than no answer at all.",
     built: [
+      // From src/agentguard/graph.py (checked 2026-11-10): a LangGraph StateGraph whose guard,
+      // decompose and verify nodes exist only when their config flags are on.
+      "I built it as a LangGraph pipeline of five steps: a policy guard, question decomposition, hybrid retrieval (dense plus BM25, fused and reranked), generation with a citation on every sentence, and a verifier that drops unsupported sentences. The guard, decomposition and verifier are optional.",
       "I indexed 10 SEC Form ADV brochures (746 chunks) for hybrid dense and BM25 retrieval with reranking.",
       "I made it cite a source chunk for every sentence, refuse when the brochures don't hold the answer, and block requests for personalized advice.",
       "I built a baseline, measured it, then added one component at a time and reported what moved the numbers, including the components that didn't.",
       "I made every component a config flag, so the eval harness can run ablations and the Streamlit UI can switch them live.",
       "I cached LLM calls on disk, so evals and demos re-run cheaply and identically.",
     ],
-    // The caveat always travels with the numbers (plan.md section 10).
+    // The caveat always travels with the numbers (plan.md section 10). Matched to the repo's
+    // README as corrected on 2026-11-04 (commit 10e91cc): the answer-quality scores, not the
+    // answers, are identical, and the policy result rests on one question.
     results: [
       "Held-out test split, run once per variant with no tuning afterwards: 8 questions (4 answerable, 3 unanswerable, 1 policy).",
-      "On this data the guardrails buy safety and traceability, not accuracy: identical answers for +57% latency and +17% cost.",
-      "With 4 answerable questions, one miss moves correctness by 25 points, so read this as an anecdote, not a benchmark.",
+      "On this data the guardrails add safety and traceability, not accuracy: the answer-quality scores are identical, and the price is +57% latency and +17% cost.",
+      "With 4 answerable questions, one question moves correctness by 25 points, and the policy result rests on a single question, so read this as an anecdote.",
     ],
-    stack: ["Claude", "RAG", "Qdrant", "BM25", "Evals", "Python", "Streamlit"],
+    stack: ["Claude", "LangGraph", "RAG", "Qdrant", "BM25", "Evals", "Python", "Streamlit"],
     links: { github: "https://github.com/Jasmeet-011/AgentGuard" },
   },
   {

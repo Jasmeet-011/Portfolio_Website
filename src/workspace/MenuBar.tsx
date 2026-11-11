@@ -132,7 +132,7 @@ function MenuList({
               </span>
               <span className="flex-1 truncate pr-4">{label}</span>
               {command?.keys?.[0] && (
-                <span className="shrink-0 text-[13px] text-muted">
+                <span className="shrink-0 text-[13px] text-muted touch:hidden">
                   {formatKeys(command.keys[0])}
                 </span>
               )}

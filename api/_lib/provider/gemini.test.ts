@@ -143,6 +143,15 @@ describe("geminiProvider", () => {
     ]);
   });
 
+  it("turns a 503 (high demand) into busy", async () => {
+    const overloaded = new ApiError({
+      status: 503,
+      message:
+        '{"error":{"code":503,"message":"This model is currently experiencing high demand.","status":"UNAVAILABLE"}}',
+    });
+    await expect(collect(overloaded)).rejects.toMatchObject({ kind: "busy" });
+  });
+
   it("turns 429s into quota errors and passes anything else through", async () => {
     const daily = new ApiError({
       status: 429,

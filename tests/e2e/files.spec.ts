@@ -64,7 +64,9 @@ test.describe("project files", () => {
     for (const heading of ["Problem", "What I built", "Results", "Stack"]) {
       await expect(editor(page).getByRole("heading", { name: heading })).toBeVisible();
     }
-    await expect(editor(page)).toContainText("read this as an anecdote, not a benchmark");
+    await expect(editor(page)).toContainText(
+      "the policy result rests on a single question, so read this as an anecdote",
+    );
     await expect(editor(page).getByRole("link", { name: "Claude", exact: true })).toHaveAttribute(
       "href",
       "/skills#claude",

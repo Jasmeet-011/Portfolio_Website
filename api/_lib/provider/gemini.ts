@@ -80,9 +80,12 @@ export function geminiRequest(
 /**
  * A 429 is the free tier's per-day quota (the error names a PerDay quota id) or a
  * per-minute limit. Anything unrecognized counts as per minute: it clears on its own,
- * and the site's own daily cap still holds.
+ * and the site's own daily cap still holds. A 503 is Google's "model is experiencing
+ * high demand", which also clears on its own, so it reads as busy too.
  */
 export function classifyGeminiError(error: unknown): unknown {
+  if (error instanceof ApiError && error.status === 503)
+    return new ProviderError("busy", "Gemini is overloaded right now.");
   if (!(error instanceof ApiError) || error.status !== 429) return error;
   return /PerDay/i.test(error.message)
     ? new ProviderError("daily_quota", "Gemini's daily quota is used up.")

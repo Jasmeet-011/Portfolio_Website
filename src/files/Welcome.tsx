@@ -52,6 +52,7 @@ function Action({
   href,
   onClick,
   download,
+  shortcut = false,
 }: {
   icon: LucideIcon;
   label: string;
@@ -60,12 +61,18 @@ function Action({
   href?: string;
   onClick?: () => void;
   download?: boolean;
+  /** The hint is a keyboard shortcut, so touch devices leave it out. */
+  shortcut?: boolean;
 }) {
   const body = (
     <>
       <Icon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
       <span>{label}</span>
-      {hint && <span className="font-mono text-[13px] text-muted">{hint}</span>}
+      {hint && (
+        <span className={`font-mono text-[13px] text-muted ${shortcut ? "touch:hidden" : ""}`}>
+          {hint}
+        </span>
+      )}
     </>
   );
   return (
@@ -90,6 +97,7 @@ function Action({
 /** The landing page: who Jasmeet is, where to start, featured work, and what is in progress. */
 export function Welcome() {
   const reveal = useRevealFolder();
+  const assistantUnavailable = useAssistant((s) => s.notice?.code === "unavailable");
   return (
     <div className="px-6 py-10 text-[16px] leading-[1.65] sm:px-10 lg:px-14">
       <header className="max-w-[72ch]">
@@ -130,7 +138,8 @@ export function Welcome() {
               <Action
                 icon={Sparkles}
                 label="Ask the assistant"
-                hint={formatKeys(ASSISTANT_KEYS)}
+                hint={assistantUnavailable ? "unavailable" : formatKeys(ASSISTANT_KEYS)}
+                shortcut={!assistantUnavailable}
                 onClick={() => {
                   useAssistant.getState().setOpen(true);
                   useWorkspace.getState().requestFocus("assistant");

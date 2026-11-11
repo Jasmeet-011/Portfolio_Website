@@ -5,6 +5,7 @@ import { PROMPT_VERSION } from "./prompt.js";
 import {
   LIMITS,
   type AssistantRequest,
+  type Availability,
   type ChatTurn,
   type ErrorBody,
   type Quota,
@@ -42,8 +43,10 @@ export interface Deps {
 export const DAILY_MESSAGE =
   "The assistant is done for today. Everything it knows is in these files.";
 export const BUSY_MESSAGE = "The assistant is busy. Try again in a minute.";
+export const UNAVAILABLE_MESSAGE =
+  "The assistant isn't available right now. Everything it knows is in these files.";
 
-const json = (status: number, body: ErrorBody) =>
+const json = (status: number, body: ErrorBody | Availability) =>
   new Response(JSON.stringify(body), {
     status,
     headers: { "content-type": "application/json", "cache-control": "no-store" },
@@ -95,6 +98,13 @@ function parse(raw: unknown, context: Context): Parsed | string {
 /** The assistant endpoint as a web-standard handler, so Vercel and the dev server share it. */
 export function createHandler(deps: Deps) {
   return async function handle(request: Request): Promise<Response> {
+    // Whether the assistant is configured, for the page to check on load. Always 200, and
+    // it touches no limit or store, so checking costs nothing and logs no error.
+    if (request.method === "GET")
+      return json(
+        200,
+        deps.provider ? { available: true } : { available: false, message: UNAVAILABLE_MESSAGE },
+      );
     if (request.method !== "POST") return json(405, { code: "invalid", message: "Use POST." });
     if (Number(request.headers.get("content-length") ?? 0) > LIMITS.bodyBytes)
       return json(413, { code: "invalid", message: "That request is too large." });
@@ -112,11 +122,7 @@ export function createHandler(deps: Deps) {
     if (typeof parsed === "string") return json(400, { code: "invalid", message: parsed });
 
     const provider = deps.provider;
-    if (!provider)
-      return json(503, {
-        code: "unavailable",
-        message: "The assistant isn't available right now. Everything it knows is in these files.",
-      });
+    if (!provider) return json(503, { code: "unavailable", message: UNAVAILABLE_MESSAGE });
 
     const visitor = await limiterKey(clientIp(request.headers, deps.onVercel), deps.ipSalt);
     const cacheKey =

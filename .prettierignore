@@ -7,3 +7,5 @@ screenshots
 test-results
 playwright-report
 api/_generated
+# Written by npm run eval:assistant
+evals/results.json

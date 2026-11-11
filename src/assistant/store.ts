@@ -7,7 +7,7 @@ import type {
   Quota,
   Trace,
 } from "../../api/_lib/protocol";
-import { requestAnswer } from "./client";
+import { checkAvailability, requestAnswer } from "./client";
 import type { Suggestion } from "./context";
 
 export interface Message {
@@ -101,6 +101,15 @@ export async function runAssistant(
   signal?: AbortSignal,
 ): Promise<RunResult> {
   const set = useAssistant.setState;
+  // Known to be unavailable: say so without a request that can only fail.
+  const blocked = useAssistant.getState().notice;
+  if (blocked?.code === "unavailable")
+    return {
+      text: "",
+      citations: [],
+      declined: false,
+      error: { code: "unavailable", message: blocked.message },
+    };
   const entry: TraceEntry = { id: nextId++, at: Date.now(), ...meta };
   set((s) => ({ busy: true, traces: [...s.traces, entry] }));
   const updateEntry = (patch: Partial<TraceEntry>) =>
@@ -153,6 +162,20 @@ export async function runAssistant(
   );
   set({ busy: false });
   return result;
+}
+
+let availabilityChecked = false;
+
+/**
+ * Once per page load: if the API says the assistant isn't configured, the panel, status
+ * bar, Welcome tab and terminal show that from the start instead of after a first try.
+ */
+export async function loadAvailability(): Promise<void> {
+  if (availabilityChecked) return;
+  availabilityChecked = true;
+  const availability = await checkAvailability();
+  if (availability?.available === false)
+    useAssistant.setState({ notice: { code: "unavailable", message: availability.message } });
 }
 
 export const useAssistant = create<AssistantState>((set, get) => {

@@ -5,6 +5,9 @@
  * earlier exchanges) or the id of a suggested-question chip.
  * Response: a JSON error with a 4xx/5xx status before anything is generated, or a
  * text/event-stream of StreamEvents ("data: <json>" lines).
+ *
+ * GET /api/copilot answers 200 with an Availability, so the page can tell on load
+ * whether the assistant is configured without a failed request in the console.
  */
 export const LIMITS = {
   questionChars: 500,
@@ -27,6 +30,9 @@ export interface AssistantRequest {
   chipId?: string;
   history?: ChatTurn[];
 }
+
+/** GET /api/copilot. `message` is what to tell the visitor while it's unavailable. */
+export type Availability = { available: true } | { available: false; message: string };
 
 /** The visitor's hourly allowance. `resetAt` is epoch milliseconds. */
 export interface Quota {

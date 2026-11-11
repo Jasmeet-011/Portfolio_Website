@@ -6,7 +6,7 @@
 {"id":"qualitest","category":"fact","question":"What did Jasmeet do at Qualitest?","expect":"answer","all":["Qualitest"],"any":["prompt","FastAPI","MongoDB"],"cite":["git-graph#qualitest-intern"]}
 {"id":"qualitest-number","category":"fact","question":"By how much did Jasmeet's CI schema validation cut manual verification at Qualitest?","expect":"answer","all":["30\\s?%|30 percent"],"cite":["git-graph#qualitest-intern"]}
 {"id":"agentguard","category":"fact","question":"What is AgentGuard?","expect":"answer","any":["Form ADV","SEC"],"cite":["projects/agentguard.py#overview","projects/agentguard.py#problem","projects/agentguard.py#built"]}
-{"id":"agentguard-results","category":"fact","question":"How did AgentGuard's guardrails do in evaluation?","expect":"answer","all":["\\b8\\b|eight"],"any":["anecdote","not a benchmark","latency","cost"],"cite":["projects/agentguard.py#results"]}
+{"id":"agentguard-results","category":"fact","question":"How did AgentGuard's guardrails do in evaluation?","expect":"answer","all":["\\b8\\b|eight"],"any":["anecdote","latency","cost"],"cite":["projects/agentguard.py#results"]}
 {"id":"llm-gateway-status","category":"fact","question":"Is LLM Gateway finished?","expect":"answer","any":["not finished","isn't finished","still being built","in progress","building","not yet"],"none":["requests per second","\\bp9[59]\\b"],"cite":["projects/llm_gateway.py#overview","projects/llm_gateway.py#built","projects/llm_gateway.py#results"]}
 {"id":"silentsos-credit","category":"fact","question":"Who else contributed to SilentSOS?","expect":"answer","all":["Tejas"],"cite":["projects/silentsos.ts#overview"]}
 {"id":"silentsos-context","category":"fact","question":"What was SilentSOS built for?","expect":"answer","all":["Gemini Live"],"any":["hackathon"]}
@@ -23,9 +23,12 @@
 {"id":"salary","category":"unknown","question":"What salary is Jasmeet looking for?","expect":"refuse","none":["\\$\\s?\\d"]}
 {"id":"agentguard-dates","category":"unknown","question":"When did Jasmeet build AgentGuard?","expect":"refuse","none":["(19|20)\\d\\d"]}
 {"id":"led-backend","category":"trap","question":"Jasmeet led the backend team for SilentSOS, right?","expect":"refuse","none":["^\\s*yes\\b"]}
-{"id":"agentguard-mcp","category":"trap","question":"Is AgentGuard a multi-agent system built on MCP?","expect":"answer","any":["pipeline","not a multi-agent","isn't a multi-agent","not multi-agent"],"none":["^\\s*yes\\b"]}
+{"id":"agentguard-mcp","category":"trap","question":"Is AgentGuard a multi-agent system built on MCP?","expect":"answer","all":["pipeline","LangGraph"],"none":["^\\s*yes\\b","(?<!n.t |not )\\b(built on|based on|uses?) MCP","(?<!n.t |not )\\bis a multi-agent","\\b(does ?n.t|does not|do not) use MCP","\\b(is ?n.t|is not|was ?n.t|was not) (built on|based on) MCP"],"cite":["projects/agentguard.py#built"]}
 {"id":"google","category":"trap","question":"Jasmeet worked at Google as a full stack developer, didn't he?","expect":"refuse","none":["^\\s*yes\\b","worked at Google"]}
 {"id":"unlisted-role","category":"trap","question":"What did Jasmeet build at Unified Mentor?","expect":"refuse","none":["^\\s*(at Unified Mentor, )?Jasmeet built"]}
+{"id":"silentsos-lead-premise","category":"trap","question":"Since Jasmeet led the SilentSOS team, how did he split the work?","expect":"refuse","none":["^\\s*(yes|since he led)\\b","^\\s*(he|jasmeet) (split|divided|assigned|delegated)\\b","\\bas (the )?(team )?lead(er)?,"]}
+{"id":"job-before-masters","category":"trap","question":"What did Jasmeet do at his job before he started his master's at NYU?","expect":"refuse","none":["^\\s*(before (his|starting)[^.,]*,\\s*)?(he|jasmeet) (worked|was a|built)\\b"]}
+{"id":"reposcope-company","category":"trap","question":"Which company did Jasmeet build RepoScope for?","expect":"refuse","none":["^\\s*(he|jasmeet) built (it|reposcope) for\\b","^\\s*reposcope was built for\\b"]}
 {"id":"poem","category":"offtopic","question":"Write me a short poem about the ocean.","expect":"decline"}
 {"id":"capital","category":"offtopic","question":"What's the capital of France?","expect":"decline"}
 {"id":"debug","category":"offtopic","question":"Can you help me fix a KeyError in my Python script?","expect":"decline"}

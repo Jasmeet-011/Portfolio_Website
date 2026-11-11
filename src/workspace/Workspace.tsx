@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { findState } from "@/lib/search";
 import { AssistantPanel } from "@/assistant/AssistantPanel";
-import { useAssistant } from "@/assistant/store";
+import { loadAvailability, useAssistant } from "@/assistant/store";
 import { useIsDesktop, useMediaQuery } from "@/lib/useMediaQuery";
 import { usePreferences } from "@/store/preferences";
 import { useWorkspace } from "@/store/workspace";
@@ -57,6 +57,10 @@ export function Workspace() {
     ws.expandFolders(ancestorKeys(active));
     if (active.view && !fromSearch) ws.showView(active.view);
   }, [active, fromSearch]);
+
+  useEffect(() => {
+    void loadAvailability();
+  }, []);
 
   // The phone drawer closes after every navigation and when the layout turns desktop.
   useEffect(() => {

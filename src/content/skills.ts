@@ -62,6 +62,11 @@ const catalog: Record<string, { category: SkillCategory; description: string }> 
     category: "AI and retrieval",
     description: "OpenAI's open-source speech recognition model.",
   },
+  LangGraph: {
+    category: "AI and retrieval",
+    description:
+      "A Python library for building LLM applications as a graph of steps that share state.",
+  },
   RAG: {
     category: "AI and retrieval",
     description:

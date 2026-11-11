@@ -1,4 +1,28 @@
-import type { AssistantRequest, ErrorBody, StreamEvent } from "../../api/_lib/protocol";
+import type {
+  AssistantRequest,
+  Availability,
+  ErrorBody,
+  StreamEvent,
+} from "../../api/_lib/protocol";
+
+/**
+ * Asks the API whether the assistant is configured. Null when that can't be told (offline,
+ * or an older server that doesn't answer GET): the page then assumes it is, and a question
+ * that fails still shows the server's message.
+ */
+export async function checkAvailability(): Promise<Availability | null> {
+  try {
+    const response = await fetch("/api/copilot", { method: "GET" });
+    if (!response.ok) return null;
+    const body = (await response.json()) as Partial<Availability>;
+    if (body.available === true) return { available: true };
+    if (body.available === false && typeof body.message === "string")
+      return { available: false, message: body.message };
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 /** Splits a text/event-stream buffer into complete events and the unfinished rest. */
 export function splitSse(buffer: string): { events: StreamEvent[]; rest: string } {

@@ -27,7 +27,9 @@ const itemClass =
   "flex min-h-9 cursor-pointer items-center gap-2 rounded px-2 py-1 data-[selected=true]:bg-selection";
 
 function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="ml-auto shrink-0 font-sans text-xs text-muted">{children}</kbd>;
+  return (
+    <kbd className="ml-auto shrink-0 font-sans text-xs text-muted touch:hidden">{children}</kbd>
+  );
 }
 
 function FileItems({ text, onPick }: { text: string; onPick: (doc: Doc) => void }) {

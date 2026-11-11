@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { CONTEXT } from "../_generated/context";
-import { BUSY_MESSAGE, createHandler, DAILY_MESSAGE, type Deps } from "./handler";
+import {
+  BUSY_MESSAGE,
+  createHandler,
+  DAILY_MESSAGE,
+  UNAVAILABLE_MESSAGE,
+  type Deps,
+} from "./handler";
 import { memoryCounter, memoryLimiter, pacificDayLimiter } from "./limits";
 import { DECLINE } from "./prompt";
 import type { StreamEvent } from "./protocol";
@@ -55,7 +61,7 @@ describe("validation", () => {
   it("rejects anything that isn't a well-formed question, before any model call", async () => {
     const { handle, provider } = setup();
     const bad: [Request, number][] = [
-      [new Request("http://localhost/api/copilot"), 405],
+      [new Request("http://localhost/api/copilot", { method: "PUT", body: "{}" }), 405],
       [post("{not json"), 400],
       [post({ question: "   " }), 400],
       [post({ question: "x".repeat(501) }), 400],
@@ -75,6 +81,18 @@ describe("validation", () => {
     const response = await handle(post(ask));
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ code: "unavailable" });
+  });
+
+  it("answers GET with whether it's configured, always 200 and without a model call", async () => {
+    const configured = setup();
+    const up = await configured.handle(new Request("http://x/api/copilot"));
+    expect(up.status).toBe(200);
+    expect(await up.json()).toEqual({ available: true });
+    expect(configured.provider.calls).toHaveLength(0);
+
+    const down = await setup({ provider: null }).handle(new Request("http://x/api/copilot"));
+    expect(down.status).toBe(200);
+    expect(await down.json()).toEqual({ available: false, message: UNAVAILABLE_MESSAGE });
   });
 });
 

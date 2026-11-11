@@ -75,6 +75,21 @@ interface Row {
 }
 
 const cases = parseCases(readFileSync("evals/assistant.jsonl", "utf8"));
+
+/**
+ * EVAL_ONLY=<regex on case ids> reruns just those cases. Their rows replace the same
+ * cases' rows in the last run's evals/results.json, and the report says which cases were
+ * rerun, when, and against which context version, so a merged report never hides that
+ * its rows come from different runs.
+ */
+const only = process.env.EVAL_ONLY ? new RegExp(process.env.EVAL_ONLY) : null;
+const selected = only ? cases.filter((c) => only.test(c.id)) : cases;
+
+interface Rerun {
+  date: string;
+  ids: string[];
+  contextVersion: string;
+}
 const model = process.env.ASSISTANT_MODEL || spec.defaultModel;
 const chunkIds = new Set<string>(CONTEXT.chunks.map((c) => c.id));
 
@@ -124,8 +139,17 @@ async function run(
           `${keyName}'s daily quota is used up. It resets at midnight Pacific; run again then.`,
           { cause: error },
         );
-      if (error instanceof ProviderError && attempt < BUSY_RETRIES) {
-        console.warn(`per-minute limit hit; waiting a minute (retry ${attempt + 1})`);
+      // Anything else is retried a few times: busy and high-demand errors, the SDK's 30 s
+      // timeout (an AbortError) and streams Google closes early ("Incomplete JSON segment")
+      // all clear on their own. A real bug still fails the run, after the retries.
+      if (attempt < BUSY_RETRIES) {
+        const what =
+          error instanceof ProviderError
+            ? "busy (per-minute limit or high demand)"
+            : error instanceof Error
+              ? `${error.name}: ${error.message.slice(0, 80)}`
+              : "unknown error";
+        console.warn(`provider ${what}; waiting a minute (retry ${attempt + 1})`);
         await sleep(65_000);
         continue;
       }
@@ -182,8 +206,19 @@ it(
     // Warm each mode's prompt cache so the first case isn't timed against a cold cache.
     for (const mode of MODES) await run(mode, "Where is Jasmeet based?");
 
-    const rows: Row[] = [];
-    for (const c of cases)
+    if (selected.length === 0)
+      throw new Error(`EVAL_ONLY=${process.env.EVAL_ONLY} matches no case`);
+    const previous = only
+      ? (JSON.parse(readFileSync("evals/results.json", "utf8")) as {
+          date: string;
+          contextVersion?: string;
+          reruns?: Rerun[];
+          rows: Row[];
+        })
+      : null;
+
+    const fresh: Row[] = [];
+    for (const c of selected)
       for (const mode of MODES) {
         const result = await run(mode, c.question);
         const verdict = score(c, {
@@ -191,8 +226,17 @@ it(
           citedChunks: result.cited,
           declined: result.declined,
         } satisfies AnswerResult);
-        rows.push({ id: c.id, category: c.category, ...result, ...verdict });
+        fresh.push({ id: c.id, category: c.category, ...result, ...verdict });
       }
+
+    const rerunIds = new Set(selected.map((c) => c.id));
+    const rows: Row[] = previous
+      ? cases.flatMap((c) =>
+          MODES.map((m) =>
+            (rerunIds.has(c.id) ? fresh : previous.rows).find((r) => r.id === c.id && r.mode === m),
+          ).filter((r): r is Row => r !== undefined),
+        )
+      : fresh;
 
     const [first, second] = MODES.map((m) => summarize(rows, m));
     if (!first || !second) throw new Error("missing a mode");
@@ -207,6 +251,11 @@ it(
           : second;
 
     const date = new Date().toISOString().slice(0, 10);
+    const runDate = previous?.date ?? date;
+    const runContext = previous ? (previous.contextVersion ?? "unknown") : CONTEXT.version;
+    const reruns: Rerun[] = previous
+      ? [...(previous.reruns ?? []), { date, ids: [...rerunIds], contextVersion: CONTEXT.version }]
+      : [];
     const ms = (n: number) => `${Math.round(n).toLocaleString("en-US")} ms`;
     const cost = (s: typeof first) => (PRICE ? `$${s.costPerAnswer.toFixed(5)}` : "free tier");
     const line = (s: typeof first) =>
@@ -214,10 +263,15 @@ it(
     const failed = rows.filter((r) => !r.pass);
     const invented = rows.filter((r) => r.unknownCitations.length > 0);
     const report = [
-      `# Assistant eval, ${date}`,
+      `# Assistant eval, ${runDate}`,
       "",
-      `Provider ${spec.name}, model \`${model}\`, prompt version ${PROMPT_VERSION}, context ${CONTEXT.version} (${CONTEXT.chunks.length} chunks), ${cases.length} cases per mode, key \`${keyName}\`${spacingMs ? `, paced at ${rpm} requests a minute` : ""}. Cases alternate between modes; each mode was warmed first. Scoring is deterministic (evals/score.ts).`,
+      `Provider ${spec.name}, model \`${model}\`, prompt version ${PROMPT_VERSION}, context ${runContext} (${CONTEXT.chunks.length} chunks), ${cases.length} cases per mode, key \`${keyName}\`${spacingMs ? `, paced at ${rpm} requests a minute` : ""}. Cases alternate between modes; each mode was warmed first. Scoring is deterministic (evals/score.ts).`,
       "",
+      ...reruns.map(
+        (r) =>
+          `Rerun on ${r.date} against context ${r.contextVersion}: ${r.ids.join(", ")}. Every other row is from the run of ${runDate}.`,
+      ),
+      ...(reruns.length ? [""] : []),
       "| Thinking | Passed | Safety (trap, off-topic, injection) | First words, median | First words, p90 | Total, median | Output tokens, median | Thought tokens, median | Invented sources dropped | Cut off | Cost per answer |",
       "|---|---|---|---|---|---|---|---|---|---|---|",
       line(first),
@@ -267,12 +321,12 @@ it(
     writeFileSync("evals/report.md", report);
     writeFileSync(
       "evals/results.json",
-      `${JSON.stringify({ date, provider: spec.name, model, chosen: chosen.mode, summary: [first, second], rows }, null, 2)}\n`,
+      `${JSON.stringify({ date: runDate, contextVersion: runContext, reruns, provider: spec.name, model, chosen: chosen.mode, summary: [first, second], rows }, null, 2)}\n`,
     );
     console.log(report);
 
-    // Every chip maps to a real chunk, in every mode.
-    for (const r of rows)
+    // Every chip maps to a real chunk, in every mode. Older rows were checked when they ran.
+    for (const r of fresh)
       for (const id of r.cited)
         expect(chunkIds.has(id), `${r.id} (${r.mode}) cites ${id}`).toBe(true);
     expect(chosen.safetyPassed, "safety cases").toBe(chosen.safetyTotal);
