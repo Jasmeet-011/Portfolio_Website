@@ -101,8 +101,13 @@ export async function runAssistant(
   signal?: AbortSignal,
 ): Promise<RunResult> {
   const set = useAssistant.setState;
-  // Known to be unavailable: say so without a request that can only fail.
-  const blocked = useAssistant.getState().notice;
+  // Known to be unavailable: say so without a request that can only fail. If that came from
+  // a check that got no answer, check again first.
+  let blocked = useAssistant.getState().notice;
+  if (blocked?.code === "unavailable") {
+    await loadAvailability();
+    blocked = useAssistant.getState().notice;
+  }
   if (blocked?.code === "unavailable")
     return {
       text: "",
@@ -152,8 +157,22 @@ export async function runAssistant(
             result.declined = event.trace.declined;
             updateEntry({ trace: event.trace });
             break;
+          case "reset":
+            // The server is asking the provider again: the words so far are dropped.
+            result.text = "";
+            result.citations = [];
+            handlers.onText?.("");
+            handlers.onCitation?.([]);
+            break;
           case "error":
-            fail({ code: event.code, message: event.message });
+            // No half answer above an error: whatever streamed before it goes.
+            if (result.text) {
+              result.text = "";
+              result.citations = [];
+              handlers.onText?.("");
+              handlers.onCitation?.([]);
+            }
+            fail({ code: event.code, message: event.message, quota: event.quota });
             break;
         }
       },
@@ -164,18 +183,35 @@ export async function runAssistant(
   return result;
 }
 
-let availabilityChecked = false;
+/** Shown when the availability check gets no usable answer. */
+export const UNREACHABLE_MESSAGE =
+  "The assistant can't be reached right now. Everything it knows is in these files.";
+
+let availability: "unknown" | "available" | "unavailable" = "unknown";
+let checking: Promise<void> | null = null;
 
 /**
- * Once per page load: if the API says the assistant isn't configured, the panel, status
- * bar, Welcome tab and terminal show that from the start instead of after a first try.
+ * Asks the API whether the assistant is configured: on page load, and again when the
+ * panel opens while the answer is still unknown. Until the API says it's available, the
+ * panel, status bar, Welcome tab and terminal never treat it as available: a failed or
+ * unusable check marks it unreachable, and a later check that succeeds clears that.
  */
-export async function loadAvailability(): Promise<void> {
-  if (availabilityChecked) return;
-  availabilityChecked = true;
-  const availability = await checkAvailability();
-  if (availability?.available === false)
-    useAssistant.setState({ notice: { code: "unavailable", message: availability.message } });
+export function loadAvailability(): Promise<void> {
+  if (availability !== "unknown") return Promise.resolve();
+  checking ??= checkAvailability().then((result) => {
+    checking = null;
+    const { notice } = useAssistant.getState();
+    if (result?.available === true) {
+      availability = "available";
+      if (notice?.code === "unavailable") useAssistant.setState({ notice: null });
+    } else if (result?.available === false) {
+      availability = "unavailable";
+      useAssistant.setState({ notice: { code: "unavailable", message: result.message } });
+    } else if (!notice) {
+      useAssistant.setState({ notice: { code: "unavailable", message: UNREACHABLE_MESSAGE } });
+    }
+  });
+  return checking;
 }
 
 export const useAssistant = create<AssistantState>((set, get) => {

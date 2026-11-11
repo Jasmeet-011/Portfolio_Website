@@ -16,6 +16,8 @@ export type AnswerEvent =
       unknownCitations: string[];
       declined: boolean;
       refused: boolean;
+      /** The provider's JSON reply didn't parse: the words that arrived are kept. */
+      jsonError: boolean;
       stopReason: string | null;
       usage: {
         inputTokens: number;
@@ -80,6 +82,7 @@ export async function* answer(
         unknownCitations: event.unknownSources ?? [],
         declined: refused || isDecline(text),
         refused,
+        jsonError: event.jsonError ?? false,
         stopReason: event.stopReason,
         usage: event.usage,
         ttftMs,

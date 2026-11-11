@@ -109,6 +109,7 @@ describe("geminiProvider", () => {
           thoughtTokens: 25,
         },
         unknownSources: ["made/up.py#x"],
+        jsonError: false,
       },
     ]);
   });
@@ -143,13 +144,37 @@ describe("geminiProvider", () => {
     ]);
   });
 
-  it("turns a 503 (high demand) into busy", async () => {
+  it("turns a 503 (high demand) into overloaded, which is worth a retry", async () => {
     const overloaded = new ApiError({
       status: 503,
       message:
         '{"error":{"code":503,"message":"This model is currently experiencing high demand.","status":"UNAVAILABLE"}}',
     });
-    await expect(collect(overloaded)).rejects.toMatchObject({ kind: "busy" });
+    await expect(collect(overloaded)).rejects.toMatchObject({
+      kind: "overloaded",
+      retryable: true,
+      detail: { status: 503, errorType: "ApiError" },
+    });
+  });
+
+  it("turns a stream Google closes early into upstream, and notes it had streamed", async () => {
+    const api: GeminiModels = {
+      async generateContentStream() {
+        return (async function* () {
+          yield { candidates: [{ content: { parts: [{ text: '{"answer": "Half' }] } }] };
+          throw new Error("Incomplete JSON segment at the end");
+        })() as never;
+      },
+    };
+    const provider = geminiProvider(CONFIG, api);
+    const run = async () => {
+      for await (const event of provider.stream(REQUEST)) void event;
+    };
+    await expect(run()).rejects.toMatchObject({
+      kind: "upstream",
+      retryable: true,
+      detail: { status: null, errorType: "Error", streamed: true },
+    });
   });
 
   it("turns 429s into quota errors and passes anything else through", async () => {
@@ -169,6 +194,9 @@ describe("geminiProvider", () => {
       ProviderError,
     );
     const server = new ApiError({ status: 500, message: "boom" });
-    expect(classifyGeminiError(server)).toBe(server);
+    expect(classifyGeminiError(server)).toMatchObject({
+      kind: "upstream",
+      detail: { status: 500, errorType: "ApiError" },
+    });
   });
 });

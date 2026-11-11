@@ -87,4 +87,7 @@ export type StreamEvent =
   | { type: "text"; text: string }
   | { type: "citation"; chunkId: string }
   | { type: "done"; trace: Trace }
-  | { type: "error"; code: ErrorCode; message: string };
+  /** The provider failed after some text and the server is asking again: drop what came. */
+  | { type: "reset" }
+  /** `quota` is the visitor's allowance after a failure, which doesn't count against it. */
+  | { type: "error"; code: ErrorCode; message: string; quota?: Quota };

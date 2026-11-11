@@ -9,6 +9,7 @@ import { JSON_REPLY } from "../prompt.js";
 import { jsonAnswerReader } from "./json-answer.js";
 import {
   ProviderError,
+  type ProviderFailureDetail,
   type Provider,
   type ProviderConfig,
   type ProviderEvent,
@@ -78,18 +79,32 @@ export function geminiRequest(
 }
 
 /**
- * A 429 is the free tier's per-day quota (the error names a PerDay quota id) or a
- * per-minute limit. Anything unrecognized counts as per minute: it clears on its own,
- * and the site's own daily cap still holds. A 503 is Google's "model is experiencing
- * high demand", which also clears on its own, so it reads as busy too.
+ * Every Gemini failure as a ProviderError, with what the server logs about it. A 429 is
+ * the free tier's per-day quota (the error names a PerDay quota id) or a per-minute
+ * limit; anything unrecognized counts as per minute, since it clears on its own and the
+ * site's own daily cap still holds. A 503 is Google's "model is experiencing high demand".
+ * Anything else (a stream Google closes early, the SDK's 30 s timeout, a network error, a
+ * 500) is upstream. Both of those are worth one retry.
  */
-export function classifyGeminiError(error: unknown): unknown {
-  if (error instanceof ApiError && error.status === 503)
-    return new ProviderError("busy", "Gemini is overloaded right now.");
-  if (!(error instanceof ApiError) || error.status !== 429) return error;
-  return /PerDay/i.test(error.message)
-    ? new ProviderError("daily_quota", "Gemini's daily quota is used up.")
-    : new ProviderError("busy", "Gemini is rate limiting this minute.");
+export function classifyGeminiError(
+  error: unknown,
+  detail: Omit<ProviderFailureDetail, "status" | "errorType"> = {},
+): ProviderError {
+  if (error instanceof ProviderError) return error;
+  const status = error instanceof ApiError ? error.status : null;
+  const full = {
+    ...detail,
+    status,
+    errorType: error instanceof Error ? error.name : typeof error,
+  };
+  if (status === 503)
+    return new ProviderError("overloaded", "Gemini is overloaded right now.", full);
+  if (status === 429)
+    return /PerDay/i.test(error instanceof Error ? error.message : "")
+      ? new ProviderError("daily_quota", "Gemini's daily quota is used up.", full)
+      : new ProviderError("busy", "Gemini is rate limiting this minute.", full);
+  const message = error instanceof Error ? error.message.slice(0, 120) : String(error);
+  return new ProviderError("upstream", `Gemini failed: ${message}`, full);
 }
 
 const textOf = (chunk: GenerateContentResponse) =>
@@ -117,6 +132,7 @@ export function geminiProvider(config: ProviderConfig, models?: GeminiModels): P
       let usage: GenerateContentResponse["usageMetadata"];
       let finish: string | undefined;
       let blocked = false;
+      let streamed = false;
       try {
         const stream = await api.generateContentStream(geminiRequest(config, request, signal));
         for await (const chunk of stream) {
@@ -126,13 +142,26 @@ export function geminiProvider(config: ProviderConfig, models?: GeminiModels): P
           if (chunk.usageMetadata) usage = chunk.usageMetadata;
           const text = textOf(chunk);
           const delta = text ? reader.push(text) : "";
-          if (delta) yield { type: "text", text: delta };
+          if (delta) {
+            streamed = true;
+            yield { type: "text", text: delta };
+          }
         }
       } catch (error) {
-        throw classifyGeminiError(error);
+        // The visitor went away: not a provider failure, nothing to retry or report.
+        if (signal?.aborted) throw error;
+        throw classifyGeminiError(error, {
+          streamed,
+          usage: usage
+            ? {
+                inputTokens: usage.promptTokenCount ?? 0,
+                outputTokens: (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0),
+              }
+            : undefined,
+        });
       }
 
-      const { rest, sources } = reader.finish();
+      const { rest, sources, parsed } = reader.finish();
       if (rest) yield { type: "text", text: rest };
       const unknownSources: string[] = [];
       for (const id of new Set(sources)) {
@@ -159,6 +188,7 @@ export function geminiProvider(config: ProviderConfig, models?: GeminiModels): P
           thoughtTokens: thoughts,
         },
         unknownSources,
+        jsonError: !parsed,
       };
     },
   };

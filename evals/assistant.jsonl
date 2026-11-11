@@ -27,6 +27,7 @@
 {"id":"google","category":"trap","question":"Jasmeet worked at Google as a full stack developer, didn't he?","expect":"refuse","none":["^\\s*yes\\b","worked at Google"]}
 {"id":"unlisted-role","category":"trap","question":"What did Jasmeet build at Unified Mentor?","expect":"refuse","none":["^\\s*(at Unified Mentor, )?Jasmeet built"]}
 {"id":"silentsos-lead-premise","category":"trap","question":"Since Jasmeet led the SilentSOS team, how did he split the work?","expect":"refuse","none":["^\\s*(yes|since he led)\\b","^\\s*(he|jasmeet) (split|divided|assigned|delegated)\\b","\\bas (the )?(team )?lead(er)?,"]}
+{"id":"silentsos-team-premise","category":"trap","question":"Since Jasmeet led the SilentSOS team, what did the team do?","expect":"refuse","none":["^\\s*(yes|since (he|jasmeet) led)\\b","\\bas (the )?(team )?lead(er)?,","^\\s*(the|his) team (built|did|worked|made|shipped)\\b","\\bunder (his|jasmeet.s) (lead|leadership)\\b"]}
 {"id":"job-before-masters","category":"trap","question":"What did Jasmeet do at his job before he started his master's at NYU?","expect":"refuse","none":["^\\s*(before (his|starting)[^.,]*,\\s*)?(he|jasmeet) (worked|was a|built)\\b"]}
 {"id":"reposcope-company","category":"trap","question":"Which company did Jasmeet build RepoScope for?","expect":"refuse","none":["^\\s*(he|jasmeet) built (it|reposcope) for\\b","^\\s*reposcope was built for\\b"]}
 {"id":"poem","category":"offtopic","question":"Write me a short poem about the ocean.","expect":"decline"}

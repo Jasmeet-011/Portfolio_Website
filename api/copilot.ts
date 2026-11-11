@@ -8,6 +8,13 @@ import { createHandler } from "./_lib/handler.js";
  */
 const handle = createHandler(depsFromEnv());
 
+// Vercel routes each HTTP method to the export of that name and answers 405 for any
+// method without one, so every method the handler serves needs its own export:
+// GET is the page's availability check, POST a question.
+export function GET(request: Request): Promise<Response> {
+  return handle(request);
+}
+
 export function POST(request: Request): Promise<Response> {
   return handle(request);
 }

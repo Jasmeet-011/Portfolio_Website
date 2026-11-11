@@ -5,6 +5,9 @@ cd "$(dirname "$0")/.."
 
 echo "== format";  npx prettier --check .
 echo "== build";   npm run build          # theme contrast check, typecheck, vite build
+# api/ type-checked and compiled with api/tsconfig.json, the config Vercel uses, then
+# called in plain Node with Vercel's routing by method export (not the Vite dev plugin).
+echo "== api (as Vercel builds it)"; node scripts/check-api.mjs
 echo "== secrets"
 # API keys and server settings must never reach the client bundle or git. Key shapes, names,
 # and each secret's value from .env and .env.local: see scripts/check-secrets.sh. The

@@ -22,6 +22,7 @@ describe("jsonAnswerReader", () => {
       answer: "Jasmeet is based in New York.",
       sources: ["about.py#bio"],
       rest: "",
+      parsed: true,
     });
   });
 
@@ -54,16 +55,26 @@ describe("jsonAnswerReader", () => {
   });
 
   it("keeps what arrived when the reply is cut off, and cites nothing", () => {
-    const { deltas, answer, sources, rest } = feed('{"answer": "Cut off mid', 5);
+    const { deltas, answer, sources, rest, parsed } = feed('{"answer": "Cut off mid', 5);
     expect(deltas.join("")).toBe("Cut off mid");
-    expect({ answer, sources, rest }).toEqual({ answer: "Cut off mid", sources: [], rest: "" });
+    expect({ answer, sources, rest, parsed }).toEqual({
+      answer: "Cut off mid",
+      sources: [],
+      rest: "",
+      parsed: false,
+    });
   });
 
   it("returns the whole answer at finish when it never streamed", () => {
     const reader = jsonAnswerReader();
     expect(reader.push('```json\n{"answer": "Fenced."')).toBe("");
     reader.push(', "sources": []}\n```');
-    expect(reader.finish()).toEqual({ answer: "Fenced.", sources: [], rest: "Fenced." });
+    expect(reader.finish()).toEqual({
+      answer: "Fenced.",
+      sources: [],
+      rest: "Fenced.",
+      parsed: true,
+    });
   });
 
   it("drops non-string sources", () => {

@@ -7,7 +7,10 @@ import {
   UNAVAILABLE_MESSAGE,
   type Deps,
 } from "./handler";
+import { limiterKey } from "./ip";
 import { memoryCounter, memoryLimiter, pacificDayLimiter } from "./limits";
+import type { FailureLog } from "./log";
+import type { Provider } from "./provider/types";
 import { DECLINE } from "./prompt";
 import type { StreamEvent } from "./protocol";
 import { defaultEvents, fakeProvider } from "./provider/fake";
@@ -233,10 +236,11 @@ describe("provider quota errors", () => {
   it("a used-up daily quota reads as done for today and stops calls until midnight Pacific", async () => {
     const { handle, provider, latch } = failingWith(new ProviderError("daily_quota", "raw"));
     const stream = await events(await handle(post(ask)));
-    expect(stream.find((e) => e.type === "error")).toEqual({
+    expect(stream.find((e) => e.type === "error")).toMatchObject({
       type: "error",
       code: "daily_cap",
       message: DAILY_MESSAGE,
+      quota: { limit: 10, remaining: 10 },
     });
     // 2026-10-20 12:00 UTC is 05:00 PDT; the quota resets at 2026-10-21 00:00 PDT.
     expect(await latch.until()).toBe(Date.UTC(2026, 9, 21, 7));
@@ -252,14 +256,17 @@ describe("provider quota errors", () => {
   });
 
   it("a per-minute limit reads as busy and sets no latch", async () => {
-    const { handle, latch } = failingWith(new ProviderError("busy", "raw"));
+    const { handle, latch, provider } = failingWith(new ProviderError("busy", "raw"));
     const stream = await events(await handle(post(ask)));
-    expect(stream.find((e) => e.type === "error")).toEqual({
+    expect(stream.find((e) => e.type === "error")).toMatchObject({
       type: "error",
       code: "busy",
       message: BUSY_MESSAGE,
+      quota: { limit: 10, remaining: 10 },
     });
     expect(await latch.until()).toBeNull();
+    // Retrying a per-minute limit straight away would only hit it again.
+    expect(provider.calls).toHaveLength(0);
   });
 
   it("never sends the provider's own error text", async () => {
@@ -269,6 +276,181 @@ describe("provider quota errors", () => {
     expect(text).toContain('"code":"upstream"');
   });
 });
+
+describe("failures", () => {
+  const usage = { inputTokens: 100, outputTokens: 20, cacheReadTokens: 80, cacheWriteTokens: 0 };
+
+  /** A provider whose nth call plays script[n]: events, then an optional error. */
+  function scripted(script: { events?: ProviderEvent[]; error?: Error }[]): Provider & {
+    calls: number;
+  } {
+    const p = {
+      model: "fake-model",
+      effort: null,
+      thinking: "off",
+      calls: 0,
+      async *stream() {
+        const step = script[Math.min(p.calls, script.length - 1)] ?? {};
+        p.calls++;
+        for (const event of step.events ?? []) yield event;
+        if (step.error) throw step.error;
+      },
+    };
+    return p;
+  }
+
+  function withLogs(overrides: Partial<Deps> = {}) {
+    const logs: { level: string; entry: FailureLog }[] = [];
+    const perIp = memoryLimiter(10, "1 h", () => NOW);
+    const s = setup({
+      perIp,
+      failures: (level, entry) => logs.push({ level, entry }),
+      ...overrides,
+    });
+    return { ...s, logs, perIp };
+  }
+
+  const dropped = () =>
+    new ProviderError("upstream", "Gemini failed: Incomplete JSON segment at the end", {
+      errorType: "Error",
+      status: null,
+      streamed: true,
+    });
+
+  it("retries once when the stream drops, and resets the words that already streamed", async () => {
+    const provider = scripted([
+      { events: [{ type: "text", text: "Jasmeet built half an" }], error: dropped() },
+      { events: defaultEvents() },
+    ]);
+    const { handle, logs } = withLogs({ provider });
+    const stream = await events(await handle(post(ask)));
+    expect(stream.map((e) => e.type)).toEqual([
+      "meta",
+      "text",
+      "reset",
+      "text",
+      "citation",
+      "done",
+    ]);
+    expect(provider.calls).toBe(2);
+    expect(logs).toHaveLength(1);
+    expect(logs[0]).toMatchObject({
+      level: "error",
+      entry: {
+        stage: "provider_stream",
+        code: "upstream",
+        errorType: "Error",
+        providerStatus: null,
+        attempt: 1,
+        retrying: true,
+        streamed: true,
+        model: "fake-model",
+      },
+    });
+    expect(typeof logs[0]?.entry.durationMs).toBe("number");
+  });
+
+  it("retries without a reset when nothing had streamed", async () => {
+    const provider = scripted([
+      { error: new ProviderError("overloaded", "Gemini is overloaded", { status: 503 }) },
+      { events: defaultEvents() },
+    ]);
+    const { handle, logs } = withLogs({ provider });
+    const stream = await events(await handle(post(ask)));
+    expect(stream.map((e) => e.type)).toEqual(["meta", "text", "citation", "done"]);
+    expect(logs[0]?.entry).toMatchObject({ code: "overloaded", providerStatus: 503 });
+  });
+
+  it("gives up after one retry, says so plainly, and doesn't count the question", async () => {
+    const provider = scripted([
+      { events: [{ type: "text", text: "Half" }], error: dropped() },
+      { events: [{ type: "text", text: "Half again" }], error: dropped() },
+    ]);
+    const { handle, logs, perIp } = withLogs({ provider });
+    const stream = await events(await handle(post(ask)));
+    expect(stream.map((e) => e.type)).toEqual(["meta", "text", "reset", "text", "error"]);
+    expect(stream.at(-1)).toMatchObject({
+      code: "upstream",
+      quota: { limit: 10, remaining: 10 },
+    });
+    expect(provider.calls).toBe(2);
+    expect(logs.map((l) => [l.entry.attempt, l.entry.retrying])).toEqual([
+      [1, true],
+      [2, false],
+    ]);
+    expect((await perIp.peek(await visitorKey())).remaining).toBe(10);
+  });
+
+  it("treats any unexpected error as upstream, and retries it once", async () => {
+    const provider = scripted([
+      { error: new TypeError("fetch failed") },
+      { events: defaultEvents() },
+    ]);
+    const { handle, logs } = withLogs({ provider });
+    const stream = await events(await handle(post(ask)));
+    expect(stream.at(-1)?.type).toBe("done");
+    expect(logs[0]?.entry).toMatchObject({ code: "upstream", errorType: "TypeError" });
+  });
+
+  it("doesn't retry when the site's per-minute limit has no room", async () => {
+    const provider = scripted([{ error: dropped() }, { events: defaultEvents() }]);
+    const { handle, logs } = withLogs({ provider, perMinute: memoryLimiter(1, "1 m", () => NOW) });
+    const stream = await events(await handle(post(ask)));
+    expect(stream.at(-1)).toMatchObject({ type: "error", code: "upstream" });
+    expect(provider.calls).toBe(1);
+    expect(logs[0]?.entry.retrying).toBe(false);
+  });
+
+  it("a limit that turns a question away after the hourly count gives it back", async () => {
+    const { handle, perIp, logs } = withLogs({ perMinute: memoryLimiter(0, "1 m", () => NOW) });
+    const response = await handle(post(ask));
+    expect(response.status).toBe(429);
+    expect(await response.json()).toMatchObject({ code: "busy", quota: { remaining: 10 } });
+    expect((await perIp.peek(await visitorKey())).remaining).toBe(10);
+    expect(logs[0]).toMatchObject({ level: "warn", entry: { stage: "limit", code: "busy" } });
+  });
+
+  it("an answered question still counts", async () => {
+    const { handle, perIp } = withLogs();
+    await events(await handle(post(ask)));
+    expect((await perIp.peek(await visitorKey())).remaining).toBe(9);
+  });
+
+  it("logs a JSON reply that didn't parse, and still answers with what arrived", async () => {
+    const provider = scripted([
+      {
+        events: [
+          { type: "text", text: "Jasmeet built" },
+          { type: "end", stopReason: "max_tokens", usage, jsonError: true },
+        ],
+      },
+    ]);
+    const { handle, logs } = withLogs({ provider });
+    const stream = await events(await handle(post(ask)));
+    expect(stream.at(-1)?.type).toBe("done");
+    expect(logs[0]).toMatchObject({
+      level: "warn",
+      entry: { stage: "json_parse", code: "cut_off", inputTokens: 180, outputTokens: 20 },
+    });
+  });
+
+  it("logs validation failures, and no log ever holds the question, the IP or the salt", async () => {
+    const provider = scripted([{ error: dropped() }]);
+    const { handle, logs } = withLogs({ provider });
+    await handle(post("{not json"));
+    await handle(post({ question: "x".repeat(501) }));
+    await events(await handle(post(ask)));
+    expect(logs.filter((l) => l.entry.stage === "validation")).toHaveLength(2);
+    const all = JSON.stringify(logs);
+    expect(all).not.toContain("AgentGuard");
+    expect(all).not.toContain("xxxxxxxxxx");
+    expect(all).not.toContain("203.0.113.7");
+    expect(all).not.toContain("test-salt");
+  });
+});
+
+/** The limiter key the handler uses for the default test IP. */
+const visitorKey = () => limiterKey("203.0.113.7", "test-salt");
 
 describe("suggested questions", () => {
   it("caches a chip answer: repeats cost nothing and use no hourly question", async () => {

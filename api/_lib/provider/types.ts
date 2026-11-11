@@ -38,6 +38,8 @@ export type ProviderEvent =
       usage: ProviderUsage;
       /** Sources the model named that aren't real chunk ids: dropped, never cited. */
       unknownSources?: string[];
+      /** The reply wasn't valid JSON (providers that answer in JSON): logged, not shown. */
+      jsonError?: boolean;
     };
 
 export interface Provider {
@@ -57,15 +59,37 @@ export interface ProviderConfig {
 }
 
 /**
- * A provider failure the handler tells visitors about in plain words: the provider's
- * daily quota is used up, or it's briefly rate limiting (per minute).
+ * daily_quota: the provider's daily quota is used up. busy: it's rate limiting this
+ * minute. overloaded: it's short of capacity (Gemini's 503 "high demand"). upstream:
+ * anything else that went wrong talking to it, such as a stream closed early or a
+ * timeout. Overloaded and upstream failures are worth one retry; the others aren't.
  */
+export type ProviderErrorKind = "daily_quota" | "busy" | "overloaded" | "upstream";
+
+/** What the server logs about a provider failure. Never the question, a key or an IP. */
+export interface ProviderFailureDetail {
+  /** The provider's HTTP status, when it answered with one. */
+  status?: number | null;
+  /** The underlying error's name, e.g. ApiError, AbortError, Error. */
+  errorType?: string;
+  /** Tokens the provider reported before it failed, if it got that far. */
+  usage?: Partial<ProviderUsage>;
+  /** Whether any answer text had streamed before the failure. */
+  streamed?: boolean;
+}
+
+/** A provider failure the handler tells visitors about in plain words. */
 export class ProviderError extends Error {
   constructor(
-    readonly kind: "daily_quota" | "busy",
+    readonly kind: ProviderErrorKind,
     message: string,
+    readonly detail: ProviderFailureDetail = {},
   ) {
     super(message);
     this.name = "ProviderError";
+  }
+
+  get retryable(): boolean {
+    return this.kind === "overloaded" || this.kind === "upstream";
   }
 }

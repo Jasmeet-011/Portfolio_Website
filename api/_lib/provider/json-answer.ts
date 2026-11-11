@@ -82,7 +82,7 @@ export function jsonAnswerReader() {
       return text;
     },
 
-    finish(): JsonAnswer & { rest: string } {
+    finish(): JsonAnswer & { rest: string; parsed: boolean } {
       try {
         // JSON mode returns a bare object; the slice also forgives a stray code fence.
         const parsed = JSON.parse(
@@ -96,10 +96,11 @@ export function jsonAnswerReader() {
           answer,
           sources,
           rest: answer.startsWith(emitted) ? answer.slice(emitted.length) : "",
+          parsed: true,
         };
       } catch {
         // Cut off (the output token cap): keep the words that arrived, cite nothing.
-        return { answer: emitted, sources: [], rest: "" };
+        return { answer: emitted, sources: [], rest: "", parsed: false };
       }
     },
   };

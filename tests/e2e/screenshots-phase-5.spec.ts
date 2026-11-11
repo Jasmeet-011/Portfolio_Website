@@ -59,6 +59,13 @@ async function mockAnswer(page: Page) {
 
 async function open(page: Page, viewport: { width: number; height: number }) {
   await page.setViewportSize(viewport);
+  // The availability check says configured; questions fall through to each test's mock
+  // (Playwright runs the most recently registered route first).
+  await page.route("**/api/copilot", (route) =>
+    route.request().method() === "GET"
+      ? route.fulfill({ status: 200, contentType: "application/json", body: '{"available":true}' })
+      : route.fallback(),
+  );
   await page.goto("/");
   await expect(page.getByRole("tab", { name: "Welcome" })).toBeVisible();
   await page.evaluate(() => document.fonts.ready);

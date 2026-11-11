@@ -8,6 +8,8 @@ export interface Limiter {
   limit(id: string): Promise<{ success: boolean; limit: number; remaining: number; reset: number }>;
   /** What is left, without counting a hit. */
   peek(id: string): Promise<{ limit: number; remaining: number; reset: number }>;
+  /** Gives back one hit counted by `limit`, for a request that failed. */
+  refund(id: string): Promise<void>;
 }
 
 export const LIMIT_DEFAULTS = {
@@ -54,6 +56,10 @@ export function upstashLimiter(
       const r = await ratelimit.getRemaining(id);
       return { limit, remaining: r.remaining, reset: r.reset };
     },
+    async refund(id) {
+      // A negative rate gives a hit back without checking the limit (sliding window).
+      await ratelimit.limit(id, { rate: -1 });
+    },
   };
 }
 
@@ -78,6 +84,10 @@ export function memoryLimiter(limit: number, window: Window, now = () => Date.no
     async peek(id) {
       const entry = current(id);
       return { limit, remaining: Math.max(0, limit - entry.count), reset: entry.start + size };
+    },
+    async refund(id) {
+      const entry = current(id);
+      if (entry.count > 0) counts.set(id, { start: entry.start, count: entry.count - 1 });
     },
   };
 }
@@ -124,6 +134,7 @@ export function pacificDay(now: number): { key: string; resetAt: number } {
 /** Counts per key with an expiry: Redis INCR in production, a Map locally. */
 export interface Counter {
   incr(key: string, ttlSeconds: number): Promise<number>;
+  decr(key: string): Promise<void>;
   get(key: string): Promise<number>;
 }
 
@@ -137,6 +148,9 @@ export function redisCounter(redis: Redis): Counter {
         .exec<[number, number]>();
       return count;
     },
+    async decr(key) {
+      await redis.decr(key);
+    },
     get: async (key) => Number((await redis.get<number>(key)) ?? 0),
   };
 }
@@ -148,6 +162,9 @@ export function memoryCounter(): Counter {
       const count = (counts.get(key) ?? 0) + 1;
       counts.set(key, count);
       return count;
+    },
+    async decr(key) {
+      counts.set(key, Math.max(0, (counts.get(key) ?? 0) - 1));
     },
     get: async (key) => counts.get(key) ?? 0,
   };
@@ -172,6 +189,9 @@ export function pacificDayLimiter(
     async peek(id) {
       const { key, reset } = keyOf(id);
       return { limit, remaining: Math.max(0, limit - (await counter.get(key))), reset };
+    },
+    async refund(id) {
+      await counter.decr(keyOf(id).key);
     },
   };
 }

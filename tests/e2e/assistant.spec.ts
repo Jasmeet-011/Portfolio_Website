@@ -44,17 +44,27 @@ const UNAVAILABLE_MESSAGE =
 const sse = (events: StreamEvent[]) => events.map((e) => `data: ${JSON.stringify(e)}\n\n`).join("");
 
 /** Answers the page's availability check, then every question with `reply`. */
-async function mock(page: Page, reply: (route: Route) => Promise<void>, available = true) {
+/**
+ * Answers the page's availability check (configured, not configured, or a check that
+ * fails with 405 like a server without a GET export), then every question with `reply`.
+ */
+async function mock(
+  page: Page,
+  reply: (route: Route) => Promise<void>,
+  available: boolean | "405" = true,
+) {
   const bodies: unknown[] = [];
   await page.route("**/api/copilot", async (route) => {
     if (route.request().method() === "GET")
-      return route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(
-          available ? { available: true } : { available: false, message: UNAVAILABLE_MESSAGE },
-        ),
-      });
+      return available === "405"
+        ? route.fulfill({ status: 405, body: "" })
+        : route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify(
+              available ? { available: true } : { available: false, message: UNAVAILABLE_MESSAGE },
+            ),
+          });
     bodies.push(route.request().postDataJSON());
     await reply(route);
   });
@@ -216,6 +226,76 @@ test.describe("desktop", () => {
     await expect(panel(page).getByRole("button", { name: /AgentGuard/ })).toBeDisabled();
     await expect(panel(page).getByRole("button", { name: "Send" })).toBeDisabled();
     expect(bodies).toEqual([]);
+  });
+
+  test("an availability check that fails never shows the assistant as available", async ({
+    page,
+  }) => {
+    const bodies = await mock(page, answerWith(ANSWER), "405");
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: "Assistant: unavailable" })).toBeVisible();
+    await page.getByRole("button", { name: "Assistant: unavailable" }).click();
+    await expect(panel(page).getByRole("status")).toContainText("can't be reached right now");
+    await expect(panel(page).getByRole("button", { name: /AgentGuard/ })).toBeDisabled();
+    expect(bodies).toEqual([]);
+  });
+
+  test("a restarted answer drops the words that streamed before the restart", async ({ page }) => {
+    const meta = ANSWER[0] as StreamEvent;
+    const done = ANSWER.at(-1) as StreamEvent;
+    await mock(
+      page,
+      answerWith([
+        meta,
+        { type: "text", text: "A half-finished first try" },
+        { type: "reset" },
+        { type: "text", text: "The complete second answer." },
+        { type: "citation", chunkId: "projects/agentguard.py#built" },
+        done,
+      ]),
+    );
+    await page.goto("/");
+    await page.getByRole("button", { name: "Assistant", exact: true }).click();
+    await input(page).fill("What did Jasmeet build?");
+    await input(page).press("Enter");
+    await expect(panel(page)).toContainText("The complete second answer.");
+    await expect(panel(page)).not.toContainText("half-finished");
+    await expect(panel(page).getByRole("list", { name: "Sources" })).toBeVisible();
+  });
+
+  test("a stream that fails after some words shows only the error, in the panel and the terminal", async ({
+    page,
+  }) => {
+    const meta = ANSWER[0] as StreamEvent;
+    const failed: StreamEvent[] = [
+      meta,
+      { type: "text", text: "A half-finished answer" },
+      {
+        type: "error",
+        code: "upstream",
+        message: "The assistant couldn't answer just now. Please try again in a moment.",
+        quota: { limit: 10, remaining: 10, resetAt: Date.now() + 3_600_000 },
+      },
+    ];
+    await mock(page, answerWith(failed));
+    await page.goto("/");
+    await expect(page.getByRole("tab", { name: "Welcome" })).toBeVisible();
+
+    await page.keyboard.press("Control+Backquote");
+    const terminal = page.getByRole("textbox", { name: "Terminal input" });
+    await terminal.fill('ask "What did Jasmeet build?"');
+    await terminal.press("Enter");
+    const output = page.getByRole("log", { name: "Terminal output" });
+    await expect(output).toContainText("ask: The assistant couldn't answer just now.");
+    await expect(output).not.toContainText("half-finished");
+
+    await page.getByRole("button", { name: "Assistant", exact: true }).click();
+    await input(page).fill("What did Jasmeet build?");
+    await input(page).press("Enter");
+    await expect(panel(page).getByRole("alert")).toContainText("couldn't answer just now");
+    await expect(panel(page)).not.toContainText("half-finished");
+    // The failure didn't count: the allowance shown is the full hour.
+    await expect(panel(page)).toContainText("10 of 10 questions left this hour");
   });
 
   test("the daily cap points to the files", async ({ page }) => {

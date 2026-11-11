@@ -7,7 +7,7 @@ import { useWorkspace } from "@/store/workspace";
 import { useRevealFolder } from "@/workspace/navigation";
 import { buildSuggestions } from "./context";
 import { blocks, chunkById, type Inline } from "./format";
-import { useAssistant, type Message, type Notice } from "./store";
+import { loadAvailability, useAssistant, type Message, type Notice } from "./store";
 
 export type PanelMode = "split" | "overlay" | "sheet";
 
@@ -168,6 +168,11 @@ export function AssistantPanel({ mode }: { mode: PanelMode }) {
   const [draft, setDraft] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+
+  // If the check on page load got no answer, opening the panel asks again.
+  useEffect(() => {
+    void loadAvailability();
+  }, []);
 
   useEffect(() => {
     if (focus?.target === "assistant" && useWorkspace.getState().takeFocus("assistant"))

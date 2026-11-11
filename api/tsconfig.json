@@ -1,0 +1,25 @@
+{
+  // The config Vercel compiles api/ with. Its Node builder looks for a tsconfig.json from
+  // the function's directory upward, so this one wins over the root's, which has no
+  // compilerOptions (Vercel then fell back to ES2021, without Object.hasOwn). It emits, so
+  // it uses Node's own module resolution. `scripts/check-api.mjs` type-checks and builds
+  // api/ with exactly this file in the gate.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "noEmitOnError": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["**/*.test.ts"]
+}

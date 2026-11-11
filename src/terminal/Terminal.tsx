@@ -64,7 +64,15 @@ function askInTerminal(question: string) {
   void runAssistant(
     { question },
     { question, chip: false, source: "terminal" },
-    { onText: (text) => useTerminal.getState().update(id, [{ text }]) },
+    {
+      // An empty text is a restart (the server asked the provider again): back to waiting.
+      onText: (text) =>
+        useTerminal
+          .getState()
+          .update(id, [
+            text ? { text } : { text: "Looking through the workspace…", tone: "muted" },
+          ]),
+    },
   ).then((result) => {
     const { update, print } = useTerminal.getState();
     if (result.error && !result.text) {
