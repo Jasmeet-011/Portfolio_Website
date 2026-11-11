@@ -1,0 +1,4 @@
+# Text files are checked out with LF on every machine, whatever core.autocrlf says, so
+# Prettier's format check (LF) passes after any checkout. Binary files are detected and
+# left alone.
+* text=auto eol=lf
